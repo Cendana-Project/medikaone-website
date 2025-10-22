@@ -20,16 +20,11 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Kolom Kanan: Carousel (Sebagai Kartu Mengambang) */}
         <div 
-          // h-screen untuk memberi batas tinggi penuh
-          // py-16 dan px-8 untuk margin di sekitar kartu
           className="hidden lg:flex relative items-center justify-center bg-primary h-screen py-16 px-8" 
         >
-          {/* Komponen LoginCarousel yang sekarang berfungsi sebagai kartu */}
-          <LoginCarousel />
+          <LoginCarousel /> 
         </div>
-        
       </div>
     </QueryClientProviderComponent>
   );

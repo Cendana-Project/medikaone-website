@@ -116,9 +116,8 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
+  /* Removed universal border on all elements. That rule added visible borders
+     behind many layout elements (headings, containers). Keep body styles here. */
   body {
     @apply bg-background text-foreground;
   }
