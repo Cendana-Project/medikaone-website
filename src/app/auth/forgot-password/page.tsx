@@ -9,10 +9,10 @@ import { ArrowLeft } from "lucide-react";
 export default function Login() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-white">
-            <div className="w-1/2 flex flex-col items-center justify-center p-14 gap-8">
+            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-4 lg:p-14 gap-8">
                 <Button type="submit" className="bg-[#2F907F] py-6 text-base">
                     <Link href="/auth/login" className="flex items-center gap-2 text-white font-medium">
-                        <ArrowLeft w-4 h-4 />
+                        <ArrowLeft className="w-4 h-4" />
                         Kembali
                     </Link>
                 </Button>

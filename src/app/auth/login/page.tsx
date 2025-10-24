@@ -9,7 +9,7 @@ import AuthCarousel from "@/components/auth/authCarousel";
 export default function Login() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-white">
-            <div className="w-1/2 flex flex-col items-center justify-center p-14 gap-8">
+            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-4 lg:p-14 gap-8">
                 <div className="text-center space-y-5 text-[#212121]">
                     <h1 className="text-4xl font-bold">Masuk Ke Akun Anda</h1>
                     <p className="w-full text-lg max-w-lg">

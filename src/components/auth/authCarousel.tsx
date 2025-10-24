@@ -24,7 +24,7 @@ export default function AuthCarousel() {
     }, [api]);
 
     return (
-        <div className="w-1/2 relative p-4">
+        <div className="hidden xl:block lg:w-1/2 relative p-4">
             <div className="relative w-full overflow-hidden rounded-2xl">
                 <Carousel
                     setApi={setApi}
@@ -40,7 +40,7 @@ export default function AuthCarousel() {
                                 src="/auth/bg1.png"
                                 alt="Doctor Picture"
                                 fill
-                                className="object-cover object-center"
+                                className="object-contain xl:object-cover object-center"
                                 />
                             </div>
                         </CarouselItem>
@@ -51,18 +51,18 @@ export default function AuthCarousel() {
                                 src="/auth/bg2.png"
                                 alt="Picture 2"
                                 fill
-                                className="object-cover object-center"
+                                className="object-contain xl:object-cover object-center"
                                 />
                             </div>
                         </CarouselItem>
                     </CarouselContent>
                 </Carousel>
 
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[90%] bg-white rounded-2xl shadow-lg py-12 px-8 gap-8 text-center">
-                    <h3 className="font-semibold text-lg text-black">
+                <div className="absolute xl:bottom-5 left-1/2 -translate-x-1/2 w-[90%] bg-white rounded-2xl shadow-lg py-4 xl:py-12 px-8 gap-8 text-center">
+                    <h3 className="font-semibold text-base xl:text-lg text-black">
                         🩺 Buat Perjanjian Secara Online
                     </h3>
-                    <p className="text-gray-600 text-base leading-relaxed">
+                    <p className="text-gray-600 text-sm xl:text-base leading-relaxed">
                         Buat perjanjian dengan lebih cepat, mudah, dan efisien bersama
                         MedicalOne—solusi terbaik untuk mengatur jadwal medis Anda kapan
                         saja dan di mana saja. Nikmati kemudahan akses, tanpa repot, dengan
