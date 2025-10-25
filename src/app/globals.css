@@ -118,3 +118,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media (max-height: 700px){
+  .slide-image{
+    bottom: 0.5rem;
+  }
+}
