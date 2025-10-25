@@ -24,7 +24,7 @@ export default function AuthCarousel() {
     }, [api]);
 
     return (
-        <div className="hidden xl:block lg:w-1/2 relative p-4">
+        <div className="hidden lg:block lg:w-1/2 relative p-4">
             <div className="relative w-full overflow-hidden rounded-2xl">
                 <Carousel
                     setApi={setApi}
@@ -57,8 +57,7 @@ export default function AuthCarousel() {
                         </CarouselItem>
                     </CarouselContent>
                 </Carousel>
-
-                <div className="absolute xl:bottom-5 left-1/2 -translate-x-1/2 w-[90%] bg-white rounded-2xl shadow-lg py-4 xl:py-12 px-8 gap-8 text-center">
+                <div className="absolute lg:bottom-16 xl:bottom-6 left-1/2 -translate-x-1/2 w-[85%] xl:w-[90%] bg-white rounded-2xl shadow-lg py-4 xl:py-12 lg:px-6 gap-8 text-center slide-image">
                     <h3 className="font-semibold text-base xl:text-lg text-black">
                         🩺 Buat Perjanjian Secara Online
                     </h3>
