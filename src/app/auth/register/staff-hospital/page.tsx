@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import AuthCarousel from "@/components/auth/authCarousel";
 
-export default function Login() {
+export default function Register() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-white">
             <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-4 lg:p-14 gap-8">
