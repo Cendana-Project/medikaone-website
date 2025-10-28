@@ -10,7 +10,7 @@ export default function Login() {
     const handleLogout = () => {
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken");
-        router.push("/login");
+        router.push("/auth/login");
     };
     return (
         <div className="flex flex-col gap-6 min-h-screen items-center justify-center bg-white">
@@ -22,7 +22,7 @@ export default function Login() {
                 </Button>
 
                 <Button className="bg-[#2F907F] py-6 text-base">
-                    <Link href={"/auth/register/admin-hospital"}>
+                    <Link href={"/auth/register/staff-hospital"}>
                         Register Staff Hospital
                     </Link>
                 </Button>
