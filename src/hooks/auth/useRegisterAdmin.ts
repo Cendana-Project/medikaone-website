@@ -6,6 +6,7 @@ import { RegisterHospitalAdminRequest } from "@/types/auth";
 
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 
 type RegisterAdminPayload = RegisterHospitalAdminRequest & { hospitalId: string };
 
@@ -21,7 +22,7 @@ export const useRegisterAdmin = () => {
             // router.push("/dashboard/admins");
         },
 
-        onError: (error: any) => {
+        onError: (error: AxiosError<{ message: string }>) => {
             const message =
                 error.response?.data?.message || "Gagal mendaftarkan admin rumah sakit.";
             toast.error(message);

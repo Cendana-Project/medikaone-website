@@ -49,7 +49,7 @@ export default function Login() {
                         <Input
                             type="email"
                             id="email"
-                            placeholder="Enter your email"
+                            placeholder="Masukkan Email Kamu"
                             {...register("identifier")}
                             className="py-6 placeholder:text-[#616161]"
                         />
@@ -97,7 +97,7 @@ export default function Login() {
                         <Input
                             type="text"
                             id="hospital_code"
-                            placeholder="Enter Hospital Code"
+                            placeholder="Masukkan Kode Rumah Sakit"
                             {...register("hospital_code")}
                             className="py-6 placeholder:text-[#616161]"
                         />

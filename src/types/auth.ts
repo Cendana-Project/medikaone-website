@@ -45,3 +45,13 @@ export type RegisterStaffForm = RegisterStaffRequest & {
     hospitalId: string;
     confirmPassword: string;
 };
+
+export type forgetPasswordRequest = {
+    email: string;
+}
+
+export type changePasswordRequest = {
+    email: string;
+    pin: string;
+    new_password: string;
+}

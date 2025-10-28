@@ -14,7 +14,7 @@ import AuthCarousel from "@/components/auth/authCarousel";
 import { useLoginSuperAdmin } from "@/hooks/auth/useLoginSuperAdmin";
 import { loginSuperAdmin } from "@/validation/auth/loginSchema";
 
-export default function Login() {
+export default function LoginAdmin() {
     const [showPassword, setShowPassword] = useState(false);
     const { mutate, isPending } = useLoginSuperAdmin();
     const { 
@@ -49,7 +49,7 @@ export default function Login() {
                         <Input
                             type="email"
                             id="email"
-                            placeholder="Enter your email"
+                            placeholder="Masukkan Email Kamu"
                             {...register("identity")}
                             className="py-6 placeholder:text-[#616161]"
                         />

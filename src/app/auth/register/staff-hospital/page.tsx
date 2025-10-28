@@ -22,7 +22,7 @@ import { registerStaffSchema } from "@/validation/auth/registerStaffHospitalSche
 import { RegisterStaffForm } from "@/types/auth";
 import { useRegisterStaffHospital } from "@/hooks/auth/useRegisterStaffHospital";
 
-export default function Register() {
+export default function RegisterStaffPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
 
@@ -129,13 +129,14 @@ export default function Register() {
                                 {...register("password")}
                                 className="py-6 placeholder:text-[#616161]"
                             />
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
                             >
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </button>
+                            </Button>
                         </div>
                         {errors.password && (
                             <p className="text-red-500 text-sm">{errors.password.message}</p>
@@ -154,13 +155,14 @@ export default function Register() {
                                 {...register("confirmPassword")}
                                 className="py-6 placeholder:text-[#616161]"
                             />
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
                                 onClick={() => setShowConfirm(!showConfirm)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 z-10 overflow-visible"
                             >
                                 {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </button>
+                            </Button>
                         </div>
                         {errors.confirmPassword && (
                             <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>

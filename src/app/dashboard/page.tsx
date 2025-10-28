@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
-export default function Login() {
+export default function Dashboard() {
     const router = useRouter();
     const handleLogout = () => {
         Cookies.remove("accessToken");

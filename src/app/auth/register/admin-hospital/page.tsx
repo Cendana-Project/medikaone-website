@@ -22,6 +22,8 @@ import { registerAdminSchema } from "@/validation/auth/registerAdminHospitalSche
 
 export default function RegisterAdminPage() {
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+
     const { mutate, isPending } = useRegisterAdmin();
 
     const {
@@ -83,12 +85,13 @@ export default function RegisterAdminPage() {
                                 id="password"
                                 placeholder="Masukkan password kamu"
                                 {...register("password")}
+                                className="py-6 placeholder:text-[#616161]"
                             />
                             <Button
                                 type="button"
                                 variant="ghost"
                                 onClick={() => setShowPassword((prev) => !prev)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
                                 aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
                             >
                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -98,8 +101,27 @@ export default function RegisterAdminPage() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="confirmPassword" className="text-base font-semibold text-[#212121]">Konfirmasi Password</Label>
-                        <Input type="password" id="confirmPassword" placeholder="Ulangi password" {...register("confirmPassword")} />
+                        <Label htmlFor="confirmPassword" className="text-base font-semibold text-[#212121]">
+                            Konfirmasi Password
+                        </Label>
+                        <div className="relative">
+                            <Input
+                                type={showConfirm ? "text" : "password"}
+                                id="confirmPassword"
+                                placeholder="Ulangi password"
+                                {...register("confirmPassword")}
+                                className="py-6 placeholder:text-[#616161]"
+                            />
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => setShowConfirm((prev) => !prev)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                                aria-label={showConfirm ? "Sembunyikan password" : "Tampilkan password"}
+                            >
+                                {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </Button>
+                        </div>
                         {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
                     </div>
 

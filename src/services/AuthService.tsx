@@ -1,7 +1,7 @@
 import api from "@/lib/api";
 import { safeRequest } from "@/app/utils/safeRequest";
 import Cookies from "js-cookie";
-import { LoginHospitalRequest, LoginRequest, RegisterHospitalAdminRequest, RegisterStaffRequest } from "@/types/auth";
+import { forgetPasswordRequest, LoginHospitalRequest, LoginRequest, RegisterHospitalAdminRequest, RegisterStaffRequest } from "@/types/auth";
 
 export const loginHospital = async (payload: LoginHospitalRequest) => {
     return safeRequest(async () => {
@@ -55,8 +55,6 @@ export const registerStaff = async (payload: RegisterStaffRequest, hospital_id: 
             payload
         );
 
-        console.log(response);
-
         return response.data;
     });
 }
@@ -72,8 +70,26 @@ export const registerAdmin = async (payload: RegisterHospitalAdminRequest, hospi
             }
         );
 
-        console.log(response);
-
         return response.data;
     });
 }
+
+export const forgotPassword = async (payload: forgetPasswordRequest) => {
+    return safeRequest(async () => {
+        const response = await api.post("/auth/password/forgot",
+            payload
+        );
+        
+        return response.data;
+    });
+};
+
+export const changePassword = async (payload: forgetPasswordRequest) => {
+    return safeRequest(async () => {
+        const response = await api.post("/auth/password/reset", 
+            payload
+        );
+            
+        return response.data;
+    });
+};

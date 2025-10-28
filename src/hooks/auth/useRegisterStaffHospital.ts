@@ -4,12 +4,13 @@ import { useMutation } from "@tanstack/react-query";
 import { registerStaff } from "@/services/AuthService";
 import { RegisterStaffRequest } from "@/types/auth";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
+// import { useRouter } from "next/navigation";
 
 type RegisterStaffPayload = RegisterStaffRequest & { hospitalId: string };
 
 export const useRegisterStaffHospital = () => {
-    const router = useRouter();
+    // const router = useRouter();
 
     return useMutation({
         mutationFn: ({ hospitalId, ...payload }: RegisterStaffPayload) =>
@@ -20,7 +21,7 @@ export const useRegisterStaffHospital = () => {
             // router.push("/dashboard/staff");
         },
 
-        onError: (error: any) => {
+        onError: (error: AxiosError<{ message: string }>) => {
             const message =
                 error.response?.data?.message || "Gagal mendaftarkan staff rumah sakit.";
             toast.error(message);
