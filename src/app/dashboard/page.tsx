@@ -13,27 +13,30 @@ export default function Dashboard() {
         router.push("/auth/login");
     };
     return (
-        <div className="flex flex-col gap-6 min-h-screen items-center justify-center bg-white">
-            <div className="flex gap-4">
-                <Button className="bg-[#2F907F] py-6 text-base">
-                    <Link href={"/auth/register/admin-hospital"}>
-                        Register Admin Hospital
-                    </Link>
-                </Button>
+        <div className="flex items-center justify-center gap-6 min-h-screen w-full bg-white">
+            <div className="flex flex-col items-center justify-center gap-4">
+                <div className="flex gap-4">
+                    <Button className="bg-[#2F907F] py-6 text-base">
+                        <Link href={"/auth/register/admin-hospital"}>
+                            Register Admin Hospital
+                        </Link>
+                    </Button>
 
-                <Button className="bg-[#2F907F] py-6 text-base">
-                    <Link href={"/auth/register/staff-hospital"}>
-                        Register Staff Hospital
-                    </Link>
+                    <Button className="bg-[#2F907F] py-6 text-base">
+                        <Link href={"/auth/register/staff-hospital"}>
+                            Register Staff Hospital
+                        </Link>
+                    </Button>
+                </div>
+                <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="text-[#2F907F] border-[#2F907F] hover:bg-[#2F907F] hover:text-white transition-colors"
+                >
+                    Logout
                 </Button>
             </div>
-            <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="text-[#2F907F] border-[#2F907F] hover:bg-[#2F907F] hover:text-white transition-colors"
-            >
-                Logout
-            </Button>
+            
         </div>
     );
 }
