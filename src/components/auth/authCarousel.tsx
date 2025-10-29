@@ -24,7 +24,7 @@ export default function AuthCarousel() {
     }, [api]);
 
     return (
-        <div className="hidden lg:block lg:w-1/2 relative p-4">
+        <div className="hidden xl:block xl:w-1/2 relative p-4">
             <div className="relative w-full overflow-hidden rounded-2xl">
                 <Carousel
                     setApi={setApi}

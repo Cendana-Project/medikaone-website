@@ -11,18 +11,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import AuthCarousel from "@/components/auth/authCarousel";
-import { useLoginHospital } from "@/hooks/auth/useLoginHospital";
-import { loginHospitalSchema } from "@/validation/auth/loginSchema";
+import { useLoginSuperAdmin } from "@/hooks/auth/useLoginSuperAdmin";
+import { loginSuperAdmin } from "@/validation/auth/loginSchema";
 
-export default function Login() {
+export default function LoginAdmin() {
     const [showPassword, setShowPassword] = useState(false);
-    const { mutate, isPending } = useLoginHospital();
+    const { mutate, isPending } = useLoginSuperAdmin();
     const { 
         register, 
         handleSubmit, 
         formState: { errors } 
     } = useForm({
-        resolver: yupResolver(loginHospitalSchema),
+        resolver: yupResolver(loginSuperAdmin),
     });
 
     const onSubmit = (data: any) => mutate(data);
@@ -50,7 +50,7 @@ export default function Login() {
                             type="email"
                             id="email"
                             placeholder="Masukkan Email Kamu"
-                            {...register("identifier")}
+                            {...register("identity")}
                             className="py-6 placeholder:text-[#616161]"
                         />
                     </div>
@@ -86,21 +86,6 @@ export default function Login() {
                         {errors.password && (
                             <p className="text-red-500 text-sm">{errors.password.message}</p>
                         )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <Label
-                            htmlFor="hospital_code"
-                            className="text-base font-semibold text-[#212121]"
-                        >
-                            Hospital Code
-                        </Label>
-                        <Input
-                            type="text"
-                            id="hospital_code"
-                            placeholder="Masukkan Kode Rumah Sakit"
-                            {...register("hospital_code")}
-                            className="py-6 placeholder:text-[#616161]"
-                        />
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
