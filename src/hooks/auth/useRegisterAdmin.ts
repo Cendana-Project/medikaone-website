@@ -5,13 +5,13 @@ import { registerAdmin } from "@/services/AuthService";
 import { RegisterHospitalAdminRequest } from "@/types/auth";
 
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation"; // Uncomment when navigation is needed
 import { AxiosError } from "axios";
 
 type RegisterAdminPayload = RegisterHospitalAdminRequest & { hospitalId: string };
 
 export const useRegisterAdmin = () => {
-    const router = useRouter();
+    // const router = useRouter(); // Uncomment when navigation is needed
 
     return useMutation({
         mutationFn: ({ hospitalId, ...payload }: RegisterAdminPayload) =>

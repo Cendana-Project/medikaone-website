@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import AuthCarousel from "@/components/auth/authCarousel";
 import { useLoginSuperAdmin } from "@/hooks/auth/useLoginSuperAdmin";
 import { loginSuperAdmin } from "@/validation/auth/loginSchema";
+import { LoginRequest } from "@/types/auth";
 
 export default function LoginAdmin() {
     const [showPassword, setShowPassword] = useState(false);
@@ -21,11 +22,11 @@ export default function LoginAdmin() {
         register, 
         handleSubmit, 
         formState: { errors } 
-    } = useForm({
+    } = useForm<LoginRequest>({
         resolver: yupResolver(loginSuperAdmin),
     });
 
-    const onSubmit = (data: any) => mutate(data);
+    const onSubmit = (data: LoginRequest) => mutate(data);
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-white">

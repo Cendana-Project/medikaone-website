@@ -36,6 +36,7 @@ export default function RegisterAdminPage() {
     });
 
     const onSubmit = (data: RegisterAdminForm) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { hospitalId, confirmPassword, ...payload } = data;
         mutate({ hospitalId, ...payload });
     };

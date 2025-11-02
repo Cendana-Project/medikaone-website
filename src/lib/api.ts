@@ -8,6 +8,44 @@ const api = axios.create({
     withCredentials: true,
 });
 
+// Separate axios instance for refresh token to avoid interceptor loop
+const refreshApi = axios.create({
+    baseURL: config.apiBaseUrl,
+    withCredentials: true,
+});
+
+const refreshToken = async (): Promise<void> => {
+    const refresh_token = Cookies.get("refreshToken");
+    
+    if (!refresh_token) {
+        throw new Error("No refresh token available");
+    }
+
+    try {
+        const response = await refreshApi.post("/auth/refresh", {
+            refresh_token,
+        });
+
+        const { access_token, refresh_token: newRefreshToken } = response.data.data;
+
+        Cookies.set("accessToken", access_token, {
+            expires: 7,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+        });
+
+        if (newRefreshToken) {
+            Cookies.set("refreshToken", newRefreshToken, {
+                expires: 30,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+            });
+        }
+    } catch (error) {
+        throw error;
+    }
+};
+
 api.interceptors.request.use( 
     (config) => {
         const token = Cookies.get("accessToken");

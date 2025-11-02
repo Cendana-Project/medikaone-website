@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import AuthCarousel from "@/components/auth/authCarousel";
 import { useLoginHospital } from "@/hooks/auth/useLoginHospital";
 import { loginHospitalSchema } from "@/validation/auth/loginSchema";
+import { LoginHospitalRequest } from "@/types/auth";
 
 export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -21,11 +22,11 @@ export default function Login() {
         register, 
         handleSubmit, 
         formState: { errors } 
-    } = useForm({
+    } = useForm<LoginHospitalRequest>({
         resolver: yupResolver(loginHospitalSchema),
     });
 
-    const onSubmit = (data: any) => mutate(data);
+    const onSubmit = (data: LoginHospitalRequest) => mutate(data);
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-white">
