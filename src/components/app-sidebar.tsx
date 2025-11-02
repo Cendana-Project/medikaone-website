@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { LogOut, Home, Settings, Users } from "lucide-react";
+import { LogOut } from "lucide-react";
 import {
     Sidebar,
     SidebarContent,

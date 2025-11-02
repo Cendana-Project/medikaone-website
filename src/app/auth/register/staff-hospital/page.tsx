@@ -48,7 +48,7 @@ export default function RegisterStaffPage() {
     });
 
     const onSubmit = (data: RegisterStaffForm) => {
-        const { confirmPassword, hospitalId, ...payload } = data;
+        const { confirmPassword: _confirmPassword, hospitalId, ...payload } = data;
         mutate({ hospitalId, ...payload });
     };
 

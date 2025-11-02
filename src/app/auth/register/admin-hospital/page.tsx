@@ -36,7 +36,7 @@ export default function RegisterAdminPage() {
     });
 
     const onSubmit = (data: RegisterAdminForm) => {
-        const { hospitalId, confirmPassword, ...payload } = data;
+        const { hospitalId, confirmPassword: _confirmPassword, ...payload } = data;
         mutate({ hospitalId, ...payload });
     };
 
