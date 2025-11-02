@@ -48,7 +48,8 @@ export default function RegisterStaffPage() {
     });
 
     const onSubmit = (data: RegisterStaffForm) => {
-        const { confirmPassword: _confirmPassword, hospitalId, ...payload } = data;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { confirmPassword, hospitalId, ...payload } = data;
         mutate({ hospitalId, ...payload });
     };
 
