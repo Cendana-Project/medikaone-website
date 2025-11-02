@@ -15,31 +15,33 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { sidebarMenuByRole } from "@/data/sideBarMenu";
+import { logout } from "@/services/AuthService"
 
-const mainMenus = [
-    {
-        name: "Kelola Role",
-        href: "#",
-        icon: "/sidebar/User-circle.svg",
-    },
-    {
-        name: "Kelola Doctor",
-        href: "#",
-        icon: "/sidebar/Document-report.svg",
-    },
-];
+type AppSidebarProps = {
+    role: string;   
+};
 
-const systemMenus = [
-    {
-        name: "Settings",
-        href: "#",
-        icon: "/sidebar/Cog-settings.svg",
-    },
-];
-
-export function AppSidebar() {
+export function AppSidebar({ role }: AppSidebarProps) {
+    const menuItems = sidebarMenuByRole[role] || sidebarMenuByRole.default;
     const pathname = usePathname();
+    const router = useRouter();
+
+    const mainMenus = menuItems.filter(item => item.name !== "System Setting");
+    const systemMenus = menuItems.filter(item => item.name === "System Setting");
+    
+    const handleLogout = async () => {
+        const result = await logout();
+        if (result.success) {
+            if (role === "super_admin") {
+                router.push("/auth/login/admin");
+            } else {
+                router.push("/auth/login");
+            }
+        }
+    };
+
     return (
         <Sidebar>
             <SidebarHeader className="flex items-center justify-center py-10">
@@ -63,27 +65,22 @@ export function AppSidebar() {
 
                     <SidebarMenu>
                         {mainMenus.map((menu) => {
-                        const isActive = pathname === menu.href;
+                            const isActive = pathname === menu.path;
                             return (
                                 <SidebarMenuItem key={menu.name}>
                                     <SidebarMenuButton
                                         asChild
                                         className={`flex items-center gap-3 px-4 py-6 rounded-lg text-lg ${
-                                        isActive
-                                            ? "bg-green-50 text-green-700 font-semibold"
-                                            : "text-gray-700 hover:bg-gray-100"
+                                            isActive
+                                                ? "bg-green-50 text-green-700 font-semibold"
+                                                : "text-gray-700 hover:bg-gray-100"
                                         }`}
                                     >
-                                        <Link href={menu.href}>
-                                        <div className="flex items-center gap-3">
-                                            <Image
-                                            src={menu.icon}
-                                            alt={menu.name}
-                                            width={30}
-                                            height={30}
-                                            />
-                                            <span>{menu.name}</span>
-                                        </div>
+                                        <Link href={menu.path}>
+                                            <div className="flex items-center gap-3">
+                                                {/* Kamu bisa tambahkan icon per menu kalau mau */}
+                                                <span>{menu.name}</span>
+                                            </div>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -92,51 +89,44 @@ export function AppSidebar() {
                     </SidebarMenu>
                 </SidebarGroup>
 
-                <SidebarGroup>
-                    <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase px-4 mb-2">
-                        SYSTEM
-                    </SidebarGroupLabel>
+                {systemMenus.length > 0 && (
+                    <SidebarGroup>
+                        <SidebarGroupLabel className="text-xs font-semibold text-gray-500 uppercase px-4 mb-2">
+                            SYSTEM
+                        </SidebarGroupLabel>
 
-                    <SidebarMenu>
-                        {systemMenus.map((menu) => {
-                        const isActive = pathname === menu.href;
-                            return (
-                                <SidebarMenuItem key={menu.name}>
-                                    <SidebarMenuButton
-                                        asChild
-                                        className={`flex items-center gap-3 px-4 py-6 rounded-lg text-lg ${
-                                        isActive
-                                            ? "bg-green-50 text-green-700 font-semibold"
-                                            : "text-gray-700 hover:bg-gray-100"
-                                        }`}
-                                    >
-                                        <Link href={menu.href}>
-                                        <div className="flex items-center gap-3">
-                                            <Image
-                                            src={menu.icon}
-                                            alt={menu.name}
-                                            width={30}
-                                            height={30}
-                                            />
-                                            <span>{menu.name}</span>
-                                        </div>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            );
-                        })}
-                    </SidebarMenu>
-                </SidebarGroup>
+                        <SidebarMenu>
+                            {systemMenus.map((menu) => {
+                                const isActive = pathname === menu.path;
+                                return (
+                                    <SidebarMenuItem key={menu.name}>
+                                        <SidebarMenuButton
+                                            asChild
+                                            className={`flex items-center gap-3 px-4 py-6 rounded-lg text-lg ${
+                                                isActive
+                                                    ? "bg-green-50 text-green-700 font-semibold"
+                                                    : "text-gray-700 hover:bg-gray-100"
+                                            }`}
+                                        >
+                                            <Link href={menu.path}>
+                                                <div className="flex items-center gap-3">
+                                                    <span>{menu.name}</span>
+                                                </div>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                );
+                            })}
+                        </SidebarMenu>
+                    </SidebarGroup>
+                )}
             </SidebarContent>
 
             <SidebarFooter>
                 <Button
                     variant="ghost"
                     className="w-full flex items-center justify-start gap-3 px-4 py-6 text-lg mb-6 text-[#767676] hover:text-[#464444]"
-                    onClick={() => {
-                        // handle logout logic here
-                        console.log("Logging out...");
-                    }}
+                    onClick={handleLogout}
                 >
                     <LogOut size={18} />
                     Logout
