@@ -1,42 +1,46 @@
 'use client';
 
 import Link from "next/link";
+import Image from "next/image";
+
 import { Button } from "@/components/ui/button";
-import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
+import DashboardCards from "@/components/dashboard/dashboardCards";
+import { Input } from "@/components/ui/input";
+import DashboardTable from "@/components/dashboard/dashboardTable";
+import { useState } from "react";
 
 export default function Dashboard() {
-    const router = useRouter();
-    const handleLogout = () => {
-        Cookies.remove("accessToken");
-        Cookies.remove("refreshToken");
-        router.push("/auth/login");
-    };
+    const [search, setSearch] = useState("");
+    
     return (
-        <div className="flex items-center justify-center gap-6 min-h-screen w-full bg-white">
-            <div className="flex flex-col items-center justify-center gap-4">
-                <div className="flex gap-4">
-                    <Button className="bg-[#2F907F] py-6 text-base">
+        <div className="flex flex-col items-center justify-center gap-4 min-h-screen w-full max-w-full overflow-x-hidden p-6">
+            <DashboardCards />
+            <div className="flex flex-col items-center gap-4 w-full h-screen bg-white rounded-lg border border-black/10">
+                <div className="flex items-center justify-between p-10 w-full">
+                    <Button className="bg-[#ebf8f5] border border-[#c4e9e2] py-6 text-base text-[#3bb49f]">
                         <Link href={"/auth/register/admin-hospital"}>
-                            Register Admin Hospital
+                            Register Admin Hospital +
                         </Link>
                     </Button>
-
-                    <Button className="bg-[#2F907F] py-6 text-base">
-                        <Link href={"/auth/register/staff-hospital"}>
-                            Register Staff Hospital
-                        </Link>
-                    </Button>
+                     <div className="relative w-full max-w-sm">
+                        <Image
+                            src="/dashboard/Search.svg"
+                            alt="Search Icon"
+                            width={18}
+                            height={18}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 opacity-60"
+                        />
+                        <Input
+                            type="text"
+                            value={search}
+                            placeholder="Cari Pegawai"
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="pl-10 pr-4 py-4 border-gray-200 text-sm text-gray-600 placeholder-gray-400 bg-white rounded-lg"
+                        />
+                    </div>
                 </div>
-                <Button
-                    onClick={handleLogout}
-                    variant="outline"
-                    className="text-[#2F907F] border-[#2F907F] hover:bg-[#2F907F] hover:text-white transition-colors"
-                >
-                    Logout
-                </Button>
+                <DashboardTable search={search} />
             </div>
-            
         </div>
     );
 }

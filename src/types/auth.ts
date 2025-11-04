@@ -1,3 +1,5 @@
+import { string } from "yup";
+
 export type LoginHospitalRequest = {
     identifier: string, 
     password: string, 
@@ -55,3 +57,17 @@ export type changePasswordRequest = {
     pin: string;
     new_password: string;
 }
+
+export type UserData = {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    gender: "L" | "F";
+    dob: string;
+    address: string;
+    status: string;
+    role: string;
+    verified_at: string;
+};

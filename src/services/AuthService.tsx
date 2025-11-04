@@ -2,6 +2,7 @@ import api from "@/lib/api";
 import { safeRequest } from "@/app/utils/safeRequest";
 import Cookies from "js-cookie";
 import { forgetPasswordRequest, LoginHospitalRequest, LoginRequest, RegisterHospitalAdminRequest, RegisterStaffRequest } from "@/types/auth";
+import { queryClient } from "@/lib/queryClient"; 
 
 export const loginHospital = async (payload: LoginHospitalRequest) => {
     return safeRequest(async () => {
@@ -21,6 +22,8 @@ export const loginHospital = async (payload: LoginHospitalRequest) => {
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
         });
+
+        queryClient.invalidateQueries({ queryKey: ["me"] });
 
         return response.data;
     });
@@ -44,6 +47,8 @@ export const loginSuperAdmin = async (payload: LoginRequest) => {
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
         });
+
+        queryClient.invalidateQueries({ queryKey: ["me"] });
 
         return response.data;
     });
@@ -76,7 +81,7 @@ export const registerAdmin = async (payload: RegisterHospitalAdminRequest, hospi
 
 export const forgotPassword = async (payload: forgetPasswordRequest) => {
     return safeRequest(async () => {
-        const response = await api.post("/auth/password/forgot",
+        const response = await api.post("auth/password/forgot",
             payload
         );
         
@@ -86,10 +91,27 @@ export const forgotPassword = async (payload: forgetPasswordRequest) => {
 
 export const changePassword = async (payload: forgetPasswordRequest) => {
     return safeRequest(async () => {
-        const response = await api.post("/auth/password/reset", 
+        const response = await api.post("auth/password/reset", 
             payload
         );
             
         return response.data;
+    });
+};
+
+export const getUserInfo = async () => {
+    return safeRequest(async () => {
+        const response = await api.get("me");
+        return response.data;
+    })
+}
+
+export const logout = async () => {
+    return safeRequest(async () => {
+        Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
+
+        queryClient.clear();
+        return { success: true, message: "Logout successful" };
     });
 };
