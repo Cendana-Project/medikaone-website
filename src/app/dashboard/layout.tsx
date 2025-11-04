@@ -6,6 +6,7 @@ import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo"
 import { Spinner } from "@/components/ui/spinner"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import LanguageAndNotification from "@/components/LanguageAndNotification";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const { userInfo, loading, error, refetch } = useGetUserInfo();
@@ -51,10 +52,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <AppSidebar role={userInfo.role} />
                 <main className="w-full">
                     <div className="bg-white py-6 px-4 border-b border-black/10">
-                        <div className="self-start flex items-center gap-4">
-                            <SidebarTrigger />
-                            <h2 className="font-bold text-lg">Detail Pegawai Rumah Sakit</h2>
-                            <span className="text-[#2596be] bg-[#f0f8fd] p-2 rounded-full text-xs">100 users</span>
+                        <div className="flex justify-between items-center">
+                            <div className="self-start flex items-center gap-4">
+                                <SidebarTrigger />
+                                <h2 className="font-bold text-lg">Detail Pegawai Rumah Sakit</h2>
+                                <span className="text-[#2596be] bg-[#f0f8fd] p-2 rounded-full text-xs">100 users</span>
+                            </div>
+                            <div>
+                                <LanguageAndNotification />
+                            </div>
                         </div>
                     </div>
 
