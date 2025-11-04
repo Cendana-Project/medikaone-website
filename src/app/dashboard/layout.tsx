@@ -47,17 +47,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     return (
         <SidebarProvider>
-            <div className="flex min-h-screen w-full">
+            <div className="flex min-h-screen w-full bg-[#F5F7F9]">
                 <AppSidebar role={userInfo.role} />
-                <main className="flex-1 flex flex-col items-center justify-center p-6">
-                    <div className="self-start mb-4">
-                        <SidebarTrigger />
+                <main className="w-full">
+                    <div className="bg-white py-6 px-4 border-b border-black/10">
+                        <div className="self-start flex items-center gap-4">
+                            <SidebarTrigger />
+                            <h2 className="font-bold text-lg">Detail Pegawai Rumah Sakit</h2>
+                            <span className="text-[#2596be] bg-[#f0f8fd] p-2 rounded-full text-xs">100 users</span>
+                        </div>
                     </div>
 
-                    <div className="w-full max-w-4xl bg-[#F5F7F9]">
-                        <div>
-
-                        </div>
+                    <div className="w-full">
                         {children}
                     </div>
                 </main>
