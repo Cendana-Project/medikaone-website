@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import AuthCarousel from "@/components/auth/authCarousel";
 import { useLoginSuperAdmin } from "@/hooks/auth/useLoginSuperAdmin";
-import { loginSuperAdmin } from "@/validation/auth/loginSchema";
+import { loginSuperAdminSchema } from "@/validation/auth/loginSchema";
 import { LoginRequest } from "@/types/auth";
 
 export default function LoginAdmin() {
@@ -23,7 +23,7 @@ export default function LoginAdmin() {
         handleSubmit, 
         formState: { errors } 
     } = useForm<LoginRequest>({
-        resolver: yupResolver(loginSuperAdmin),
+        resolver: zodResolver(loginSuperAdminSchema),
     });
 
     const onSubmit = (data: LoginRequest) => mutate(data);

@@ -1,11 +1,19 @@
-import * as yup from "yup";
+import { z } from "zod";
 
-export const forgotPasswordSchema = yup.object({
-    email: yup.string().email("Email tidak valid").required("Email wajib diisi"),
+export const forgotPasswordSchema = z.object({
+    email: z.string().min(1, "Email wajib diisi").email("Email tidak valid"),
 });
 
-export const changePasswordSchema = yup.object({
-    email: yup.string().email("Email tidak valid").required("Email wajib diisi"),
-    pin: yup.string().required("Pin wajib diisi").length(6, "Pin harus terdiri dari 6 karakter"),
-    new_password: yup.string().required("Password wajib diisi"),
+export const verifyPinSchema = z.object({
+    email: z.string().min(1, "Email wajib diisi").email("Email tidak valid"),
+    pin: z.string().min(1, "PIN wajib diisi").length(6, "PIN harus 6 digit angka"),
 });
+
+export const resetPasswordSchema = z.object({
+    new_password: z.string().min(6, "Password minimal 6 karakter"),
+    confirm_password: z.string().min(1, "Konfirmasi password wajib diisi"),
+}).refine((data) => data.new_password === data.confirm_password, {
+    message: "Konfirmasi password tidak cocok",
+    path: ["confirm_password"],
+});
+

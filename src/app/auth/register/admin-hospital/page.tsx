@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ export default function RegisterAdminPage() {
         setValue, watch,
         formState: { errors },
     } = useForm<RegisterAdminForm>({
-        resolver: yupResolver(registerAdminSchema),
+        resolver: zodResolver(registerAdminSchema),
     });
 
     const onSubmit = (data: RegisterAdminForm) => {

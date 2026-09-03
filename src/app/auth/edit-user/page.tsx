@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +34,7 @@ export default function RegisterStaffPage() {
         formState: { errors },
         setValue
     } = useForm<RegisterStaffForm>({
-        resolver: yupResolver(registerStaffSchema),
+        resolver: zodResolver(registerStaffSchema),
         defaultValues: {
             hospitalId: "",
             email: "",
@@ -222,7 +222,7 @@ export default function RegisterStaffPage() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="L">Laki-laki</SelectItem>
-                                <SelectItem value="F">Perempuan</SelectItem>
+                                <SelectItem value="P">Perempuan</SelectItem>
                             </SelectContent>
                         </Select>
                         {errors.gender && <p className="text-red-500 text-sm">{errors.gender.message}</p>}

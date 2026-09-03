@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
@@ -23,7 +23,7 @@ export default function Login() {
         handleSubmit, 
         formState: { errors } 
     } = useForm<LoginHospitalRequest>({
-        resolver: yupResolver(loginHospitalSchema),
+        resolver: zodResolver(loginHospitalSchema),
     });
 
     const onSubmit = (data: LoginHospitalRequest) => mutate(data);
@@ -54,6 +54,9 @@ export default function Login() {
                             {...register("identifier")}
                             className="py-6 placeholder:text-[#616161]"
                         />
+                        {errors.identifier && (
+                            <p className="text-red-500 text-sm">{errors.identifier.message}</p>
+                        )}
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label
@@ -90,18 +93,21 @@ export default function Login() {
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label
-                            htmlFor="hospital_code"
+                            htmlFor="hospital_id"
                             className="text-base font-semibold text-[#212121]"
                         >
-                            Hospital Code
+                            Hospital ID
                         </Label>
                         <Input
                             type="text"
-                            id="hospital_code"
-                            placeholder="Masukkan Kode Rumah Sakit"
-                            {...register("hospital_code")}
+                            id="hospital_id"
+                            placeholder="Masukkan ID Rumah Sakit"
+                            {...register("hospital_id")}
                             className="py-6 placeholder:text-[#616161]"
                         />
+                        {errors.hospital_id && (
+                            <p className="text-red-500 text-sm">{errors.hospital_id.message}</p>
+                        )}
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -117,7 +123,7 @@ export default function Login() {
                             Lupa Kata Sandi
                         </Link>
                     </div>
-                    <Button type="submit" className="bg-[#2F907F] py-6 text-base" disabled={isPending}>
+                    <Button type="submit" className="bg-[#2F907F] py-6 text-base text-white" disabled={isPending}>
                         {isPending ? "Loading..." : "Login"}
                     </Button>
                 </form>

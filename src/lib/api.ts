@@ -49,10 +49,14 @@ const refreshToken = async (): Promise<void> => {
 api.interceptors.request.use( 
     (config) => {
         const token = Cookies.get("accessToken");
+        const hospitalId = Cookies.get("hospitalId");
         config.headers = config.headers || {}; 
         
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+        }
+        if (hospitalId) {
+            config.headers["X-Hospital-ID"] = hospitalId;
         }
 
         return config;
@@ -84,6 +88,7 @@ api.interceptors.response.use(
             } catch (err) {
                 Cookies.remove("accessToken");
                 Cookies.remove("refreshToken");
+                Cookies.remove("hospitalId");
                 Cookies.remove("userId");
 
                 toast.error("Session expired, please login again.");
