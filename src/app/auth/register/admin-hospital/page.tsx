@@ -60,26 +60,38 @@ export default function RegisterAdminPage() {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full max-w-3xl gap-6 px-6">
+                    <p className="text-xs text-gray-500 self-end">
+                        <span className="text-red-500">*</span> Wajib diisi
+                    </p>
+
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="hospitalId">Kode Rumah Sakit</Label>
+                        <Label htmlFor="hospitalId" className="text-base font-semibold text-[#212121]">
+                            Kode Rumah Sakit <span className="text-red-500">*</span>
+                        </Label>
                         <Input id="hospitalId" {...register("hospitalId")} placeholder="Contoh: RS123" />
                         {errors.hospitalId && <p className="text-red-500 text-sm">{errors.hospitalId.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="email" className="text-base font-semibold text-[#212121]">Email</Label>
+                        <Label htmlFor="email" className="text-base font-semibold text-[#212121]">
+                            Email <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="email" id="email" placeholder="Masukkan email admin" {...register("email")} />
                         {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="username" className="text-base font-semibold text-[#212121]">Username</Label>
+                        <Label htmlFor="username" className="text-base font-semibold text-[#212121]">
+                            Username <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="text" id="username" placeholder="Masukkan username" {...register("username")} />
                         {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="password" className="text-base font-semibold text-[#212121]">Password</Label>
+                        <Label htmlFor="password" className="text-base font-semibold text-[#212121]">
+                            Password <span className="text-red-500">*</span>
+                        </Label>
                         <div className="relative">
                             <Input
                                 type={showPassword ? "text" : "password"}
@@ -103,7 +115,7 @@ export default function RegisterAdminPage() {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="confirmPassword" className="text-base font-semibold text-[#212121]">
-                            Konfirmasi Password
+                            Konfirmasi Password <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
                             <Input
@@ -127,37 +139,49 @@ export default function RegisterAdminPage() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="phone" className="text-base font-semibold text-[#212121]">Nomor Telepon</Label>
+                        <Label htmlFor="phone" className="text-base font-semibold text-[#212121]">
+                            Nomor Telepon <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="text" id="phone" placeholder="+628xxxxxxxxxx" {...register("phone")} />
                         {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="first_name" className="text-base font-semibold text-[#212121]">Nama Depan</Label>
+                        <Label htmlFor="first_name" className="text-base font-semibold text-[#212121]">
+                            Nama Depan <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="text" id="first_name" placeholder="Nama depan" {...register("first_name")} />
                         {errors.first_name && <p className="text-red-500 text-sm">{errors.first_name.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="last_name" className="text-base font-semibold text-[#212121]">Nama Belakang</Label>
+                        <Label htmlFor="last_name" className="text-base font-semibold text-[#212121]">
+                            Nama Belakang <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="text" id="last_name" placeholder="Nama belakang" {...register("last_name")} />
                         {errors.last_name && <p className="text-red-500 text-sm">{errors.last_name.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="dob" className="text-base font-semibold text-[#212121]">Tanggal Lahir</Label>
+                        <Label htmlFor="dob" className="text-base font-semibold text-[#212121]">
+                            Tanggal Lahir <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="date" id="dob" {...register("dob")} />
                         {errors.dob && <p className="text-red-500 text-sm">{errors.dob.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="address" className="text-base font-semibold text-[#212121]">Alamat</Label>
+                        <Label htmlFor="address" className="text-base font-semibold text-[#212121]">
+                            Alamat <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="text" id="address" placeholder="Masukkan alamat lengkap" {...register("address")} />
                         {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="gender" className="text-base font-semibold text-[#212121]">Jenis Kelamin</Label>
+                        <Label htmlFor="gender" className="text-base font-semibold text-[#212121]">
+                            Jenis Kelamin <span className="text-red-500">*</span>
+                        </Label>
                         <Select
                             onValueChange={(value) => setValue("gender", value as "L" | "P")}
                             defaultValue={watch("gender")} 
@@ -174,7 +198,9 @@ export default function RegisterAdminPage() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="nik" className="text-base font-semibold text-[#212121]">NIK</Label>
+                        <Label htmlFor="nik" className="text-base font-semibold text-[#212121]">
+                            NIK <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="text" id="nik" placeholder="Masukkan NIK" {...register("nik")} />
                         {errors.nik && <p className="text-red-500 text-sm">{errors.nik.message}</p>}
                     </div>

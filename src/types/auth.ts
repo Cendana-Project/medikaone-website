@@ -1,7 +1,7 @@
 export type LoginHospitalRequest = {
     identifier: string;
     password: string;
-    hospital_id: string;
+    hospital_code?: string;
 };
 
 export type LoginRequest = {

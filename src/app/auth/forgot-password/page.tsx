@@ -106,7 +106,7 @@ export default function ForgotPassword() {
                     <form onSubmit={formStep1.handleSubmit(onStep1Submit)} className="flex flex-col w-full gap-6 px-6 max-w-lg">
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="email" className="text-base font-semibold text-[#212121]">
-                                Email
+                                Email <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 type="email"
@@ -130,7 +130,7 @@ export default function ForgotPassword() {
                     <form onSubmit={formStep2.handleSubmit(onStep2Submit)} className="flex flex-col w-full gap-6 px-6 max-w-lg">
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="pin" className="text-base font-semibold text-[#212121]">
-                                PIN Verifikasi (6 digit)
+                                PIN Verifikasi (6 digit) <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 type="text"
@@ -155,7 +155,7 @@ export default function ForgotPassword() {
                     <form onSubmit={formStep3.handleSubmit(onStep3Submit)} className="flex flex-col w-full gap-6 px-6 max-w-lg">
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="new_password" className="text-base font-semibold text-[#212121]">
-                                Kata Sandi Baru
+                                Kata Sandi Baru <span className="text-red-500">*</span>
                             </Label>
                             <div className="relative">
                                 <Input
@@ -181,7 +181,7 @@ export default function ForgotPassword() {
 
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="confirm_password" className="text-base font-semibold text-[#212121]">
-                                Konfirmasi Kata Sandi Baru
+                                Konfirmasi Kata Sandi Baru <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 type={showPassword ? "text" : "password"}

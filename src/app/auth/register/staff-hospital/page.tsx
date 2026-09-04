@@ -74,21 +74,29 @@ export default function RegisterStaffPage() {
                     onSubmit={handleSubmit(onSubmit)}
                     className="flex flex-col w-full max-w-3xl gap-6 px-6"
                 >
+                    <p className="text-xs text-gray-500 self-end">
+                        <span className="text-red-500">*</span> Wajib diisi
+                    </p>
+
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="hospitalId">Kode Rumah Sakit</Label>
+                        <Label htmlFor="hospitalId" className="text-base font-semibold text-[#212121]">
+                            Kode Rumah Sakit <span className="text-red-500">*</span>
+                        </Label>
                         <Input id="hospitalId" {...register("hospitalId")} placeholder="Contoh: RS123" />
                         {errors.hospitalId && <p className="text-red-500 text-sm">{errors.hospitalId.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="username">Username</Label>
+                        <Label htmlFor="username" className="text-base font-semibold text-[#212121]">
+                            Username <span className="text-red-500">*</span>
+                        </Label>
                         <Input id="username" placeholder="Masukkan username" {...register("username")} />
                         {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="email" className="text-base font-semibold text-[#212121]">
-                            Email
+                            Email <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             type="email"
@@ -104,7 +112,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="phone" className="text-base font-semibold text-[#212121]">
-                            Nomor Telepon
+                            Nomor Telepon <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             type="text"
@@ -120,7 +128,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2 relative">
                         <Label htmlFor="password" className="text-base font-semibold text-[#212121]">
-                            Password
+                            Password <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
                             <Input
@@ -146,7 +154,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2 relative">
                         <Label htmlFor="confirmPassword" className="text-base font-semibold text-[#212121]">
-                            Konfirmasi Password
+                            Konfirmasi Password <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
                             <Input
@@ -172,7 +180,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="first_name" className="text-base font-semibold text-[#212121]">
-                            Nama Depan
+                            Nama Depan <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             type="text"
@@ -188,7 +196,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="last_name" className="text-base font-semibold text-[#212121]">
-                            Nama Belakang
+                            Nama Belakang <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             type="text"
@@ -203,19 +211,25 @@ export default function RegisterStaffPage() {
                     </div>
                     
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="dob">Tanggal Lahir</Label>
+                        <Label htmlFor="dob" className="text-base font-semibold text-[#212121]">
+                            Tanggal Lahir <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="date" id="dob" {...register("dob")} />
                         {errors.dob && <p className="text-red-500 text-sm">{errors.dob.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="address">Alamat</Label>
+                        <Label htmlFor="address" className="text-base font-semibold text-[#212121]">
+                            Alamat <span className="text-red-500">*</span>
+                        </Label>
                         <Input id="address" placeholder="Masukkan alamat lengkap" {...register("address")} />
                         {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="gender">Jenis Kelamin</Label>
+                        <Label htmlFor="gender" className="text-base font-semibold text-[#212121]">
+                            Jenis Kelamin <span className="text-red-500">*</span>
+                        </Label>
                         <Select onValueChange={(value) => setValue("gender", value as "L" | "P")}>
                             <SelectTrigger className="py-6 text-[#212121]">
                                 <SelectValue placeholder="Pilih jenis kelamin" />
@@ -229,14 +243,16 @@ export default function RegisterStaffPage() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="nik">NIK</Label>
+                        <Label htmlFor="nik" className="text-base font-semibold text-[#212121]">
+                            NIK <span className="text-red-500">*</span>
+                        </Label>
                         <Input id="nik" placeholder="Masukkan NIK" {...register("nik")} />
                         {errors.nik && <p className="text-red-500 text-sm">{errors.nik.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="role" className="text-base font-semibold text-[#212121]">
-                            Role Pegawai
+                            Role Pegawai <span className="text-red-500">*</span>
                         </Label>
                         <Select
                             onValueChange={(value) => setValue("role", value as "nurse" | "receptionist" | "bod" | "doctor")}

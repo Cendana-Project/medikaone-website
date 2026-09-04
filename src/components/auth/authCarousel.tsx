@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Autoplay from "embla-carousel-autoplay";
 import {
     Carousel,
     CarouselContent,
@@ -13,6 +14,10 @@ export default function AuthCarousel() {
     const [api, setApi] = useState<CarouselApi>();
     const [current, setCurrent] = useState(0);
     const [count, setCount] = useState(0);
+
+    const plugin = useRef(
+        Autoplay({ delay: 3000, stopOnInteraction: false })
+    );
 
     useEffect(() => {
         if (!api) return;
@@ -28,6 +33,7 @@ export default function AuthCarousel() {
             <div className="relative w-full overflow-hidden rounded-2xl">
                 <Carousel
                     setApi={setApi}
+                    plugins={[plugin.current]}
                     opts={{
                         align: "start",
                         loop: true,

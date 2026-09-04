@@ -12,9 +12,11 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
     SUPER_ADMIN: [
         { name: "Kelola Role", path: "/roles" },
         { name: "Kelola Dokter", path: "/doctors" },
+        { name: "Tambah Rumah Sakit", path: "/auth/register/hospital" },
+        { name: "Tambah Admin RS", path: "/auth/register/admin-hospital" },
     ],
 
-    RESEPSIONIS: [
+    RECEPTIONIST: [
         { name: "Data Appointment", path: "/appointments" },
         { name: "Chat", path: "/chat" },
         { name: "Cek Jadwal Dokter", path: "/doctor-schedule" },
@@ -30,7 +32,7 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
         { name: "Riwayat Pemasukan", path: "/revenue" },
     ],
 
-    DOKTER: [
+    DOCTOR: [
         { name: "Dashboard", path: "/dashboard" },
         { name: "Appointment", path: "/appointment" },
     ],
@@ -38,13 +40,32 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
     default: [],
 };
 
-export const sidebarMenuByRole: Record<string, SidebarMenuItem[]> = Object.keys(baseMenus).reduce(
-    (acc, key) => {
-        acc[key] = [
-            ...baseMenus[key],
-            { name: "System Setting", path: "/system" },
-        ];
-        return acc;
-    },
-    {} as Record<string, SidebarMenuItem[]>
+// Synonym/Alias mapping for roles coming from backend
+const roleAliases: Record<string, string> = {
+    "SUPER_ADMIN": "SUPER_ADMIN",
+    "SUPER-ADMIN": "SUPER_ADMIN",
+    "ADMIN": "ADMIN",
+    "DOCTOR": "DOCTOR",
+    "DOKTER": "DOCTOR",
+    "NURSE": "NURSE",
+    "PERAWAT": "NURSE",
+    "RECEPTIONIST": "RECEPTIONIST",
+    "RESEPSIONIS": "RECEPTIONIST",
+    "BOD": "BOD",
+};
+
+export const sidebarMenuByRole: Record<string, SidebarMenuItem[]> = new Proxy(
+    {},
+    {
+        get: (_, prop: string) => {
+            if (typeof prop !== "string") return [];
+            const normalizedKey = prop.toUpperCase().replace("-", "_");
+            const targetRole = roleAliases[normalizedKey] || normalizedKey;
+            const items = baseMenus[targetRole] || baseMenus[prop] || baseMenus.default;
+            return [
+                ...items,
+                { name: "System Setting", path: "/system" },
+            ];
+        },
+    }
 );

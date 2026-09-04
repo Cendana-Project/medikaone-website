@@ -5,13 +5,13 @@ import toast from "react-hot-toast";
 
 const api = axios.create({
     baseURL: config.apiBaseUrl,
-    withCredentials: true,
+    withCredentials: false,
 });
 
 // Separate axios instance for refresh token to avoid interceptor loop
 const refreshApi = axios.create({
     baseURL: config.apiBaseUrl,
-    withCredentials: true,
+    withCredentials: false,
 });
 
 const refreshToken = async (): Promise<void> => {

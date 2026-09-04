@@ -40,12 +40,16 @@ export default function Login() {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full max-w-2xl gap-6 px-6">
+                    <p className="text-xs text-gray-500 self-end">
+                        <span className="text-red-500">*</span> Wajib diisi
+                    </p>
+
                     <div className="flex flex-col gap-2">
                         <Label
                             htmlFor="email"
                             className="text-base font-semibold text-[#212121]"
                         >
-                            Email
+                            Email <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             type="email"
@@ -63,7 +67,7 @@ export default function Login() {
                             htmlFor="password"
                             className="text-base font-semibold text-[#212121]"
                         >
-                            Password
+                            Password <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
                             <Input
@@ -93,20 +97,20 @@ export default function Login() {
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label
-                            htmlFor="hospital_id"
+                            htmlFor="hospital_code"
                             className="text-base font-semibold text-[#212121]"
                         >
-                            Hospital ID
+                            Kode Rumah Sakit <span className="text-gray-400 font-normal">(Opsional)</span>
                         </Label>
                         <Input
                             type="text"
-                            id="hospital_id"
-                            placeholder="Masukkan ID Rumah Sakit"
-                            {...register("hospital_id")}
+                            id="hospital_code"
+                            placeholder="Masukkan Kode Rumah Sakit (Opsional, cth: HSP-MO-001)"
+                            {...register("hospital_code")}
                             className="py-6 placeholder:text-[#616161]"
                         />
-                        {errors.hospital_id && (
-                            <p className="text-red-500 text-sm">{errors.hospital_id.message}</p>
+                        {errors.hospital_code && (
+                            <p className="text-red-500 text-sm">{errors.hospital_code.message}</p>
                         )}
                     </div>
                     <div className="flex items-center justify-between">

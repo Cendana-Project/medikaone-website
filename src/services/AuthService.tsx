@@ -14,8 +14,12 @@ import { queryClient } from "@/lib/queryClient";
 
 export const loginHospital = async (payload: LoginHospitalRequest) => {
     return safeRequest(async () => {
+        const body = { ...payload };
+        if (!body.hospital_code) {
+            delete body.hospital_code;
+        }
         const response = await api.post("auth/login/hospital", 
-            payload
+            body
         );
         const { access_token, refresh_token, hospital_id } = response.data.data;
 

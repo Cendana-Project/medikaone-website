@@ -7,21 +7,33 @@ import { Button } from "@/components/ui/button";
 import DashboardCards from "@/components/dashboard/dashboardCards";
 import { Input } from "@/components/ui/input";
 import DashboardTable from "@/components/dashboard/dashboardTable";
+import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
 import { useState } from "react";
 
 export default function Dashboard() {
     const [search, setSearch] = useState("");
+    const { userInfo } = useGetUserInfo();
+    const isSuperAdmin = userInfo?.role?.toUpperCase().replace("-", "_") === "SUPER_ADMIN";
     
     return (
-        <div className="flex flex-col items-center justify-center gap-4 min-h-screen w-full max-w-full overflow-x-hidden p-6">
+        <div className="flex flex-col gap-6 w-full max-w-full p-6">
             <DashboardCards />
-            <div className="flex flex-col items-center gap-4 w-full h-screen bg-white rounded-lg border border-black/10">
-                <div className="flex items-center justify-between p-10 w-full">
-                    <Button className="bg-[#ebf8f5] border border-[#c4e9e2] py-6 text-base text-[#3bb49f]">
-                        <Link href={"/auth/register/admin-hospital"}>
-                            Register Admin Hospital +
-                        </Link>
-                    </Button>
+            <div className="flex flex-col items-center gap-4 w-full bg-white rounded-lg border border-black/10">
+                <div className="flex flex-wrap items-center justify-between p-10 w-full gap-4">
+                    {isSuperAdmin && (
+                        <div className="flex items-center gap-3">
+                            <Button asChild className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-6 text-base text-[#3bb49f]">
+                                <Link href={"/auth/register/hospital"}>
+                                    Register Rumah Sakit +
+                                </Link>
+                            </Button>
+                            <Button asChild className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-6 text-base text-[#3bb49f]">
+                                <Link href={"/auth/register/admin-hospital"}>
+                                    Register Admin Hospital +
+                                </Link>
+                            </Button>
+                        </div>
+                    )}
                      <div className="relative w-full max-w-sm">
                         <Image
                             src="/dashboard/Search.svg"

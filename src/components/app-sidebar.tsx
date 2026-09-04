@@ -17,14 +17,20 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { sidebarMenuByRole } from "@/data/sideBarMenu";
-import { logout } from "@/services/AuthService"
+import { logout } from "@/services/AuthService";
+import toast from "react-hot-toast";
 
 type AppSidebarProps = {
     role: string;   
 };
 
 export function AppSidebar({ role }: AppSidebarProps) {
-    const menuItems = sidebarMenuByRole[role] || sidebarMenuByRole.default;
+    const normalizedRole = role ? role.toUpperCase().replace("-", "_") : "";
+    const menuItems =
+        sidebarMenuByRole[role] ||
+        sidebarMenuByRole[normalizedRole] ||
+        sidebarMenuByRole[role?.toLowerCase()] ||
+        sidebarMenuByRole.default;
     const pathname = usePathname();
     const router = useRouter();
 
@@ -34,11 +40,8 @@ export function AppSidebar({ role }: AppSidebarProps) {
     const handleLogout = async () => {
         const result = await logout();
         if (result.success) {
-            if (role === "super_admin") {
-                router.push("/auth/login/admin");
-            } else {
-                router.push("/auth/login");
-            }
+            toast.success("Anda berhasil logout.");
+            router.push("/auth/login");
         }
     };
 
