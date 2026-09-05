@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from "react";
-import Image from "next/image";
-import { User, Upload, Trash2, Lock, Save, Loader2, Building, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { Upload, Trash2, Lock, Save, Loader2, Building, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

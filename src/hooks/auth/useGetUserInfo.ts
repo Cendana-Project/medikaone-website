@@ -38,7 +38,7 @@ export const useGetUserInfo = () => {
         if (!data) return undefined;
         return {
             ...data,
-            avatar: photoUrl || (data as any).avatar || null,
+            avatar: photoUrl || (data as unknown as Record<string, string>)?.avatar || null,
         };
     }, [data, photoUrl]);
 

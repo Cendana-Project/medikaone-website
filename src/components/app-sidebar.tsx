@@ -137,7 +137,8 @@ export function AppSidebar({ role }: AppSidebarProps) {
         }
     };
 
-    const userAvatarUrl = (userInfo as any)?.avatar || (userInfo as any)?.image || (userInfo as any)?.profile_picture;
+    const userInfoRecord = userInfo as (Record<string, unknown> & { photo_url?: string; avatar?: string; image?: string; profile_picture?: string }) | null;
+    const userAvatarUrl = userInfoRecord?.photo_url || userInfoRecord?.avatar || userInfoRecord?.image || userInfoRecord?.profile_picture;
     const [imgError, setImgError] = useState(false);
 
     useEffect(() => {
