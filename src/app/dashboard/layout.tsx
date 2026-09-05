@@ -8,13 +8,33 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import LanguageAndNotification from "@/components/LanguageAndNotification";
 
+import { usePathname } from "next/navigation";
+
+const getHeaderInfo = (pathname: string) => {
+    if (pathname.startsWith("/profile")) {
+        return { title: "Pengaturan Profil", badge: null };
+    }
+    if (pathname.startsWith("/roles")) {
+        return { title: "Kelola Role", badge: null };
+    }
+    if (pathname.startsWith("/doctors")) {
+        return { title: "Kelola Dokter", badge: null };
+    }
+    if (pathname.startsWith("/system")) {
+        return { title: "System Setting", badge: null };
+    }
+    return { title: "Detail Pegawai Rumah Sakit", badge: "100 users" };
+};
+
 export default function Layout({ children }: { children: React.ReactNode }) {
-    const { userInfo, loading, error, refetch } = useGetUserInfo();
+    const { userInfo, loading, error } = useGetUserInfo();
+    const pathname = usePathname();
+    const headerInfo = getHeaderInfo(pathname);
 
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen w-full">
-            <Spinner className="w-10 h-10 text-green-600" /> {/* ukuran & warna bisa disesuaikan */}
+            <Spinner className="w-10 h-10 text-green-600" />
             </div>
         );
     }    
@@ -55,8 +75,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <div className="flex justify-between items-center">
                             <div className="self-start flex items-center gap-4">
                                 <SidebarTrigger />
-                                <h2 className="font-bold text-lg">Detail Pegawai Rumah Sakit</h2>
-                                <span className="text-[#2596be] bg-[#f0f8fd] p-2 rounded-full text-xs">100 users</span>
+                                <h2 className="font-bold text-lg">{headerInfo.title}</h2>
+                                {headerInfo.badge && (
+                                    <span className="text-[#2596be] bg-[#f0f8fd] p-2 rounded-full text-xs">
+                                        {headerInfo.badge}
+                                    </span>
+                                )}
                             </div>
                             <div>
                                 <LanguageAndNotification />
@@ -70,5 +94,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </main>
             </div>
         </SidebarProvider>
-    )
+    );
 }

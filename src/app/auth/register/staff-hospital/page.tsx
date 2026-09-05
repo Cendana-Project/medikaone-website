@@ -4,12 +4,13 @@ import Link from "next/link";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { TermsModal } from "@/components/auth/TermsModal";
 import {
     Select,
     SelectContent,
@@ -25,6 +26,22 @@ import { useRegisterStaffHospital } from "@/hooks/auth/useRegisterStaffHospital"
 export default function RegisterStaffPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [agreedTerms, setAgreedTerms] = useState(false);
+    const [hasReadTerms, setHasReadTerms] = useState(false);
+    const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+    const [termsModalTab, setTermsModalTab] = useState<"terms" | "privacy">("terms");
+
+    const openTermsModal = (tab: "terms" | "privacy" = "terms") => {
+        setTermsModalTab(tab);
+        setIsTermsModalOpen(true);
+    };
+
+    const handleCheckboxClick = (e: React.MouseEvent) => {
+        if (!hasReadTerms) {
+            e.preventDefault();
+            openTermsModal("terms");
+        }
+    };
 
     const { mutate, isPending } = useRegisterStaffHospital();
 
@@ -34,7 +51,7 @@ export default function RegisterStaffPage() {
         formState: { errors },
         setValue
     } = useForm<RegisterStaffForm>({
-        resolver: yupResolver(registerStaffSchema),
+        resolver: zodResolver(registerStaffSchema),
         defaultValues: {
             hospitalId: "",
             email: "",
@@ -55,6 +72,15 @@ export default function RegisterStaffPage() {
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-white">
+            <TermsModal
+                isOpen={isTermsModalOpen}
+                onClose={() => setIsTermsModalOpen(false)}
+                defaultTab={termsModalTab}
+                onAccept={() => {
+                    setHasReadTerms(true);
+                    setAgreedTerms(true);
+                }}
+            />
             <div className="w-full flex flex-col items-center justify-center p-4 lg:p-14 gap-8">
                 <Button type="button" className="bg-[#2F907F] py-6 text-base">
                     <Link href="/dashboard" className="flex items-center gap-2 text-white font-medium">
@@ -74,21 +100,29 @@ export default function RegisterStaffPage() {
                     onSubmit={handleSubmit(onSubmit)}
                     className="flex flex-col w-full max-w-3xl gap-6 px-6"
                 >
+                    <p className="text-xs text-gray-500 self-end">
+                        <span className="text-red-500">*</span> Wajib diisi
+                    </p>
+
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="hospitalId">Kode Rumah Sakit</Label>
+                        <Label htmlFor="hospitalId" className="text-base font-semibold text-[#212121]">
+                            Kode Rumah Sakit <span className="text-red-500">*</span>
+                        </Label>
                         <Input id="hospitalId" {...register("hospitalId")} placeholder="Contoh: RS123" />
                         {errors.hospitalId && <p className="text-red-500 text-sm">{errors.hospitalId.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="username">Username</Label>
+                        <Label htmlFor="username" className="text-base font-semibold text-[#212121]">
+                            Username <span className="text-red-500">*</span>
+                        </Label>
                         <Input id="username" placeholder="Masukkan username" {...register("username")} />
                         {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="email" className="text-base font-semibold text-[#212121]">
-                            Email
+                            Email <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             type="email"
@@ -104,7 +138,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="phone" className="text-base font-semibold text-[#212121]">
-                            Nomor Telepon
+                            Nomor Telepon <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             type="text"
@@ -120,7 +154,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2 relative">
                         <Label htmlFor="password" className="text-base font-semibold text-[#212121]">
-                            Password
+                            Password <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
                             <Input
@@ -146,7 +180,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2 relative">
                         <Label htmlFor="confirmPassword" className="text-base font-semibold text-[#212121]">
-                            Konfirmasi Password
+                            Konfirmasi Password <span className="text-red-500">*</span>
                         </Label>
                         <div className="relative">
                             <Input
@@ -172,7 +206,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="first_name" className="text-base font-semibold text-[#212121]">
-                            Nama Depan
+                            Nama Depan <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             type="text"
@@ -188,7 +222,7 @@ export default function RegisterStaffPage() {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="last_name" className="text-base font-semibold text-[#212121]">
-                            Nama Belakang
+                            Nama Belakang <span className="text-red-500">*</span>
                         </Label>
                         <Input
                             type="text"
@@ -203,40 +237,48 @@ export default function RegisterStaffPage() {
                     </div>
                     
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="dob">Tanggal Lahir</Label>
+                        <Label htmlFor="dob" className="text-base font-semibold text-[#212121]">
+                            Tanggal Lahir <span className="text-red-500">*</span>
+                        </Label>
                         <Input type="date" id="dob" {...register("dob")} />
                         {errors.dob && <p className="text-red-500 text-sm">{errors.dob.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="address">Alamat</Label>
+                        <Label htmlFor="address" className="text-base font-semibold text-[#212121]">
+                            Alamat <span className="text-red-500">*</span>
+                        </Label>
                         <Input id="address" placeholder="Masukkan alamat lengkap" {...register("address")} />
                         {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="gender">Jenis Kelamin</Label>
+                        <Label htmlFor="gender" className="text-base font-semibold text-[#212121]">
+                            Jenis Kelamin <span className="text-red-500">*</span>
+                        </Label>
                         <Select onValueChange={(value) => setValue("gender", value as "L" | "P")}>
                             <SelectTrigger className="py-6 text-[#212121]">
                                 <SelectValue placeholder="Pilih jenis kelamin" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="L">Laki-laki</SelectItem>
-                                <SelectItem value="F">Perempuan</SelectItem>
+                                <SelectItem value="P">Perempuan</SelectItem>
                             </SelectContent>
                         </Select>
                         {errors.gender && <p className="text-red-500 text-sm">{errors.gender.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="nik">NIK</Label>
+                        <Label htmlFor="nik" className="text-base font-semibold text-[#212121]">
+                            NIK <span className="text-red-500">*</span>
+                        </Label>
                         <Input id="nik" placeholder="Masukkan NIK" {...register("nik")} />
                         {errors.nik && <p className="text-red-500 text-sm">{errors.nik.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="role" className="text-base font-semibold text-[#212121]">
-                            Role Pegawai
+                            Role Pegawai <span className="text-red-500">*</span>
                         </Label>
                         <Select
                             onValueChange={(value) => setValue("role", value as "nurse" | "receptionist" | "bod" | "doctor")}
@@ -258,16 +300,44 @@ export default function RegisterStaffPage() {
 
 
                     <div className="flex items-center gap-3">
-                        <Checkbox id="agree" />
+                        <div onClick={handleCheckboxClick} className="flex items-center">
+                            <Checkbox
+                                id="agree"
+                                checked={agreedTerms}
+                                onCheckedChange={(checked) => {
+                                    if (hasReadTerms) {
+                                        setAgreedTerms(!!checked);
+                                    } else {
+                                        openTermsModal("terms");
+                                    }
+                                }}
+                                className="w-5 h-5 rounded-[4px] border-[#236C5F] data-[state=checked]:bg-[#2F907F] data-[state=checked]:border-[#236C5F] cursor-pointer"
+                            />
+                        </div>
                         <Label htmlFor="agree" className="text-base font-normal text-[#212121]">
-                            Saya setuju dengan Ketentuan Layanan dan Kebijakan Privasi
+                            Saya setuju dengan{" "}
+                            <button
+                                type="button"
+                                onClick={() => openTermsModal("terms")}
+                                className="font-semibold text-[#2F907F] hover:underline cursor-pointer"
+                            >
+                                Ketentuan Layanan
+                            </button>{" "}
+                            dan{" "}
+                            <button
+                                type="button"
+                                onClick={() => openTermsModal("privacy")}
+                                className="font-semibold text-[#2F907F] hover:underline cursor-pointer"
+                            >
+                                Kebijakan Privasi
+                            </button>
                         </Label>
                     </div>
 
                     <Button
                         type="submit"
-                        className="bg-[#2F907F] py-6 text-base"
-                        disabled={isPending}
+                        className="bg-[#2F907F] py-6 text-base cursor-pointer"
+                        disabled={isPending || !agreedTerms}
                     >
                         {isPending ? "Mendaftarkan..." : "Daftar Akun"}
                     </Button>
