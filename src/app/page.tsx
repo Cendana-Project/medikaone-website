@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 export default async function Home() {
     const cookieStore = await cookies();
-    const token = cookieStore.get("accessToken")?.value;
+    const token = cookieStore.get("accessToken")?.value || cookieStore.get("refreshToken")?.value;
 
     if (token) {
         redirect("/dashboard");

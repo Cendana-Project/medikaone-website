@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateDoctorStatus } from "@/services/DoctorRegistrationService";
 import { UpdateDoctorStatusRequest } from "@/types/doctorRegistration";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
+import { handleApiError } from "@/lib/handleError";
 
 type MutationArgs = {
     doctorId: string;
@@ -20,8 +20,9 @@ export const useUpdateDoctorStatus = (hospitalId: string) => {
             toast.success("Status dokter berhasil diperbarui!");
             queryClient.invalidateQueries({ queryKey: ["doctors", hospitalId] });
         },
-        onError: (error: AxiosError<{ message: string }>) => {
-            toast.error(error.response?.data?.message || "Gagal mengupdate status dokter");
+        onError: (error) => {
+            handleApiError(error, "Gagal memperbarui status dokter");
         },
     });
 };
+

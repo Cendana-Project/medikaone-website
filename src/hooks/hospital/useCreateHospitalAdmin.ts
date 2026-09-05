@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createHospitalAdmin } from "@/services/HospitalService";
 import { CreateHospitalAdminRequest } from "@/types/hospital";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
+import { handleApiError } from "@/lib/handleError";
 
 type MutationArgs = {
     hospitalId: string;
@@ -20,8 +20,9 @@ export const useCreateHospitalAdmin = () => {
             toast.success("Admin rumah sakit berhasil didaftarkan!");
             queryClient.invalidateQueries({ queryKey: ["hospital-admins"] });
         },
-        onError: (error: AxiosError<{ message: string }>) => {
-            toast.error(error.response?.data?.message || "Gagal mendaftarkan admin rumah sakit");
+        onError: (error) => {
+            handleApiError(error, "Gagal mendaftarkan admin rumah sakit");
         },
     });
 };
+

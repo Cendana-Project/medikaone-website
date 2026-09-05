@@ -11,7 +11,7 @@ export default function Forbidden() {
     const [hasToken, setHasToken] = useState(false);
 
     useEffect(() => {
-        const token = Cookies.get("accessToken");
+        const token = Cookies.get("accessToken") || Cookies.get("refreshToken");
         setHasToken(!!token);
     }, []);
 

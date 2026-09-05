@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { TermsModal } from "@/components/auth/TermsModal";
 import {
     Select,
     SelectContent,
@@ -25,6 +26,22 @@ import { useRegisterStaffHospital } from "@/hooks/auth/useRegisterStaffHospital"
 export default function RegisterStaffPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [agreedTerms, setAgreedTerms] = useState(false);
+    const [hasReadTerms, setHasReadTerms] = useState(false);
+    const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+    const [termsModalTab, setTermsModalTab] = useState<"terms" | "privacy">("terms");
+
+    const openTermsModal = (tab: "terms" | "privacy" = "terms") => {
+        setTermsModalTab(tab);
+        setIsTermsModalOpen(true);
+    };
+
+    const handleCheckboxClick = (e: React.MouseEvent) => {
+        if (!hasReadTerms) {
+            e.preventDefault();
+            openTermsModal("terms");
+        }
+    };
 
     const { mutate, isPending } = useRegisterStaffHospital();
 
@@ -55,6 +72,15 @@ export default function RegisterStaffPage() {
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-white">
+            <TermsModal
+                isOpen={isTermsModalOpen}
+                onClose={() => setIsTermsModalOpen(false)}
+                defaultTab={termsModalTab}
+                onAccept={() => {
+                    setHasReadTerms(true);
+                    setAgreedTerms(true);
+                }}
+            />
             <div className="w-full flex flex-col items-center justify-center p-4 lg:p-14 gap-8">
                 <Button type="button" className="bg-[#2F907F] py-6 text-base">
                     <Link href="/dashboard" className="flex items-center gap-2 text-white font-medium">
@@ -274,16 +300,44 @@ export default function RegisterStaffPage() {
 
 
                     <div className="flex items-center gap-3">
-                        <Checkbox id="agree" />
+                        <div onClick={handleCheckboxClick} className="flex items-center">
+                            <Checkbox
+                                id="agree"
+                                checked={agreedTerms}
+                                onCheckedChange={(checked) => {
+                                    if (hasReadTerms) {
+                                        setAgreedTerms(!!checked);
+                                    } else {
+                                        openTermsModal("terms");
+                                    }
+                                }}
+                                className="w-5 h-5 rounded-[4px] border-[#236C5F] data-[state=checked]:bg-[#2F907F] data-[state=checked]:border-[#236C5F] cursor-pointer"
+                            />
+                        </div>
                         <Label htmlFor="agree" className="text-base font-normal text-[#212121]">
-                            Saya setuju dengan Ketentuan Layanan dan Kebijakan Privasi
+                            Saya setuju dengan{" "}
+                            <button
+                                type="button"
+                                onClick={() => openTermsModal("terms")}
+                                className="font-semibold text-[#2F907F] hover:underline cursor-pointer"
+                            >
+                                Ketentuan Layanan
+                            </button>{" "}
+                            dan{" "}
+                            <button
+                                type="button"
+                                onClick={() => openTermsModal("privacy")}
+                                className="font-semibold text-[#2F907F] hover:underline cursor-pointer"
+                            >
+                                Kebijakan Privasi
+                            </button>
                         </Label>
                     </div>
 
                     <Button
                         type="submit"
-                        className="bg-[#2F907F] py-6 text-base"
-                        disabled={isPending}
+                        className="bg-[#2F907F] py-6 text-base cursor-pointer"
+                        disabled={isPending || !agreedTerms}
                     >
                         {isPending ? "Mendaftarkan..." : "Daftar Akun"}
                     </Button>

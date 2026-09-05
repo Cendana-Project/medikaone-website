@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cancelDoctorInvitation } from "@/services/DoctorRegistrationService";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
+import { handleApiError } from "@/lib/handleError";
 
 export const useCancelDoctorInvitation = (hospitalId: string) => {
     const queryClient = useQueryClient();
@@ -14,8 +14,9 @@ export const useCancelDoctorInvitation = (hospitalId: string) => {
             toast.success("Undangan berhasil dibatalkan!");
             queryClient.invalidateQueries({ queryKey: ["doctor-invitations", hospitalId] });
         },
-        onError: (error: AxiosError<{ message: string }>) => {
-            toast.error(error.response?.data?.message || "Gagal membatalkan undangan");
+        onError: (error) => {
+            handleApiError(error, "Gagal membatalkan undangan");
         },
     });
 };
+

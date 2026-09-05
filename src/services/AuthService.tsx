@@ -12,32 +12,31 @@ import {
 } from "@/types/auth";
 import { queryClient } from "@/lib/queryClient"; 
 
-export const loginHospital = async (payload: LoginHospitalRequest) => {
+export const loginHospital = async (payload: LoginHospitalRequest, rememberMe: boolean = true) => {
     return safeRequest(async () => {
-        const body = { ...payload };
-        if (!body.hospital_code) {
-            delete body.hospital_code;
-        }
         const response = await api.post("auth/login/hospital", 
-            body
+            payload
         );
         const { access_token, refresh_token, hospital_id } = response.data.data;
 
+        const accessExpiry = rememberMe ? 7 : undefined;
+        const refreshExpiry = rememberMe ? 30 : undefined;
+
         Cookies.set("accessToken", access_token, {
-            expires: 7,
+            expires: accessExpiry,
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
         });
 
         Cookies.set("refreshToken", refresh_token, {
-            expires: 30,
+            expires: refreshExpiry,
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
         });
 
         if (hospital_id) {
             Cookies.set("hospitalId", hospital_id, {
-                expires: 30,
+                expires: refreshExpiry,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
             });

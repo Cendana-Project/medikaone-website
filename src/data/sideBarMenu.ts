@@ -6,12 +6,12 @@ export type SidebarMenuItem = {
 const baseMenus: Record<string, SidebarMenuItem[]> = {
     ADMIN: [
         { name: "Kelola Role", path: "/roles" },
-        { name: "Kelola Dokter", path: "/doctors" },
+        { name: "Kelola Doctor", path: "/doctors" },
     ],
 
     SUPER_ADMIN: [
         { name: "Kelola Role", path: "/roles" },
-        { name: "Kelola Dokter", path: "/doctors" },
+        { name: "Kelola Doctor", path: "/doctors" },
         { name: "Tambah Rumah Sakit", path: "/auth/register/hospital" },
         { name: "Tambah Admin RS", path: "/auth/register/admin-hospital" },
     ],
@@ -34,10 +34,12 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
 
     DOCTOR: [
         { name: "Dashboard", path: "/dashboard" },
-        { name: "Appointment", path: "/appointment" },
+        { name: "Appointment", path: "/appointments" },
     ],
 
-    default: [],
+    default: [
+        { name: "Dashboard", path: "/dashboard" },
+    ],
 };
 
 // Synonym/Alias mapping for roles coming from backend
@@ -45,6 +47,7 @@ const roleAliases: Record<string, string> = {
     "SUPER_ADMIN": "SUPER_ADMIN",
     "SUPER-ADMIN": "SUPER_ADMIN",
     "ADMIN": "ADMIN",
+    "HOSPITAL_ADMIN": "ADMIN",
     "DOCTOR": "DOCTOR",
     "DOKTER": "DOCTOR",
     "NURSE": "NURSE",
@@ -64,7 +67,7 @@ export const sidebarMenuByRole: Record<string, SidebarMenuItem[]> = new Proxy(
             const items = baseMenus[targetRole] || baseMenus[prop] || baseMenus.default;
             return [
                 ...items,
-                { name: "System Setting", path: "/system" },
+                { name: "Settings", path: "/profile" },
             ];
         },
     }

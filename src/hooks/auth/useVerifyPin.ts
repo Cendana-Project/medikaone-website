@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { verifyPin } from "@/services/AuthService";
 import { verifyPinRequest } from "@/types/auth";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
+import { handleApiError } from "@/lib/handleError";
 
 export const useVerifyPin = () => {
     return useMutation({
@@ -12,8 +12,9 @@ export const useVerifyPin = () => {
         onSuccess: () => {
             toast.success("PIN berhasil diverifikasi!");
         },
-        onError: (error: AxiosError<{ message: string }>) => {
-            toast.error(error.response?.data?.message || "Verifikasi PIN gagal");
+        onError: (error) => {
+            handleApiError(error, "Verifikasi PIN gagal");
         },
     });
 };
+

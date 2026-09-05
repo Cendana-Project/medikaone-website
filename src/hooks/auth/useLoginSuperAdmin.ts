@@ -5,7 +5,7 @@ import { loginSuperAdmin } from "@/services/AuthService";
 import { LoginRequest } from "@/types/auth";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { AxiosError } from "axios";
+import { handleApiError } from "@/lib/handleError";
 
 export const useLoginSuperAdmin = () => {
     const router = useRouter();
@@ -21,8 +21,8 @@ export const useLoginSuperAdmin = () => {
             toast.success(`Selamat datang kembali, ${userName}.`);
             router.push("/dashboard"); 
         },
-        onError: (error: AxiosError<{ message: string }>) => {
-            toast.error(error.response?.data?.message || "Gagal masuk. Silakan periksa kembali email dan kata sandi Anda.");
+        onError: (error) => {
+            handleApiError(error, "Gagal masuk");
         },
     });
 };
