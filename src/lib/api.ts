@@ -53,8 +53,13 @@ const refreshToken = async (): Promise<string> => {
     }
 
     try {
+        const idempotency_key = typeof crypto !== "undefined" && crypto.randomUUID 
+            ? crypto.randomUUID() 
+            : `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
         const response = await refreshApi.post("auth/refresh", {
             refresh_token,
+            idempotency_key,
         });
 
         const { access_token, refresh_token: newRefreshToken } = response.data.data;
@@ -63,15 +68,21 @@ const refreshToken = async (): Promise<string> => {
             throw new Error("Invalid access token returned from refresh API");
         }
 
+        const rememberPref = typeof window !== "undefined" ? localStorage.getItem("remember_me_preference") : null;
+        const isRemembered = rememberPref !== "false";
+
+        const accessExpiry = isRemembered ? 7 : undefined;
+        const refreshExpiry = isRemembered ? 30 : undefined;
+
         Cookies.set("accessToken", access_token, {
-            expires: 7,
+            expires: accessExpiry,
             secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
         });
 
         if (newRefreshToken) {
             Cookies.set("refreshToken", newRefreshToken, {
-                expires: 30,
+                expires: refreshExpiry,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
             });
