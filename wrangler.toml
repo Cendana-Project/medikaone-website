@@ -1,0 +1,10 @@
+name = "dashboard-medikaone"
+compatibility_date = "2026-01-16"
+pages_build_output_dir = ".vercel/output/static"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NEXT_PUBLIC_API_BASE_URL = "https://medikaone-api.onrender.com/v1/"
+
+[placement]
+mode = "smart"
