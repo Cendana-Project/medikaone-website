@@ -23,14 +23,14 @@ export type LoginHospitalResponseData = {
 export type RegisterHospitalAdminRequest = {
     email: string;
     username: string;
-    phone: string;
     password: string;
-    first_name: string;
-    last_name: string;
-    dob: string;
-    address: string;
-    gender: "L" | "P";
-    nik: string;
+    phone?: string;
+    first_name?: string;
+    last_name?: string;
+    dob?: string;
+    address?: string;
+    gender?: "L" | "P" | "";
+    nik?: string;
 };
 
 export type RegisterAdminForm = RegisterHospitalAdminRequest & {
@@ -39,17 +39,17 @@ export type RegisterAdminForm = RegisterHospitalAdminRequest & {
 };
 
 export type RegisterStaffRequest = {
-    role: "nurse" | "receptionist" | "bod" | "doctor";
+    role: "NURSE" | "RECEPTIONIST" | "BOD" | "nurse" | "receptionist" | "bod";
     email: string;
     username: string;
-    phone: string;
     password: string;
-    first_name: string;
-    last_name: string;
-    dob: string;
-    address: string;
-    gender: "L" | "P";
-    nik: string;
+    phone?: string;
+    first_name?: string;
+    last_name?: string;
+    dob?: string;
+    address?: string;
+    gender?: "L" | "P" | "";
+    nik?: string;
 };
 
 export type RegisterStaffForm = RegisterStaffRequest & {

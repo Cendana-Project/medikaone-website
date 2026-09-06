@@ -5,15 +5,13 @@ export type SidebarMenuItem = {
 
 const baseMenus: Record<string, SidebarMenuItem[]> = {
     ADMIN: [
-        { name: "Kelola Role", path: "/roles" },
+        { name: "Kelola Role", path: "/dashboard/roles" },
         { name: "Kelola Doctor", path: "/doctors" },
     ],
 
     SUPER_ADMIN: [
-        { name: "Kelola Role", path: "/roles" },
+        { name: "Kelola Role", path: "/dashboard/roles" },
         { name: "Kelola Doctor", path: "/doctors" },
-        { name: "Tambah Rumah Sakit", path: "/auth/register/hospital" },
-        { name: "Tambah Admin RS", path: "/auth/register/admin-hospital" },
     ],
 
     RECEPTIONIST: [
@@ -67,7 +65,7 @@ export const sidebarMenuByRole: Record<string, SidebarMenuItem[]> = new Proxy(
             const items = baseMenus[targetRole] || baseMenus[prop] || baseMenus.default;
             return [
                 ...items,
-                { name: "Settings", path: "/profile" },
+                { name: "Settings", path: "/dashboard/profile" },
             ];
         },
     }

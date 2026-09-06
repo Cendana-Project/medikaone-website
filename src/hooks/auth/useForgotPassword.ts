@@ -13,7 +13,7 @@ export const useForgotPassword = () => {
             toast.success("PIN telah dikirim ke email Anda.");
         },
         onError: (error) => {
-            handleApiError(error, "Gagal menguji email reset password");
+            handleApiError(error, "Gagal mengirimkan PIN reset kata sandi");
         },
     });
 };

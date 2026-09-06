@@ -34,26 +34,36 @@ import Link from "next/link";
 
 interface DashboardTableProps {
     search: string;
+    roleFilter?: string;
+    statusFilter?: string;
 }
 
-export default function DashboardTable({ search }: DashboardTableProps) {
+export default function DashboardTable({ search, roleFilter = "all", statusFilter = "all" }: DashboardTableProps) {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
     const filteredData = useMemo(() => {
         const keyword = search.toLowerCase();
-        return tableData.filter(
-            (emp) =>
+        return tableData.filter((emp) => {
+            const matchesSearch =
                 emp.name.toLowerCase().includes(keyword) ||
                 emp.username.toLowerCase().includes(keyword) ||
                 emp.email.toLowerCase().includes(keyword) ||
-                emp.role.toLowerCase().includes(keyword)
-            );
-    }, [search]);
+                emp.role.toLowerCase().includes(keyword);
+
+            const matchesRole =
+                !roleFilter || roleFilter === "all" || emp.role.toLowerCase().includes(roleFilter.toLowerCase());
+
+            const matchesStatus =
+                !statusFilter || statusFilter === "all" || emp.status.toLowerCase() === statusFilter.toLowerCase();
+
+            return matchesSearch && matchesRole && matchesStatus;
+        });
+    }, [search, roleFilter, statusFilter]);
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [search]);
+    }, [search, roleFilter, statusFilter]);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
@@ -129,7 +139,7 @@ export default function DashboardTable({ search }: DashboardTableProps) {
                                         onConfirm={() => console.log("hapus", emp.id)}
                                     />
 
-                                    <Link href="/auth/edit-user" passHref>
+                                    <Link href="/edit-user" passHref>
                                         <Button
                                             variant="outline"
                                             size="sm"
