@@ -7,13 +7,17 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
     ADMIN: [
         { name: "Kelola Role", path: "/roles" },
         { name: "Kelola Doctor", path: "/doctors" },
+        { name: "Kelola Departemen", path: "/departments" },
+        { name: "Kelola Ruangan", path: "/rooms" },
     ],
 
     SUPER_ADMIN: [
         { name: "Kelola Role", path: "/roles" },
         { name: "Kelola Doctor", path: "/doctors" },
-        { name: "Tambah Rumah Sakit", path: "/auth/register/hospital" },
-        { name: "Tambah Admin RS", path: "/auth/register/admin-hospital" },
+        { name: "Kelola Departemen", path: "/departments" },
+        { name: "Kelola Ruangan", path: "/rooms" },
+        { name: "Tambah Rumah Sakit", path: "/register/hospital" },
+        { name: "Tambah Admin RS", path: "/register/admin-hospital" },
     ],
 
     RECEPTIONIST: [

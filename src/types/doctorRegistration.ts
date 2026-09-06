@@ -31,6 +31,7 @@ export type CreateRoomRequest = {
 };
 
 export type SearchDoctorParams = {
+    identity?: string;
     email?: string;
     sip_number?: string;
     medikaone_id?: string;

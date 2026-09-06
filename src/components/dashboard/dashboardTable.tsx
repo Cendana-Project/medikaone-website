@@ -129,7 +129,7 @@ export default function DashboardTable({ search }: DashboardTableProps) {
                                         onConfirm={() => console.log("hapus", emp.id)}
                                     />
 
-                                    <Link href="/auth/edit-user" passHref>
+                                    <Link href="/edit-user" passHref>
                                         <Button
                                             variant="outline"
                                             size="sm"

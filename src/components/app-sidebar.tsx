@@ -51,6 +51,10 @@ const getMenuIcon = (name: string, isActive: boolean) => {
         case "Kelola Dokter":
         case "Kelola Doctor":
             return <FileText size={iconSize} style={{ color: iconColor }} />;
+        case "Kelola Departemen":
+            return <Building2 size={iconSize} style={{ color: iconColor }} />;
+        case "Kelola Ruangan":
+            return <UserPlus size={iconSize} style={{ color: iconColor }} />;
         case "Tambah Rumah Sakit":
             return <Building2 size={iconSize} style={{ color: iconColor }} />;
         case "Tambah Admin RS":

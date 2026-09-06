@@ -23,12 +23,12 @@ export default function Dashboard() {
                     {isSuperAdmin && (
                         <div className="flex items-center gap-3">
                             <Button asChild className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-6 text-base text-[#3bb49f]">
-                                <Link href={"/auth/register/hospital"}>
+                                <Link href={"/register/hospital"}>
                                     Register Rumah Sakit +
                                 </Link>
                             </Button>
                             <Button asChild className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-6 text-base text-[#3bb49f]">
-                                <Link href={"/auth/register/admin-hospital"}>
+                                <Link href={"/register/admin-hospital"}>
                                     Register Admin Hospital +
                                 </Link>
                             </Button>

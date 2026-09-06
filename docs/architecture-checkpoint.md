@@ -24,9 +24,15 @@ src/
 │   │   ├── change-password/             # Change password page (/change-password)
 │   │   ├── register/                    # Staff & hospital admin registration (/register/*)
 │   │   └── layout.tsx                   # Auth carousel layout with route guard
-│   ├── dashboard/page.tsx               # Primary dashboard page (/dashboard)
-│   ├── profile/page.tsx                 # User profile page (/profile)
-│   ├── system/page.tsx                  # System setting page (/system)
+│   ├── (dashboard)/
+│   │   ├── dashboard/page.tsx           # Primary dashboard page (/dashboard)
+│   │   ├── roles/page.tsx               # Kelola Role Pegawai (/roles)
+│   │   ├── doctors/page.tsx             # Kelola Dokter (/doctors)
+│   │   ├── departments/page.tsx         # Kelola Departemen (/departments)
+│   │   ├── rooms/page.tsx               # Kelola Ruangan (/rooms)
+│   │   ├── profile/page.tsx             # User profile page (/profile)
+│   │   ├── system/page.tsx              # System setting page (/system)
+│   │   └── layout.tsx                   # Shared dashboard sidebar & top navbar layout
 │   ├── forbidden/page.tsx               # 403 Access Forbidden fallback page (/forbidden)
 │   ├── layout.tsx                       # Root layout wrapped in QueryClientProvider
 │   └── page.tsx                         # Root redirect (/ -> /dashboard or /login)

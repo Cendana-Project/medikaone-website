@@ -20,6 +20,12 @@ const getHeaderInfo = (pathname: string) => {
     if (pathname.startsWith("/doctors")) {
         return { title: "Kelola Dokter", badge: null };
     }
+    if (pathname.startsWith("/departments")) {
+        return { title: "Kelola Departemen", badge: null };
+    }
+    if (pathname.startsWith("/rooms")) {
+        return { title: "Kelola Ruangan", badge: null };
+    }
     if (pathname.startsWith("/system")) {
         return { title: "System Setting", badge: null };
     }
