@@ -7,7 +7,7 @@ export default function ChangePassword() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace("/auth/forgot-password");
+        router.replace("/forgot-password");
     }, [router]);
 
     return (

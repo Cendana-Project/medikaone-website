@@ -18,18 +18,18 @@
 ```text
 src/
 ├── app/
-│   ├── auth/
-│   │   ├── login/page.tsx               # Login page (email, password, hospital_code, rememberMe)
-│   │   ├── forgot-password/page.tsx     # 3-step password reset (email -> 6-box PIN -> new pass)
-│   │   ├── change-password/             # Change password page
-│   │   ├── register/                    # Staff & hospital admin registration
+│   ├── (auth)/
+│   │   ├── login/page.tsx               # Login page (/login)
+│   │   ├── forgot-password/page.tsx     # 3-step password reset (/forgot-password)
+│   │   ├── change-password/             # Change password page (/change-password)
+│   │   ├── register/                    # Staff & hospital admin registration (/register/*)
 │   │   └── layout.tsx                   # Auth carousel layout with route guard
-│   ├── dashboard/page.tsx               # Primary dashboard page
-│   ├── profile/page.tsx                 # User profile page
-│   ├── system/page.tsx                  # System setting page (alias to profile)
-│   ├── forbidden/page.tsx               # 403 Access Forbidden fallback page
+│   ├── dashboard/page.tsx               # Primary dashboard page (/dashboard)
+│   ├── profile/page.tsx                 # User profile page (/profile)
+│   ├── system/page.tsx                  # System setting page (/system)
+│   ├── forbidden/page.tsx               # 403 Access Forbidden fallback page (/forbidden)
 │   ├── layout.tsx                       # Root layout wrapped in QueryClientProvider
-│   └── page.tsx                         # Root redirect (/ -> /dashboard or /auth/login)
+│   └── page.tsx                         # Root redirect (/ -> /dashboard or /login)
 ├── components/
 │   ├── app-sidebar.tsx                  # 240px Sidebar with role-based navigation & profile card
 │   ├── auth/
@@ -83,7 +83,7 @@ src/
 ## 4. Route Protection & Middleware Rules
 - Next.js `middleware.ts` guards all protected routes (`/dashboard`, `/profile`, `/system`, `/roles`, etc.).
 - Authentication status is determined by checking **`accessToken || refreshToken`** cookies.
-- If `refreshToken` is present when `accessToken` expires, middleware permits route access, enabling background token refresh via client API interceptors without kicking the user to `/auth/login`.
+- If `refreshToken` is present when `accessToken` expires, middleware permits route access, enabling background token refresh via client API interceptors without kicking the user to `/login`.
 
 ---
 

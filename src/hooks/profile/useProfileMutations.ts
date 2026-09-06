@@ -62,8 +62,10 @@ export const useDeleteProfilePhoto = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (_variables?: { options?: MutationOptions }) => 
-            deleteProfilePhoto(),
+        mutationFn: (args?: { options?: MutationOptions }) => {
+            void args;
+            return deleteProfilePhoto();
+        },
         onSuccess: async (res, variables) => {
             if (!variables?.options?.silent) {
                 const successMsg = 

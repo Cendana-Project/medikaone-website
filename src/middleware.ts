@@ -3,11 +3,11 @@ import type { NextRequest } from "next/server";
 
 // Guest auth routes: ONLY accessible when NOT logged in
 const guestAuthRoutes = [
-    "/auth/login",
-    "/auth/forgot-password",
-    "/auth/verify-pin",
-    "/auth/change-password",
-    "/auth/reset-password",
+    "/login",
+    "/forgot-password",
+    "/verify-pin",
+    "/change-password",
+    "/reset-password",
 ];
 
 // Protected routes: REQUIRE authentication
@@ -37,7 +37,7 @@ export function middleware(req: NextRequest) {
         if (hasAuth) {
             return NextResponse.redirect(new URL("/dashboard", req.url));
         } else {
-            return NextResponse.redirect(new URL("/auth/login", req.url));
+            return NextResponse.redirect(new URL("/login", req.url));
         }
     }
 
@@ -47,10 +47,10 @@ export function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
-    // 3. If user is NOT logged in and tries to access protected routes -> Redirect to /auth/login
+    // 3. If user is NOT logged in and tries to access protected routes -> Redirect to /login
     const isProtected = protectedRoutes.some((route) => path.startsWith(route));
     if (isProtected && !hasAuth) {
-        return NextResponse.redirect(new URL("/auth/login", req.url));
+        return NextResponse.redirect(new URL("/login", req.url));
     }
 
     return NextResponse.next();
@@ -71,6 +71,10 @@ export const config = {
         "/patients/:path*",
         "/users/:path*",
         "/revenue/:path*",
-        "/auth/:path*",
+        "/login",
+        "/forgot-password",
+        "/change-password",
+        "/edit-user",
+        "/register/:path*",
     ],
 };

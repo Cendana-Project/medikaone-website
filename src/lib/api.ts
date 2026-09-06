@@ -131,9 +131,9 @@ api.interceptors.request.use(
                         Cookies.remove("hospitalId");
                         Cookies.remove("userId");
 
-                        if (typeof window !== "undefined" && window.location.pathname !== "/auth/login") {
+                        if (typeof window !== "undefined" && window.location.pathname !== "/login") {
                             toast.error("Session expired, please login again.");
-                            window.location.href = "/auth/login";
+                            window.location.href = "/login";
                         }
                         return Promise.reject(err);
                     } finally {
@@ -207,9 +207,9 @@ api.interceptors.response.use(
                 Cookies.remove("hospitalId");
                 Cookies.remove("userId");
 
-                if (typeof window !== "undefined" && window.location.pathname !== "/auth/login") {
+                if (typeof window !== "undefined" && window.location.pathname !== "/login") {
                     toast.error("Session expired, please login again.");
-                    window.location.href = "/auth/login";
+                    window.location.href = "/login";
                 }
                 return Promise.reject(err);
             } finally {

@@ -35,7 +35,7 @@
   - If `true`: `accessToken` expires in 7 days, `refreshToken` expires in 30 days.
   - If `false`: Session-based cookies (cleared on browser close).
 - **Session Expiry Handling**:
-  - If refresh fails or token is invalid, clear cookies (`accessToken`, `refreshToken`, `hospitalId`, `userId`), display `toast.error("Session expired, please login again.")`, and redirect to `/auth/login`.
+  - If refresh fails or token is invalid, clear cookies (`accessToken`, `refreshToken`, `hospitalId`, `userId`), display `toast.error("Session expired, please login again.")`, and redirect to `/login`.
 
 ---
 

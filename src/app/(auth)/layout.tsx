@@ -6,11 +6,11 @@ import Cookies from "js-cookie";
 import AuthCarousel from "@/components/auth/authCarousel";
 
 const guestRoutes = [
-    "/auth/login",
-    "/auth/forgot-password",
-    "/auth/verify-pin",
-    "/auth/change-password",
-    "/auth/reset-password",
+    "/login",
+    "/forgot-password",
+    "/verify-pin",
+    "/change-password",
+    "/reset-password",
 ];
 
 export default function AuthLayout({

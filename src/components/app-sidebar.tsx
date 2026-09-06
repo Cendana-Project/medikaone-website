@@ -99,7 +99,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
         const result = await logout();
         if (result.success) {
             toast.success("Anda berhasil logout.");
-            router.push("/auth/login");
+            router.push("/login");
         }
     };
 

@@ -54,7 +54,7 @@ export default function Forbidden() {
                         variant="outline"
                         className="text-[#2F907F] border-[#2F907F] hover:bg-[#2F907F] hover:text-white transition-colors px-8 py-6 text-lg"
                         >
-                        <Link href="/auth/login">Login</Link>
+                        <Link href="/login">Login</Link>
                         </Button>
                     )}
                 </div>
