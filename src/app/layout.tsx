@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./providers";
+import { Nunito_Sans } from "next/font/google";
+
+const nunito = Nunito_Sans({
+    subsets: ["latin"],
+    weight: ["300", "400", "600", "700", "800"],
+    variable: "--font-nunito-sans",
+});
 
 export const metadata: Metadata = {
     title: "MedikaOne",
@@ -11,7 +18,7 @@ export default function RootLayout({
   children,
 }: { children: React.ReactNode }) {
     return (
-        <html lang="en">
+        <html lang="en" className={nunito.variable}>
             <body className="antialiased">
                 <Providers>{children}</Providers>
             </body>

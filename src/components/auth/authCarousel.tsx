@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Autoplay from "embla-carousel-autoplay";
 import {
     Carousel,
     CarouselContent,
@@ -9,77 +10,84 @@ import {
     CarouselApi,
 } from "@/components/ui/carousel";
 
+const slides = [
+    {
+        id: 1,
+        image: "/auth/bg1.png",
+        alt: "Doctor Banner 1",
+    },
+    {
+        id: 2,
+        image: "/auth/bg2.png",
+        alt: "Doctor Banner 2",
+    },
+];
+
 export default function AuthCarousel() {
     const [api, setApi] = useState<CarouselApi>();
     const [current, setCurrent] = useState(0);
-    const [count, setCount] = useState(0);
+
+    const plugin = useRef(
+        Autoplay({ delay: 4000, stopOnInteraction: false })
+    );
 
     useEffect(() => {
         if (!api) return;
 
-        setCount(api.scrollSnapList().length);
         setCurrent(api.selectedScrollSnap());
 
         api.on("select", () => setCurrent(api.selectedScrollSnap()));
     }, [api]);
 
     return (
-        <div className="hidden xl:block xl:w-1/2 relative p-4">
-            <div className="relative w-full overflow-hidden rounded-2xl">
+        <div className="hidden lg:flex lg:w-1/2 h-screen p-4 items-center justify-center">
+            <div className="relative w-full h-[calc(100vh-2rem)] overflow-hidden rounded-[16px] bg-[#2F907F] shadow-md">
                 <Carousel
                     setApi={setApi}
+                    plugins={[plugin.current]}
                     opts={{
                         align: "start",
                         loop: true,
                     }}
+                    className="w-full h-full"
                 >
-                    <CarouselContent>
-                        <CarouselItem>
-                            <div className="relative w-full h-screen">
-                                <Image
-                                src="/auth/bg1.png"
-                                alt="Doctor Picture"
-                                fill
-                                className="object-contain xl:object-cover object-center"
-                                />
-                            </div>
-                        </CarouselItem>
-
-                        <CarouselItem>
-                            <div className="relative w-full h-screen">
-                                <Image
-                                src="/auth/bg2.png"
-                                alt="Picture 2"
-                                fill
-                                className="object-contain xl:object-cover object-center"
-                                />
-                            </div>
-                        </CarouselItem>
+                    <CarouselContent className="h-full -ml-0">
+                        {slides.map((slide, idx) => (
+                            <CarouselItem key={slide.id} className="pl-0 h-full">
+                                <div className="relative w-full h-[calc(100vh-2rem)]">
+                                    <Image
+                                        src={slide.image}
+                                        alt={slide.alt}
+                                        fill
+                                        priority={idx === 0}
+                                        className="object-cover object-top"
+                                    />
+                                </div>
+                            </CarouselItem>
+                        ))}
                     </CarouselContent>
                 </Carousel>
-                <div className="absolute lg:bottom-16 xl:bottom-6 left-1/2 -translate-x-1/2 w-[85%] xl:w-[90%] bg-white rounded-2xl shadow-lg py-4 xl:py-12 lg:px-6 gap-8 text-center slide-image">
-                    <h3 className="font-semibold text-base xl:text-lg text-black">
-                        🩺 Buat Perjanjian Secara Online
-                    </h3>
-                    <p className="text-gray-600 text-sm xl:text-base leading-relaxed">
-                        Buat perjanjian dengan lebih cepat, mudah, dan efisien bersama
-                        MedicalOne—solusi terbaik untuk mengatur jadwal medis Anda kapan
-                        saja dan di mana saja. Nikmati kemudahan akses, tanpa repot, dengan
-                        layanan digital yang dirancang khusus untuk Anda.
-                    </p>
-                    <div className="flex justify-center items-center gap-3 mt-6">
-                        {Array.from({ length: count }).map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => api?.scrollTo(index)}
-                                className={`transition-all rounded-full h-2 ${
-                                current === index ? "w-10 bg-[#2F907F]" : "w-6 bg-gray-300"
-                                }`}
-                            />
-                        ))}
-                    </div>
+
+                {/* Bullet Indicators */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 z-10 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
+                    {slides.map((_, index) => (
+                        <button
+                            key={index}
+                            type="button"
+                            onClick={() => api?.scrollTo(index)}
+                            aria-label={`Go to slide ${index + 1}`}
+                            className={`transition-all h-[7px] rounded-[84px] cursor-pointer ${
+                                current === index
+                                    ? "w-10 bg-[#2F907F]"
+                                    : "w-8 bg-[#D9D9D9] hover:bg-gray-400"
+                            }`}
+                        />
+                    ))}
                 </div>
             </div>
         </div>
     );
 }
+
+
+

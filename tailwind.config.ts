@@ -8,10 +8,17 @@ const config: Config = {
     ],
     theme: {
         extend: {
-        screens: {
-            portrait: { raw: "(orientation: portrait)" },
-            landscape: { raw: "(orientation: landscape)" },
-        },
+            colors: {
+                sidebar: {
+                    DEFAULT: '255 255 255',
+                    foreground: '31 41 55',
+                },
+            },
+
+            screens: {
+                portrait: { raw: "(orientation: portrait)" },
+                landscape: { raw: "(orientation: landscape)" },
+            },
         },
     },
     plugins: [],

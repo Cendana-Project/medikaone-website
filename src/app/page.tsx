@@ -1,9 +1,15 @@
-import Image from "next/image";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-    <div className="">
-      
-    </div>
-  );
+export const runtime = "edge";
+
+export default async function Home() {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("accessToken")?.value || cookieStore.get("refreshToken")?.value;
+
+    if (token) {
+        redirect("/dashboard");
+    } else {
+        redirect("/auth/login");
+    }
 }

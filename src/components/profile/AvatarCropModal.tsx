@@ -69,7 +69,7 @@ export default function AvatarCropModal({
         const img = e.currentTarget;
         const nw = img.naturalWidth || 220;
         const nh = img.naturalHeight || 220;
-        
+
         // Cover the 220px circular frame without empty space
         const scaleToCover = Math.max(CROP_FRAME_SIZE / nw, CROP_FRAME_SIZE / nh);
         setBaseSize({

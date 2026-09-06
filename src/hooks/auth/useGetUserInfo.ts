@@ -11,7 +11,7 @@ export const useGetUserInfo = () => {
         queryKey: ["me"],
         queryFn: async () => {
             const res = await getUserInfo();
-            return res.data; 
+            return res.data;
         },
         staleTime: 1000 * 60 * 10, // 10 minutes cache
         refetchOnWindowFocus: false,
