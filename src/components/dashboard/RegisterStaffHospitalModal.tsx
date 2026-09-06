@@ -45,6 +45,9 @@ export default function RegisterStaffHospitalModal({
     const { mutate, isPending } = useRegisterStaffHospital();
     const { userInfo } = useGetUserInfo();
 
+    const normalizedRole = (userInfo?.role || "").toUpperCase().replace(/[-\s]+/g, "_");
+    const isSuperAdmin = normalizedRole === "SUPER_ADMIN";
+
     const getActiveHospitalCode = (): string => {
         const record = (userInfo || {}) as unknown as Record<string, unknown>;
         return (
@@ -69,7 +72,7 @@ export default function RegisterStaffHospitalModal({
     } = useForm<RegisterStaffForm>({
         resolver: zodResolver(registerStaffSchema),
         defaultValues: {
-            hospitalId: "TEMP_ID",
+            hospitalId: "",
             username: "",
             email: "",
             phone: "",
@@ -85,18 +88,22 @@ export default function RegisterStaffHospitalModal({
         },
     });
 
-    // Auto set active hospital ID in hidden state
+    // Auto set active hospital ID in hidden state for hospital admin
     useEffect(() => {
         if (isOpen) {
-            const hId = getActiveHospitalCode();
-            setValue("hospitalId", hId);
+            if (!isSuperAdmin) {
+                const hId = getActiveHospitalCode();
+                setValue("hospitalId", hId);
+            } else {
+                setValue("hospitalId", "");
+            }
         }
-    }, [isOpen, userInfo, setValue]);
+    }, [isOpen, userInfo, isSuperAdmin, setValue]);
 
     const handleFormSubmit = (data: RegisterStaffForm) => {
-        const finalHospitalId = data.hospitalId && data.hospitalId !== "TEMP_ID"
+        const finalHospitalId = isSuperAdmin
             ? data.hospitalId
-            : getActiveHospitalCode();
+            : (data.hospitalId && data.hospitalId !== "TEMP_ID" ? data.hospitalId : getActiveHospitalCode());
 
         const updatedData = { ...data, hospitalId: finalHospitalId };
         setFormData(updatedData);
@@ -105,7 +112,7 @@ export default function RegisterStaffHospitalModal({
 
     const handleConfirmSubmit = () => {
         if (!formData) return;
-        const targetHospitalId = formData.hospitalId || getActiveHospitalCode();
+        const targetHospitalId = formData.hospitalId || (isSuperAdmin ? "" : getActiveHospitalCode());
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { confirmPassword, hospitalId: _, ...payload } = formData;
@@ -143,6 +150,7 @@ export default function RegisterStaffHospitalModal({
 
     const confirmDetails: ConfirmDetailItem[] = formData
         ? [
+            ...(formData.hospitalId ? [{ label: "Kode Rumah Sakit", value: formData.hospitalId }] : []),
             { label: "Role Pegawai", value: getRoleLabel(formData.role) },
             { label: "Nama Staff", value: `${formData.first_name || ""} ${formData.last_name || ""}`.trim() || formData.username || formData.email },
             { label: "Email", value: formData.email },
@@ -167,8 +175,24 @@ export default function RegisterStaffHospitalModal({
 
                     <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col flex-1 overflow-hidden">
                         <div className="flex-1 overflow-y-auto px-7 pb-5 flex flex-col gap-4">
-                            {/* Hidden hospitalId input */}
-                            <input type="hidden" {...register("hospitalId")} />
+                            {/* Hospital ID Input for SuperAdmin or Hidden for Admin */}
+                            {isSuperAdmin ? (
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="hospitalId" className="text-sm font-medium text-gray-800">
+                                        Kode Rumah Sakit <span className="text-red-500">*</span>
+                                    </Label>
+                                    <Input
+                                        type="text"
+                                        id="hospitalId"
+                                        placeholder="Contoh: HSP-MO-001"
+                                        {...register("hospitalId")}
+                                        className="h-11 bg-[#F8FAFC] border-gray-200 rounded-xl px-4 text-sm focus-visible:bg-white focus-visible:ring-[#3BB49F]/20 focus-visible:border-[#3BB49F]"
+                                    />
+                                    {errors.hospitalId && <p className="text-red-500 text-xs mt-0.5">{errors.hospitalId.message}</p>}
+                                </div>
+                            ) : (
+                                <input type="hidden" {...register("hospitalId")} />
+                            )}
 
                             {/* Email & Username */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
