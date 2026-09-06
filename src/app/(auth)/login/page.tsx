@@ -157,7 +157,7 @@ export default function Login() {
                         </Label>
                     </div>
                     <Link
-                        href="/auth/forgot-password"
+                        href="/forgot-password"
                         className="text-base font-semibold text-[#1E1E1E] hover:text-[#2F907F] hover:underline transition-colors duration-200 cursor-pointer"
                     >
                         Lupa Kata Sandi

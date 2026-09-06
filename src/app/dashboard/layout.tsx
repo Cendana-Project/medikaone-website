@@ -34,20 +34,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen w-full">
-            <Spinner className="w-10 h-10 text-green-600" />
+                <Spinner className="w-10 h-10 text-green-600" />
             </div>
         );
     }    
     if (error) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-            <Alert variant="destructive" className="max-w-md">
-                <AlertCircle className="h-5 w-5" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>
-                Gagal memuat data user. Silakan coba lagi nanti.
-                </AlertDescription>
-            </Alert>
+                <Alert variant="destructive" className="max-w-md">
+                    <AlertCircle className="h-5 w-5" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>
+                        Gagal memuat data user. Silakan coba lagi nanti.
+                    </AlertDescription>
+                </Alert>
             </div>
         );
     }
@@ -55,29 +55,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     if (!userInfo || userInfo.status !== "active") {
         return (
             <div className="flex items-center justify-center min-h-screen">
-            <Alert variant="warning" className="max-w-md">
-                <AlertCircle className="h-5 w-5" />
-                <AlertTitle>Akun Tidak Aktif</AlertTitle>
-                <AlertDescription>
-                Akun kamu tidak aktif atau data user tidak ditemukan.
-                </AlertDescription>
-            </Alert>
+                <Alert variant="warning" className="max-w-md">
+                    <AlertCircle className="h-5 w-5" />
+                    <AlertTitle>Akun Tidak Aktif</AlertTitle>
+                    <AlertDescription>
+                        Akun kamu tidak aktif atau data user tidak ditemukan.
+                    </AlertDescription>
+                </Alert>
             </div>
         );
     }
 
     return (
-        <SidebarProvider>
-            <div className="flex min-h-screen w-full bg-[#F5F7F9]">
+        <SidebarProvider className="h-screen w-full overflow-hidden">
+            <div className="flex h-screen w-full bg-[#F5F7F9] overflow-hidden">
                 <AppSidebar role={userInfo.role} />
-                <main className="w-full">
-                    <div className="bg-white py-6 px-4 border-b border-black/10">
+                <div className="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
+                    {/* Fixed Top Navbar Header */}
+                    <header className="sticky top-0 z-40 bg-white py-4 px-6 border-b border-black/10 shrink-0 shadow-2xs">
                         <div className="flex justify-between items-center">
                             <div className="self-start flex items-center gap-4">
                                 <SidebarTrigger />
-                                <h2 className="font-bold text-lg">{headerInfo.title}</h2>
+                                <h2 className="font-bold text-lg text-gray-900">{headerInfo.title}</h2>
                                 {headerInfo.badge && (
-                                    <span className="text-[#2596be] bg-[#f0f8fd] p-2 rounded-full text-xs">
+                                    <span className="text-[#2596be] bg-[#f0f8fd] px-3 py-1 rounded-full text-xs font-semibold">
                                         {headerInfo.badge}
                                     </span>
                                 )}
@@ -86,12 +87,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 <LanguageAndNotification />
                             </div>
                         </div>
-                    </div>
+                    </header>
 
-                    <div className="w-full">
+                    {/* Scrollable Main Content Area */}
+                    <main className="flex-1 overflow-y-auto w-full">
                         {children}
-                    </div>
-                </main>
+                    </main>
+                </div>
             </div>
         </SidebarProvider>
     );

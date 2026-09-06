@@ -13,7 +13,7 @@ export const useChangePassword = () => {
         mutationFn: (payload: changePasswordRequest) => changePassword(payload),
         onSuccess: () => {
             toast.success("Ganti password berhasil!");
-            router.push("/auth/login"); 
+            router.push("/login"); 
         },
         onError: (error) => {
             handleApiError(error, "Ganti password gagal");

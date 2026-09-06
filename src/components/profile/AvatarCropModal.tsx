@@ -9,7 +9,7 @@ interface AvatarCropModalProps {
     isOpen: boolean;
     onClose: () => void;
     imageSrc: string | null;
-    onSave: (croppedBlob: Blob) => Promise<void>;
+    onSave: (croppedBlob: Blob) => Promise<void> | void;
 }
 
 export default function AvatarCropModal({
@@ -21,7 +21,7 @@ export default function AvatarCropModal({
     const [zoom, setZoom] = useState<number>(1.0);
     const [offsetX, setOffsetX] = useState<number>(0);
     const [offsetY, setOffsetY] = useState<number>(0);
-    const [baseSize, setBaseSize] = useState<{ width: number; height: number }>({ width: 180, height: 180 });
+    const [baseSize, setBaseSize] = useState<{ width: number; height: number }>({ width: 220, height: 220 });
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -29,7 +29,21 @@ export default function AvatarCropModal({
     const imageRef = useRef<HTMLImageElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
-    const VIEWFINDER_SIZE = 180; // Viewfinder circle diameter
+    const CROP_FRAME_SIZE = 220; // Circular crop frame size (220px x 220px)
+
+    // Calculate maximum drag offset allowed so image never leaves circular viewfinder
+    const getClampedOffset = useCallback((x: number, y: number, currentZoom: number, size: { width: number; height: number }) => {
+        const scaledW = size.width * currentZoom;
+        const scaledH = size.height * currentZoom;
+
+        const maxOffsetX = Math.max(0, (scaledW - CROP_FRAME_SIZE) / 2);
+        const maxOffsetY = Math.max(0, (scaledH - CROP_FRAME_SIZE) / 2);
+
+        const clampedX = Math.min(maxOffsetX, Math.max(-maxOffsetX, x));
+        const clampedY = Math.min(maxOffsetY, Math.max(-maxOffsetY, y));
+
+        return { x: clampedX, y: clampedY };
+    }, []);
 
     // Reset settings when image changes or modal opens
     useEffect(() => {
@@ -38,14 +52,14 @@ export default function AvatarCropModal({
             setOffsetX(0);
             setOffsetY(0);
 
-            // If image is already loaded/cached in DOM, compute scale to fit immediately
             if (imageRef.current && imageRef.current.complete && imageRef.current.naturalWidth) {
                 const nw = imageRef.current.naturalWidth;
                 const nh = imageRef.current.naturalHeight;
-                const scaleToFit = Math.min(VIEWFINDER_SIZE / nw, VIEWFINDER_SIZE / nh);
+                // Scale to cover the 220px circular frame completely
+                const scaleToCover = Math.max(CROP_FRAME_SIZE / nw, CROP_FRAME_SIZE / nh);
                 setBaseSize({
-                    width: nw * scaleToFit,
-                    height: nh * scaleToFit,
+                    width: nw * scaleToCover,
+                    height: nh * scaleToCover,
                 });
             }
         }
@@ -53,14 +67,14 @@ export default function AvatarCropModal({
 
     const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
         const img = e.currentTarget;
-        const nw = img.naturalWidth || 180;
-        const nh = img.naturalHeight || 180;
-        
-        // Scale image to fit within the 180px viewfinder circle at default zoom = 1.0
-        const scaleToFit = Math.min(VIEWFINDER_SIZE / nw, VIEWFINDER_SIZE / nh);
+        const nw = img.naturalWidth || 220;
+        const nh = img.naturalHeight || 220;
+
+        // Cover the 220px circular frame without empty space
+        const scaleToCover = Math.max(CROP_FRAME_SIZE / nw, CROP_FRAME_SIZE / nh);
         setBaseSize({
-            width: nw * scaleToFit,
-            height: nh * scaleToFit,
+            width: nw * scaleToCover,
+            height: nh * scaleToCover,
         });
     };
 
@@ -72,12 +86,42 @@ export default function AvatarCropModal({
 
     const handleMouseMove = useCallback((e: React.MouseEvent) => {
         if (!isDragging) return;
-        setOffsetX(e.clientX - dragStart.x);
-        setOffsetY(e.clientY - dragStart.y);
-    }, [isDragging, dragStart]);
+        e.preventDefault();
+        const rawX = e.clientX - dragStart.x;
+        const rawY = e.clientY - dragStart.y;
+        const clamped = getClampedOffset(rawX, rawY, zoom, baseSize);
+        setOffsetX(clamped.x);
+        setOffsetY(clamped.y);
+    }, [isDragging, dragStart, zoom, baseSize, getClampedOffset]);
 
     const handleMouseUp = () => {
         setIsDragging(false);
+    };
+
+    // Touch Event Handlers for Mobile & Trackpads
+    const handleTouchStart = (e: React.TouchEvent) => {
+        if (e.touches.length === 1) {
+            const touch = e.touches[0];
+            setIsDragging(true);
+            setDragStart({ x: touch.clientX - offsetX, y: touch.clientY - offsetY });
+        }
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        const rawX = touch.clientX - dragStart.x;
+        const rawY = touch.clientY - dragStart.y;
+        const clamped = getClampedOffset(rawX, rawY, zoom, baseSize);
+        setOffsetX(clamped.x);
+        setOffsetY(clamped.y);
+    };
+
+    const handleZoomChange = (newZoom: number) => {
+        setZoom(newZoom);
+        const clamped = getClampedOffset(offsetX, offsetY, newZoom, baseSize);
+        setOffsetX(clamped.x);
+        setOffsetY(clamped.y);
     };
 
     const handleReset = () => {
@@ -92,36 +136,31 @@ export default function AvatarCropModal({
 
         try {
             const canvas = document.createElement("canvas");
-            const CROP_SIZE = 300; // Output avatar size 300x300
-            canvas.width = CROP_SIZE;
-            canvas.height = CROP_SIZE;
+            const OUTPUT_SIZE = 300; // Output 300x300 avatar image
+            canvas.width = OUTPUT_SIZE;
+            canvas.height = OUTPUT_SIZE;
 
             const ctx = canvas.getContext("2d");
             if (!ctx) return;
 
             const img = imageRef.current;
+            ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
-            // Clear canvas
-            ctx.clearRect(0, 0, CROP_SIZE, CROP_SIZE);
-
-            // Draw clip circle
+            // Clip circle shape
             ctx.beginPath();
-            ctx.arc(CROP_SIZE / 2, CROP_SIZE / 2, CROP_SIZE / 2, 0, Math.PI * 2);
+            ctx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, 0, Math.PI * 2);
             ctx.closePath();
             ctx.clip();
 
-            // Fill white background for clean crop
+            // Background fill
             ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, CROP_SIZE, CROP_SIZE);
+            ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
-            // Calculate scaling and center translation
-            const scaleFactor = CROP_SIZE / VIEWFINDER_SIZE;
-
+            const scaleFactor = OUTPUT_SIZE / CROP_FRAME_SIZE;
             const drawWidth = baseSize.width * zoom * scaleFactor;
             const drawHeight = baseSize.height * zoom * scaleFactor;
-
-            const centerX = CROP_SIZE / 2 + offsetX * scaleFactor;
-            const centerY = CROP_SIZE / 2 + offsetY * scaleFactor;
+            const centerX = OUTPUT_SIZE / 2 + offsetX * scaleFactor;
+            const centerY = OUTPUT_SIZE / 2 + offsetY * scaleFactor;
 
             ctx.drawImage(
                 img,
@@ -143,7 +182,7 @@ export default function AvatarCropModal({
                 0.95
             );
         } catch (err) {
-            console.error("Cropping failed", err);
+            console.error("Cropping error", err);
             setIsSubmitting(false);
         }
     };
@@ -155,24 +194,27 @@ export default function AvatarCropModal({
             <DialogContent className="max-w-md bg-white rounded-xl p-6">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-bold text-gray-900">
-                        Atur & Sesuaikan Foto Profil
+                        Sesuaikan Position Foto
                     </DialogTitle>
                     <p className="text-xs text-gray-500">
-                        Geser gambar dan sesuaikan zoom untuk memfokuskan foto dalam bingkai bulat.
+                        Geser foto dan sesuaikan tingkat zoom dalam bingkai bundar.
                     </p>
                 </DialogHeader>
 
-                {/* Viewfinder Canvas */}
-                <div className="flex flex-col items-center gap-4 my-2">
+                {/* Clean Circular Viewfinder without huge black background box */}
+                <div className="flex flex-col items-center gap-4 my-3">
                     <div
                         ref={containerRef}
                         onMouseDown={handleMouseDown}
                         onMouseMove={handleMouseMove}
                         onMouseUp={handleMouseUp}
                         onMouseLeave={handleMouseUp}
-                        className="relative w-[260px] h-[260px] bg-slate-900 rounded-lg overflow-hidden cursor-move flex items-center justify-center select-none"
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleMouseUp}
+                        className="relative w-[220px] h-[220px] rounded-full border-4 border-[#3BB49F] shadow-lg bg-gray-100 overflow-hidden cursor-move flex items-center justify-center select-none touch-none"
                     >
-                        {/* Render Source Image */}
+                        {/* Source Image */}
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             ref={imageRef}
@@ -180,7 +222,7 @@ export default function AvatarCropModal({
                             onLoad={handleImageLoad}
                             alt="Crop Preview"
                             draggable={false}
-                            className="absolute max-w-none transition-transform duration-75"
+                            className="absolute max-w-none transition-transform duration-75 select-none pointer-events-none"
                             style={{
                                 width: `${baseSize.width}px`,
                                 height: `${baseSize.height}px`,
@@ -188,9 +230,6 @@ export default function AvatarCropModal({
                                 transformOrigin: "center center",
                             }}
                         />
-
-                        {/* Circular Viewfinder Overlay */}
-                        <div className="pointer-events-none absolute w-[180px] h-[180px] rounded-full border-2 border-[#3BB49F] shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]" />
                     </div>
 
                     {/* Controls */}
@@ -199,23 +238,24 @@ export default function AvatarCropModal({
                             <ZoomOut size={16} className="text-gray-500 shrink-0" />
                             <input
                                 type="range"
-                                min="0.5"
-                                max="4.0"
+                                min="1.0"
+                                max="3.5"
                                 step="0.05"
                                 value={zoom}
-                                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                                onChange={(e) => handleZoomChange(parseFloat(e.target.value))}
                                 className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#3BB49F]"
                             />
                             <ZoomIn size={16} className="text-gray-500 shrink-0" />
                         </div>
 
                         <div className="flex justify-between items-center text-xs text-gray-500">
-                            <span className="flex items-center gap-1">
-                                <Move size={12} /> Drag gambar untuk menggeser posisi
+                            <span className="flex items-center gap-1 text-[11px]">
+                                <Move size={12} /> Klik & geser foto untuk mengubah posisi
                             </span>
                             <button
+                                type="button"
                                 onClick={handleReset}
-                                className="flex items-center gap-1 text-[#3BB49F] hover:underline cursor-pointer"
+                                className="flex items-center gap-1 text-[#3BB49F] hover:underline cursor-pointer font-medium"
                             >
                                 <RotateCcw size={12} /> Reset
                             </button>
@@ -223,13 +263,13 @@ export default function AvatarCropModal({
                     </div>
                 </div>
 
-                <DialogFooter className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                <DialogFooter className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
                     <Button
                         type="button"
                         variant="outline"
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className="rounded-lg cursor-pointer"
+                        className="rounded-lg cursor-pointer text-xs"
                     >
                         Batal
                     </Button>
@@ -237,15 +277,15 @@ export default function AvatarCropModal({
                         type="button"
                         onClick={handleCropAndSave}
                         disabled={isSubmitting}
-                        className="bg-[#3BB49F] hover:bg-[#349d8b] text-white rounded-lg px-5 cursor-pointer"
+                        className="bg-[#3BB49F] hover:bg-[#349d8b] text-white rounded-lg px-5 cursor-pointer text-xs font-semibold"
                     >
                         {isSubmitting ? (
                             <>
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Menyimpan...
+                                Memproses...
                             </>
                         ) : (
-                            "Simpan & Unggah"
+                            "Pilih Foto Ini"
                         )}
                     </Button>
                 </DialogFooter>

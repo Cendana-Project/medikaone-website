@@ -11,9 +11,11 @@ export const useGetUserInfo = () => {
         queryKey: ["me"],
         queryFn: async () => {
             const res = await getUserInfo();
-            return res.data; 
+            return res.data;
         },
-        staleTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 10, // 10 minutes cache
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
         retry: 1,
     });
 
@@ -30,7 +32,9 @@ export const useGetUserInfo = () => {
                 return null;
             }
         },
-        staleTime: 0,
+        staleTime: 1000 * 60 * 10, // 10 minutes cache
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
         retry: 1,
     });
 

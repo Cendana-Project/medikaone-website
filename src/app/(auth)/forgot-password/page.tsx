@@ -212,7 +212,7 @@ export default function ForgotPassword() {
 
                         <div className="text-center text-[16px] leading-[24px] text-[#212121]">
                             Sudah punya akun?{" "}
-                            <Link href="/auth/login" className="font-bold text-[#000000] hover:underline">
+                            <Link href="/login" className="font-bold text-[#000000] hover:underline">
                                 Masuk
                             </Link>
                         </div>
