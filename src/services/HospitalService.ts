@@ -34,3 +34,14 @@ export const createHospitalStaff = async (hospitalId: string, payload: CreateHos
         return response.data;
     });
 };
+
+/**
+ * Get list of hospitals in system.
+ * GET /v1/hospitals
+ */
+export const getHospitals = async (params?: { search?: string; limit?: number }) => {
+    return safeRequest(async () => {
+        const response = await api.get("hospitals", { params });
+        return response.data;
+    });
+};

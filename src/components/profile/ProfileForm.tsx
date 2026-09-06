@@ -190,20 +190,47 @@ export default function ProfileForm() {
                 </div>
 
                 {/* Hospital Assignment Info */}
-                {userInfo?.hospitals && userInfo.hospitals.length > 0 && (
-                    <div className="flex flex-col gap-2 bg-slate-50 border border-slate-200 rounded-lg p-4">
-                        <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-                            <Building size={14} className="text-[#3BB49F]" /> Rumah Sakit Terkait:
-                        </span>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                            {userInfo.hospitals.map((hsp) => (
-                                <span key={hsp.id} className="text-xs bg-white text-slate-800 border border-slate-200 px-3 py-1 rounded-md font-medium shadow-xs">
-                                    {hsp.name} <span className="text-slate-400">({hsp.code})</span>
-                                </span>
-                            ))}
+                {(() => {
+                    const record = (userInfo || {}) as unknown as Record<string, unknown>;
+                    const hospitalsList: Array<{ id?: string; name?: string; code?: string }> = 
+                        Array.isArray(userInfo?.hospitals) && userInfo.hospitals.length > 0
+                            ? userInfo.hospitals
+                            : Array.isArray(record.hospital_list) && record.hospital_list.length > 0
+                            ? (record.hospital_list as Array<{ id?: string; name?: string; code?: string }>)
+                            : record.hospital && typeof record.hospital === "object"
+                            ? [record.hospital as { id?: string; name?: string; code?: string }]
+                            : record.hospital_name || record.hospital_code
+                            ? [{ id: record.hospital_id as string, name: record.hospital_name as string, code: record.hospital_code as string }]
+                            : [];
+
+                    const isSuperAdmin = (userInfo?.role || "").toUpperCase().replace(/[-\s]+/g, "_") === "SUPER_ADMIN";
+
+                    return (
+                        <div className="flex flex-col gap-2 bg-slate-50 border border-slate-200 rounded-lg p-4">
+                            <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                                <Building size={14} className="text-[#3BB49F]" /> Rumah Sakit Terkait:
+                            </span>
+                            <div className="flex flex-wrap gap-2 mt-1">
+                                {hospitalsList.length > 0 ? (
+                                    hospitalsList.map((hsp, idx) => (
+                                        <span key={hsp.id || idx} className="text-xs bg-white text-slate-800 border border-slate-200 px-3 py-1.5 rounded-md font-medium shadow-xs flex items-center gap-1.5">
+                                            <span>{hsp.name || "Rumah Sakit"}</span>
+                                            {hsp.code && <span className="text-slate-400 font-mono text-[11px]">({hsp.code})</span>}
+                                        </span>
+                                    ))
+                                ) : isSuperAdmin ? (
+                                    <span className="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-md font-medium">
+                                        Super Admin (Akses Seluruh Sistem)
+                                    </span>
+                                ) : (
+                                    <span className="text-xs text-slate-500 italic bg-white border border-slate-200 px-3 py-1.5 rounded-md">
+                                        Belum terdaftar di rumah sakit mana pun.
+                                    </span>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    );
+                })()}
             </div>
 
             {/* Popup Modal Edit Profile */}

@@ -126,9 +126,9 @@ export default function EditProfileModal({
         e.preventDefault();
         setFormError(null);
 
-        // Basic phone format validation if provided
-        if (phone && !/^[0-9+\-\s()]{7,20}$/.test(phone)) {
-            setFormError("Nomor telepon tidak valid. Gunakan format angka 7-20 digit.");
+        // Strict phone format validation if provided
+        if (phone && !/^(?:\+62|0)[2-9]\d{7,12}$/.test(phone.trim())) {
+            setFormError("Nomor telepon tidak valid. Gunakan format +628... atau 08... (minimal 10 digit, tanpa angka 1 di depan +62).");
             return;
         }
 
@@ -329,7 +329,11 @@ export default function EditProfileModal({
                                 id="edit_phone"
                                 type="text"
                                 value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
+                                onChange={(e) => {
+                                    const raw = e.target.value;
+                                    const cleaned = raw.replace(/^1+(\+62|0)/, "$1").replace(/^1+(?=\+62)/, "");
+                                    setPhone(cleaned);
+                                }}
                                 placeholder="Contoh: 081234567890"
                                 className="rounded-lg text-sm border-gray-200 focus:ring-[#3BB49F] focus:border-[#3BB49F]"
                             />

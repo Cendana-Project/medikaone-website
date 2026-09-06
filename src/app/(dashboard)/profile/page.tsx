@@ -1,11 +1,5 @@
-'use client';
+import { redirect } from "next/navigation";
 
-import ProfileForm from "@/components/profile/ProfileForm";
-
-export default function ProfilePage() {
-    return (
-        <div className="w-full min-h-screen py-4">
-            <ProfileForm />
-        </div>
-    );
+export default function ProfileRedirectPage() {
+    redirect("/dashboard/profile");
 }

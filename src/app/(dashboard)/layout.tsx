@@ -11,22 +11,22 @@ import LanguageAndNotification from "@/components/LanguageAndNotification";
 import { usePathname } from "next/navigation";
 
 const getHeaderInfo = (pathname: string) => {
-    if (pathname.startsWith("/profile")) {
+    if (pathname.includes("/profile")) {
         return { title: "Pengaturan Profil", badge: null };
     }
-    if (pathname.startsWith("/roles")) {
+    if (pathname.includes("/roles")) {
         return { title: "Kelola Role", badge: null };
     }
-    if (pathname.startsWith("/doctors")) {
+    if (pathname.includes("/doctors")) {
         return { title: "Kelola Dokter", badge: null };
     }
-    if (pathname.startsWith("/departments")) {
+    if (pathname.includes("/departments")) {
         return { title: "Kelola Departemen", badge: null };
     }
-    if (pathname.startsWith("/rooms")) {
+    if (pathname.includes("/rooms")) {
         return { title: "Kelola Ruangan", badge: null };
     }
-    if (pathname.startsWith("/system")) {
+    if (pathname.includes("/system")) {
         return { title: "System Setting", badge: null };
     }
     return { title: "Detail Pegawai Rumah Sakit", badge: "100 users" };

@@ -167,44 +167,9 @@ export default function ForgotPassword() {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-2">
-                            <div onClick={handleCheckboxClick} className="flex items-center">
-                                <Checkbox
-                                    id="terms"
-                                    checked={agreedTerms}
-                                    onCheckedChange={(checked) => {
-                                        if (hasReadTerms) {
-                                            setAgreedTerms(!!checked);
-                                        } else {
-                                            openTermsModal("terms");
-                                        }
-                                    }}
-                                    className="w-5 h-5 rounded-[4px] border-[#236C5F] data-[state=checked]:bg-[#2F907F] data-[state=checked]:border-[#236C5F] cursor-pointer"
-                                />
-                            </div>
-                            <label htmlFor="terms" className="text-[14px] leading-[20px] font-normal text-[#212121]">
-                                Saya setuju dengan{" "}
-                                <button
-                                    type="button"
-                                    onClick={() => openTermsModal("terms")}
-                                    className="font-semibold text-[#2F907F] hover:underline cursor-pointer"
-                                >
-                                    Ketentuan Layanan
-                                </button>{" "}
-                                dan{" "}
-                                <button
-                                    type="button"
-                                    onClick={() => openTermsModal("privacy")}
-                                    className="font-semibold text-[#2F907F] hover:underline cursor-pointer"
-                                >
-                                    Kebijakan Privasi
-                                </button>
-                            </label>
-                        </div>
-
                         <Button
                             type="submit"
-                            disabled={forgotPasswordMutation.isPending || !agreedTerms}
+                            disabled={forgotPasswordMutation.isPending}
                             className="h-[52px] rounded-[10px] bg-[#2F907F] hover:bg-[#236C5F] text-[16px] font-semibold text-white transition-colors cursor-pointer"
                         >
                             {forgotPasswordMutation.isPending ? "Mengirim..." : "Send Reset Link"}
