@@ -253,7 +253,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
             <SidebarFooter className="p-0 flex flex-col gap-6 mt-auto">
                 {/* Tenant User Info Card - Click to navigate to Profile */}
                 <Link 
-                    href="/profile"
+                    href="/dashboard/profile"
                     className="w-full min-h-[96px] rounded-[12px] p-[24px_12px_24px_10px] border border-[#EAECF0] flex items-center gap-[10px] box-border transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                     style={{
                         background: "linear-gradient(148.58deg, #3BB49F 18.96%, #00FFD3 176.22%)"

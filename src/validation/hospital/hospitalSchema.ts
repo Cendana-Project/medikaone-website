@@ -7,7 +7,7 @@ export const createHospitalSchema = z.object({
     city: z.string().min(1, "Kota wajib diisi"),
     province: z.string().min(1, "Provinsi wajib diisi"),
     country: z.string().min(1, "Negara wajib diisi"),
-    phone: z.string().min(1, "Nomor telepon wajib diisi"),
+    phone: z.string().min(1, "Nomor telepon wajib diisi").regex(/^(?:\+62|0)[2-9]\d{7,12}$/, "Nomor telepon harus format valid (cth: +62812... atau 0812...)"),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
     description: z.string().optional(),
