@@ -8,7 +8,6 @@ export const useDeleteRoom = (hospitalId: string) => {
   return useMutation({
     mutationFn: (roomId: string) => deleteRoom(hospitalId, roomId),
     onSuccess: () => {
-      toast.success("Ruangan berhasil dihapus!");
       queryClient.invalidateQueries({ queryKey: ["rooms", hospitalId] });
     },
   });

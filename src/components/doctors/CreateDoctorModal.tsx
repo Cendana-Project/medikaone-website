@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, CheckCircle2, FileText, Upload, Plus, ArrowLeft, ArrowRight, UserCheck } from "lucide-react";
+import { ChevronDown, CheckCircle2, FileText, Upload, Plus, ArrowLeft, ArrowRight, UserCheck, Calendar, Info } from "lucide-react";
 import { DoctorSearchInput } from "./DoctorSearchInput";
 import { DoctorSearchResult, DoctorSchedule, Department, Room } from "@/types/doctorRegistration";
 import { SchedulePicker } from "./SchedulePicker";
@@ -219,32 +219,83 @@ export function CreateDoctorModal({
                 Ketik kata kunci untuk mencari data dokter terverifikasi di jaringan nasional MedikaOne.
               </p>
 
-              {/* Selected Doctor Identified Card */}
+              {/* Selected Doctor Identified & Verified Card (Full Figma Spec) */}
               {selectedDoctor && (
-                <div className="bg-[#EBF8F5] border border-[#C4E9E2] p-4 rounded-xl flex flex-col gap-3 shadow-2xs mt-2">
-                  <div className="flex items-center justify-between border-b border-[#C4E9E2] pb-2.5">
-                    <div className="flex items-center gap-2 text-xs text-[#008A72] font-bold">
-                      <CheckCircle2 className="h-4 w-4 text-[#3BB49F]" />
-                      <span>Data Dokter Teridentifikasi & Terverifikasi</span>
+                <div className="flex flex-col gap-4 mt-2">
+                  <div
+                    className="w-full flex flex-col gap-6 p-6 md:p-8 rounded-xl shadow-lg transition-all"
+                    style={{
+                      background: "linear-gradient(147.77deg, #009B80 10.39%, #00352B 162.6%)",
+                      border: "6px solid rgba(0, 155, 128, 0.3)",
+                      borderRadius: "14px",
+                    }}
+                  >
+                    {/* Header Title inside card */}
+                    <div className="flex flex-col justify-center items-center text-center gap-1.5 border-b border-[#89D2C5] pb-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="h-6 w-6 text-white" />
+                        <h4 className="text-[22px] md:text-[24px] font-bold text-white leading-[28px] tracking-tight">
+                          Data Teridentifikasi
+                        </h4>
+                      </div>
+                      <p className="text-xs md:text-sm text-[#D8F0EC] font-normal">
+                        Pastikan identitas akun sesuai dengan user
+                      </p>
                     </div>
-                    <span className="text-xs bg-white px-2.5 py-1 rounded border border-[#C4E9E2] font-mono font-semibold text-gray-800">
-                      SIP: {selectedDoctor.sip_number || "-"}
-                    </span>
+
+                    {/* Avatar + Nama Lengkap */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#D4B5AD] text-white flex items-center justify-center font-bold text-base border border-white/30 shrink-0">
+                        {selectedDoctor.first_name?.[0] || "D"}
+                      </div>
+                      <div className="flex flex-col justify-center">
+                        <span className="text-xs text-white/90 font-normal leading-tight">
+                          Nama Lengkap
+                        </span>
+                        <span className="text-lg font-bold text-white leading-tight">
+                          {selectedDoctor.first_name} {selectedDoctor.last_name || ""}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* SIP Box */}
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-xs font-medium text-white">SIP</Label>
+                      <div className="h-11 w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[10px] px-4 flex items-center shadow-xs">
+                        <span className="text-sm text-gray-900 font-medium">
+                          {selectedDoctor.sip_number || "35041120392003"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Grid 2 Columns: Departemen & Tanggal Lahir */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <Label className="text-xs font-medium text-white">Spesialisasi</Label>
+                        <div className="h-11 w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[10px] px-4 flex items-center shadow-xs">
+                          <span className="text-sm text-gray-900 font-medium truncate">
+                            {selectedDoctor.specialty || "Dokter Spesialis"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <Label className="text-xs font-medium text-white flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5 text-white" /> Tanggal Lahir
+                        </Label>
+                        <div className="h-11 w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[10px] px-4 flex items-center shadow-xs">
+                          <span className="text-sm text-gray-900 font-medium">
+                            31 - 10 - 2002
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-800">
-                    <div>
-                      <span className="text-gray-500 block text-[11px]">Nama Lengkap Dokter:</span>
-                      <span className="font-bold text-gray-900 text-sm">
-                        {selectedDoctor.first_name} {selectedDoctor.last_name || ""}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 block text-[11px]">Spesialisasi:</span>
-                      <span className="font-semibold text-gray-900">
-                        {selectedDoctor.specialty || "Dokter Spesialis"}
-                      </span>
-                    </div>
+                  {/* Warning Subtitle */}
+                  <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500 font-medium">
+                    <Info className="h-3.5 w-3.5 text-gray-400" />
+                    <span>Jangan Sebarkan data pasien ke orang lain.</span>
                   </div>
                 </div>
               )}

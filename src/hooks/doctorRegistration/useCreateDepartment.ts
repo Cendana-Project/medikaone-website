@@ -12,7 +12,6 @@ export const useCreateDepartment = (hospitalId: string) => {
     return useMutation({
         mutationFn: (payload: CreateDepartmentRequest) => createDepartment(hospitalId, payload),
         onSuccess: () => {
-            toast.success("Department berhasil dibuat!");
             queryClient.invalidateQueries({ queryKey: ["departments", hospitalId] });
         },
         onError: (error) => {

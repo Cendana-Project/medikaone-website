@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserPlus, Calendar, ShieldCheck, Clock, Eye, Globe, Building2, Trash2 } from "lucide-react";
 import { CreateDoctorModal } from "@/components/doctors/CreateDoctorModal";
-import { VerifyDoctorModal } from "@/components/doctors/VerifyDoctorModal";
 import { ScheduleChangeModal } from "@/components/doctors/ScheduleChangeModal";
 import ConfirmModal from "@/components/ui/confirm-modal";
+import { StatusFilterDropdown, StatusOption } from "@/components/ui/StatusFilterDropdown";
 import { useGetDoctors } from "@/hooks/doctorRegistration/useGetDoctors";
 import { useGetGlobalDoctors, GlobalDoctorItem } from "@/hooks/doctorRegistration/useGetGlobalDoctors";
 import { useDeleteDoctorAffiliation } from "@/hooks/doctorRegistration/useDeleteDoctorAffiliation";
@@ -19,23 +19,34 @@ import { handleApiError, handleApiSuccess } from "@/lib/handleError";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+
+const DOCTOR_STATUS_OPTIONS: StatusOption[] = [
+  { value: "ACTIVE", label: "Aktif (Tersedia)" },
+  { value: "SUSPENDED", label: "Suspended (Tidak Aktif)" },
+];
+
 export default function DoctorsPage() {
   const router = useRouter();
   const hospitalId = Cookies.get("hospitalId") || "";
   const { userInfo } = useGetUserInfo();
 
-  const userRole = (userInfo?.role || "").toUpperCase().replace(/[-\s]+/g, "_");
-  const isSuperAdmin = userRole === "SUPER_ADMIN";
+  const roleFromCookie = Cookies.get("role") || Cookies.get("userRole") || "";
+  const rawRole = userInfo?.role || roleFromCookie;
+  const userRole = (rawRole || "").toUpperCase().replace(/[-\s]+/g, "_");
+  const isSuperAdmin = userRole === "SUPER_ADMIN" || userRole === "SUPERADMIN";
 
   const [activeTab, setActiveTab] = useState<"hospital" | "global">("hospital");
+  const [appliedStatuses, setAppliedStatuses] = useState<string[]>(DOCTOR_STATUS_OPTIONS.map((o) => o.value));
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isVerifyOpen, setIsVerifyOpen] = useState(false);
   const [scheduleTarget, setScheduleTarget] = useState<{ affiliationId: string; doctorName: string; schedules?: DoctorSchedule[] } | null>(null);
   const [deleteAffiliationTarget, setDeleteAffiliationTarget] = useState<DoctorAffiliation | null>(null);
 
   useEffect(() => {
     if (isSuperAdmin) {
       setActiveTab("global");
+    } else {
+      setActiveTab("hospital");
     }
   }, [isSuperAdmin]);
 
@@ -43,7 +54,13 @@ export default function DoctorsPage() {
   const { doctors: globalDoctors, isLoading: isGlobalLoading } = useGetGlobalDoctors();
   const deleteAffiliationMutation = useDeleteDoctorAffiliation(hospitalId);
 
-  const doctorsList: DoctorAffiliation[] = apiDoctors;
+  const doctorsList = useMemo(() => {
+    if (!Array.isArray(apiDoctors)) return [];
+    if (appliedStatuses.length === 0 || appliedStatuses.length === DOCTOR_STATUS_OPTIONS.length) {
+      return apiDoctors;
+    }
+    return apiDoctors.filter((d: DoctorAffiliation) => appliedStatuses.includes(d.status));
+  }, [apiDoctors, appliedStatuses]);
 
   const handleDeleteAffiliationConfirm = async () => {
     if (!deleteAffiliationTarget) return;
@@ -137,55 +154,83 @@ export default function DoctorsPage() {
       sortable: false,
       align: "center",
       render: (row) => (
-        <div className="flex items-center justify-center gap-2">
-          {/* Eye Icon Action Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => router.push(`/doctors/${row.doctor_id || row.affiliation_id || "doc-1"}/schedule`)}
-            title="Lihat Detail & Jadwal 24 Jam"
-            className="flex items-center gap-1 px-2.5 h-8 border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer text-xs font-medium"
-          >
-            <Eye className="h-3.5 w-3.5 text-[#3BB49F]" />
-            <span className="hidden sm:inline">Detail</span>
-          </Button>
+        <TooltipProvider>
+          <div className="flex items-center justify-center gap-1.5">
+            {/* Detail Tooltip Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push(`/doctors/${row.doctor_id || row.affiliation_id || "doc-1"}/schedule`)}
+                  className="h-8 w-8 p-0 flex items-center justify-center border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer"
+                >
+                  <Eye className="h-4 w-4 text-[#3BB49F]" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Detail & Profil Dokter</p>
+              </TooltipContent>
+            </Tooltip>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => router.push(`/doctors/${row.doctor_id || row.affiliation_id || "doc-1"}/schedule`)}
-            className="flex items-center gap-1.5 px-3 h-8 border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer text-xs font-medium"
-          >
-            <Calendar className="h-3.5 w-3.5 text-[#3BB49F]" />
-            <span>Kalender Jadwal</span>
-          </Button>
+            {/* Kalender Jadwal Tooltip Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push(`/doctors/${row.doctor_id || row.affiliation_id || "doc-1"}/schedule`)}
+                  className="h-8 w-8 p-0 flex items-center justify-center border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer"
+                >
+                  <Calendar className="h-4 w-4 text-[#3BB49F]" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Kalender Jadwal Praktik</p>
+              </TooltipContent>
+            </Tooltip>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              setScheduleTarget({
-                affiliationId: row.affiliation_id || row.doctor_id,
-                doctorName: `${row.first_name} ${row.last_name}`,
-                schedules: row.schedules || [],
-              })
-            }
-            className="flex items-center gap-1.5 px-3 h-8 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer text-xs font-medium"
-          >
-            <Clock className="h-3.5 w-3.5 text-gray-500" />
-            <span>Ubah Jadwal</span>
-          </Button>
+            {/* Ubah Jadwal Tooltip Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setScheduleTarget({
+                      affiliationId: row.affiliation_id || row.doctor_id,
+                      doctorName: `${row.first_name} ${row.last_name}`,
+                      schedules: row.schedules || [],
+                    })
+                  }
+                  className="h-8 w-8 p-0 flex items-center justify-center border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer"
+                >
+                  <Clock className="h-4 w-4 text-gray-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Ubah Jam Praktik</p>
+              </TooltipContent>
+            </Tooltip>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setDeleteAffiliationTarget(row)}
-            className="flex items-center justify-center p-2 h-8 w-8 border-red-200 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
-            title="Hapus Afiliasi Dokter"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
+            {/* Hapus Afiliasi Tooltip Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDeleteAffiliationTarget(row)}
+                  className="h-8 w-8 p-0 flex items-center justify-center border-red-200 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Hapus Afiliasi Dokter</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       ),
     },
   ];
@@ -263,64 +308,74 @@ export default function DoctorsPage() {
           </p>
         </div>
 
-        {/* View Mode Tab */}
-        <div className="flex items-center bg-gray-100 p-1.5 rounded-xl border border-gray-200 self-start sm:self-auto text-xs">
-          <button
-            onClick={() => setActiveTab("hospital")}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-semibold transition-all cursor-pointer ${
-              activeTab === "hospital"
-                ? "bg-white text-[#008A72] shadow-xs"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            <Building2 className="h-4 w-4" />
-            <span>Dokter RS Ini</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("global")}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-semibold transition-all cursor-pointer ${
-              activeTab === "global"
-                ? "bg-white text-[#008A72] shadow-xs"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            <Globe className="h-4 w-4" />
-            <span>Direktori Dokter (Superadmin)</span>
-          </button>
-        </div>
+        {/* View Mode Tab (Hanya tampil untuk SuperAdmin) */}
+        {isSuperAdmin && (
+          <div className="flex items-center bg-gray-100 p-1.5 rounded-xl border border-gray-200 self-start sm:self-auto text-xs">
+            <button
+              type="button"
+              onClick={() => setActiveTab("hospital")}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-semibold transition-all cursor-pointer ${
+                activeTab === "hospital"
+                  ? "bg-white text-[#008A72] shadow-xs"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <Building2 className="h-4 w-4" />
+              <span>Dokter RS</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("global")}
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-semibold transition-all cursor-pointer ${
+                activeTab === "global"
+                  ? "bg-white text-[#008A72] shadow-xs"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <Globe className="h-4 w-4" />
+              <span>Dokter Global</span>
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* 3 Top Summary Metric Cards */}
+      {/* 3 Top Summary Metric Cards (Styled like /dashboard/roles DashboardCards) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col justify-between shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Total Dokter Aktif
-          </span>
-          <div className="flex items-baseline gap-2 mt-4">
-            <span className="text-3xl font-bold text-gray-900">{activeCount}</span>
-            <span className="text-sm font-medium text-gray-500">Dokter</span>
+        <div className="flex flex-col rounded-lg border border-black/10 bg-white shadow-xs transition hover:shadow-md w-full overflow-hidden">
+          <div className="bg-gray-50 border-b border-black/10 p-4 px-6 rounded-t-xl">
+            <p className="text-sm font-semibold text-gray-700">Total Dokter Aktif</p>
+          </div>
+          <div className="flex-1 flex items-center p-5 px-6">
+            <p className="text-3xl font-bold text-gray-900">
+              {activeCount}{" "}
+              <span className="text-base font-medium text-gray-500">Dokter</span>
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col justify-between shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Total Dokter Suspended
-          </span>
-          <div className="flex items-baseline gap-2 mt-4">
-            <span className="text-3xl font-bold text-gray-900">{suspendedCount}</span>
-            <span className="text-sm font-medium text-gray-500">Dokter</span>
+        <div className="flex flex-col rounded-lg border border-black/10 bg-white shadow-xs transition hover:shadow-md w-full overflow-hidden">
+          <div className="bg-gray-50 border-b border-black/10 p-4 px-6 rounded-t-xl">
+            <p className="text-sm font-semibold text-gray-700">Total Dokter Suspended</p>
+          </div>
+          <div className="flex-1 flex items-center p-5 px-6">
+            <p className="text-3xl font-bold text-gray-900">
+              {suspendedCount}{" "}
+              <span className="text-base font-medium text-gray-500">Dokter</span>
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col justify-between shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            {activeTab === "hospital" ? "Total Dokter Terdaftar RS" : "Total Dokter Terdaftar System"}
-          </span>
-          <div className="flex items-baseline gap-2 mt-4">
-            <span className="text-3xl font-bold text-gray-900">
-              {activeTab === "hospital" ? totalCount : globalDoctors.length || totalCount}
-            </span>
-            <span className="text-sm font-medium text-gray-500">Dokter</span>
+        <div className="flex flex-col rounded-lg border border-black/10 bg-white shadow-xs transition hover:shadow-md w-full overflow-hidden">
+          <div className="bg-gray-50 border-b border-black/10 p-4 px-6 rounded-t-xl">
+            <p className="text-sm font-semibold text-gray-700">
+              {activeTab === "hospital" ? "Total Dokter Terdaftar RS" : "Total Dokter Terdaftar System"}
+            </p>
+          </div>
+          <div className="flex-1 flex items-center p-5 px-6">
+            <p className="text-3xl font-bold text-gray-900">
+              {activeTab === "hospital" ? totalCount : globalDoctors.length || totalCount}{" "}
+              <span className="text-base font-medium text-gray-500">Dokter</span>
+            </p>
           </div>
         </div>
       </div>
@@ -337,21 +392,19 @@ export default function DoctorsPage() {
           createButtonIcon={<UserPlus className="h-4 w-4" />}
           onCreateButtonClick={() => setIsCreateOpen(true)}
           extraHeaderControls={
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setIsVerifyOpen(true)}
-                variant="outline"
-                className="border-[#C4E9E2] text-[#3BB49F] hover:bg-[#EBF8F5] text-xs font-medium h-10 px-3.5 rounded-lg flex items-center gap-1.5 cursor-pointer"
-              >
-                <ShieldCheck className="h-4 w-4" />
-                <span>Verifikasi Dokter</span>
-              </Button>
+            <div className="flex items-center gap-2.5">
+              <StatusFilterDropdown
+                title="Filter Status Dokter"
+                options={DOCTOR_STATUS_OPTIONS}
+                appliedStatuses={appliedStatuses}
+                onApply={(newStatuses) => setAppliedStatuses(newStatuses)}
+              />
               <Button
                 onClick={() => router.push("/doctors/schedule-changes")}
                 variant="outline"
-                className="border-amber-200 text-amber-700 hover:bg-amber-50 text-xs font-medium h-10 px-3.5 rounded-lg flex items-center gap-1.5 cursor-pointer"
+                className="border-amber-200 text-amber-700 hover:bg-amber-50 text-xs font-semibold h-10 px-3.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-2xs"
               >
-                <Clock className="h-4 w-4" />
+                <Clock className="h-4 w-4 text-amber-600" />
                 <span>Pengajuan Jadwal</span>
               </Button>
             </div>
@@ -373,12 +426,6 @@ export default function DoctorsPage() {
       <CreateDoctorModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        onSubmitSuccess={() => refetchHospitalDoctors()}
-      />
-
-      <VerifyDoctorModal
-        isOpen={isVerifyOpen}
-        onClose={() => setIsVerifyOpen(false)}
         onSubmitSuccess={() => refetchHospitalDoctors()}
       />
 

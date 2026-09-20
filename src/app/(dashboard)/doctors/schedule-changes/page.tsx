@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,28 +11,45 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Clock, CheckCircle, XCircle, Eye, AlertCircle } from "lucide-react";
+import { Clock, CheckCircle, XCircle, Eye, AlertCircle, Plus } from "lucide-react";
 import { ScheduleChangeRequestItem } from "@/types/doctorRegistration";
 import { useGetScheduleChanges } from "@/hooks/doctorRegistration/useGetScheduleChanges";
 import { useApproveScheduleChange } from "@/hooks/doctorRegistration/useApproveScheduleChange";
 import { useRejectScheduleChange } from "@/hooks/doctorRegistration/useRejectScheduleChange";
 import ConfirmModal from "@/components/ui/confirm-modal";
+import { StatusFilterDropdown, StatusOption } from "@/components/ui/StatusFilterDropdown";
+import { ScheduleChangeModal } from "@/components/doctors/ScheduleChangeModal";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { handleApiError, handleApiSuccess } from "@/lib/handleError";
 import Cookies from "js-cookie";
 
+const SCHEDULE_CHANGE_STATUS_OPTIONS: StatusOption[] = [
+  { value: "PENDING", label: "Pending Persetujuan" },
+  { value: "APPROVED", label: "Disetujui" },
+  { value: "REJECTED", label: "Ditolak" },
+];
+
 export default function DoctorScheduleChangesPage() {
   const hospitalId = Cookies.get("hospitalId") || "";
-  const [selectedStatus, setSelectedStatus] = useState<string>("PENDING");
+  const [appliedStatuses, setAppliedStatuses] = useState<string[]>(
+    SCHEDULE_CHANGE_STATUS_OPTIONS.map((o) => o.value)
+  );
 
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [detailItem, setDetailItem] = useState<ScheduleChangeRequestItem | null>(null);
   const [approveTargetItem, setApproveTargetItem] = useState<ScheduleChangeRequestItem | null>(null);
   const [rejectTargetItem, setRejectTargetItem] = useState<ScheduleChangeRequestItem | null>(null);
   const [rejectReason, setRejectReason] = useState("");
 
-  const { scheduleChanges, isLoading, refetch } = useGetScheduleChanges(
-    hospitalId,
-    selectedStatus === "ALL" ? undefined : selectedStatus
-  );
+  const { scheduleChanges, isLoading, refetch } = useGetScheduleChanges(hospitalId);
+
+  const filteredScheduleChanges = useMemo(() => {
+    if (!Array.isArray(scheduleChanges)) return [];
+    if (appliedStatuses.length === 0 || appliedStatuses.length === SCHEDULE_CHANGE_STATUS_OPTIONS.length) {
+      return scheduleChanges;
+    }
+    return scheduleChanges.filter((c) => appliedStatuses.includes(c.status));
+  }, [scheduleChanges, appliedStatuses]);
 
   const approveMutation = useApproveScheduleChange(hospitalId);
   const rejectMutation = useRejectScheduleChange(hospitalId);
@@ -144,45 +161,63 @@ export default function DoctorScheduleChangesPage() {
       sortable: false,
       align: "center",
       render: (row) => (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setDetailItem(row)}
-            className="flex items-center gap-1 px-3 h-8 text-xs border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer"
-          >
-            <Eye className="h-3.5 w-3.5 text-[#3BB49F]" />
-            <span>Detail Slot</span>
-          </Button>
+        <TooltipProvider>
+          <div className="flex items-center justify-center gap-1.5">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDetailItem(row)}
+                  className="h-8 w-8 p-0 flex items-center justify-center border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer"
+                >
+                  <Eye className="h-4 w-4 text-[#3BB49F]" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Rincian Slot Jadwal</p>
+              </TooltipContent>
+            </Tooltip>
 
-          {row.status === "PENDING" && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setApproveTargetItem(row)}
-                disabled={approveMutation.isPending}
-                className="flex items-center gap-1 px-2.5 h-8 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50 rounded-lg cursor-pointer"
-                title="Setujui Perubahan"
-              >
-                <CheckCircle className="h-3.5 w-3.5" />
-                <span>Setujui</span>
-              </Button>
+            {row.status === "PENDING" && (
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setApproveTargetItem(row)}
+                      disabled={approveMutation.isPending}
+                      className="h-8 w-8 p-0 flex items-center justify-center border-emerald-200 text-emerald-600 hover:bg-emerald-50 rounded-lg cursor-pointer"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>Setujui Perubahan Jadwal</p>
+                  </TooltipContent>
+                </Tooltip>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setRejectTargetItem(row)}
-                disabled={rejectMutation.isPending}
-                className="flex items-center gap-1 px-2.5 h-8 text-xs border-red-200 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
-                title="Tolak Perubahan"
-              >
-                <XCircle className="h-3.5 w-3.5" />
-                <span>Tolak</span>
-              </Button>
-            </>
-          )}
-        </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setRejectTargetItem(row)}
+                      disabled={rejectMutation.isPending}
+                      className="h-8 w-8 p-0 flex items-center justify-center border-red-200 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>Tolak Perubahan Jadwal</p>
+                  </TooltipContent>
+                </Tooltip>
+              </>
+            )}
+          </div>
+        </TooltipProvider>
       ),
     },
   ];
@@ -190,82 +225,90 @@ export default function DoctorScheduleChangesPage() {
   return (
     <div className="flex flex-col gap-6 w-full max-w-full p-6">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-            <Clock className="h-6 w-6 text-[#3BB49F]" />
-            <span>Perubahan Jadwal Dokter RS</span>
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Kelola & setujui permintaan pengajuan perubahan jadwal praktik dokter.
-          </p>
-        </div>
+      <div className="border-b border-gray-200 pb-4">
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+          <Clock className="h-6 w-6 text-[#3BB49F]" />
+          <span>Perubahan Jadwal Dokter RS</span>
+        </h1>
+        <p className="text-gray-500 text-sm mt-1">
+          Kelola & setujui permintaan pengajuan perubahan jadwal praktik dokter.
+        </p>
       </div>
 
-      {/* 3 Top Metric Cards */}
+      {/* 3 Top Summary Metric Cards (Styled like /dashboard/roles DashboardCards) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col justify-between shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
-            <Clock className="h-4 w-4 text-amber-500" /> Pending Persetujuan
-          </span>
-          <div className="flex items-baseline gap-2 mt-4">
-            <span className="text-3xl font-bold text-gray-900">{pendingCount}</span>
-            <span className="text-sm font-medium text-gray-500">Pengajuan</span>
+        <div className="flex flex-col rounded-lg border border-black/10 bg-white shadow-xs transition hover:shadow-md w-full overflow-hidden">
+          <div className="bg-gray-50 border-b border-black/10 p-4 px-6 rounded-t-xl">
+            <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <Clock className="h-4 w-4 text-amber-500" />
+              <span>Pending Persetujuan</span>
+            </p>
+          </div>
+          <div className="flex-1 flex items-center p-5 px-6">
+            <p className="text-3xl font-bold text-gray-900">
+              {pendingCount}{" "}
+              <span className="text-base font-medium text-gray-500">Pengajuan</span>
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col justify-between shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
-            <CheckCircle className="h-4 w-4 text-emerald-500" /> Disetujui
-          </span>
-          <div className="flex items-baseline gap-2 mt-4">
-            <span className="text-3xl font-bold text-gray-900">{approvedCount}</span>
-            <span className="text-sm font-medium text-gray-500">Pengajuan</span>
+        <div className="flex flex-col rounded-lg border border-black/10 bg-white shadow-xs transition hover:shadow-md w-full overflow-hidden">
+          <div className="bg-gray-50 border-b border-black/10 p-4 px-6 rounded-t-xl">
+            <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <CheckCircle className="h-4 w-4 text-emerald-500" />
+              <span>Disetujui</span>
+            </p>
+          </div>
+          <div className="flex-1 flex items-center p-5 px-6">
+            <p className="text-3xl font-bold text-gray-900">
+              {approvedCount}{" "}
+              <span className="text-base font-medium text-gray-500">Pengajuan</span>
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col justify-between shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
-            <XCircle className="h-4 w-4 text-red-500" /> Ditolak
-          </span>
-          <div className="flex items-baseline gap-2 mt-4">
-            <span className="text-3xl font-bold text-gray-900">{rejectedCount}</span>
-            <span className="text-sm font-medium text-gray-500">Pengajuan</span>
+        <div className="flex flex-col rounded-lg border border-black/10 bg-white shadow-xs transition hover:shadow-md w-full overflow-hidden">
+          <div className="bg-gray-50 border-b border-black/10 p-4 px-6 rounded-t-xl">
+            <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <XCircle className="h-4 w-4 text-red-500" />
+              <span>Ditolak</span>
+            </p>
+          </div>
+          <div className="flex-1 flex items-center p-5 px-6">
+            <p className="text-3xl font-bold text-gray-900">
+              {rejectedCount}{" "}
+              <span className="text-base font-medium text-gray-500">Pengajuan</span>
+            </p>
           </div>
         </div>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {["PENDING", "APPROVED", "REJECTED", "ALL"].map((st) => (
-          <button
-            key={st}
-            onClick={() => setSelectedStatus(st)}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
-              selectedStatus === st
-                ? "bg-[#3BB49F] text-white shadow-xs"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            {st === "PENDING"
-              ? "Pending Persetujuan"
-              : st === "APPROVED"
-              ? "Disetujui"
-              : st === "REJECTED"
-              ? "Ditolak"
-              : "Semua Status"}
-          </button>
-        ))}
       </div>
 
       {/* Main DataTable */}
       <DataTable
         columns={columns}
-        data={scheduleChanges}
+        data={filteredScheduleChanges}
         keyExtractor={(row) => row.id}
+        createButtonLabel="Buat Pengajuan Jadwal"
+        createButtonIcon={<Plus className="h-4 w-4" />}
+        onCreateButtonClick={() => setIsCreateOpen(true)}
+        extraHeaderControls={
+          <StatusFilterDropdown
+            title="Filter Status Pengajuan"
+            options={SCHEDULE_CHANGE_STATUS_OPTIONS}
+            appliedStatuses={appliedStatuses}
+            onApply={(newStatuses) => setAppliedStatuses(newStatuses)}
+          />
+        }
         searchPlaceholder="Cari nama dokter atau alasan..."
         searchField={(row) => `${row.doctor_name || ""} ${row.reason || ""}`}
         emptyText={isLoading ? "Memuat data pengajuan jadwal..." : "Tidak ada data pengajuan perubahan jadwal"}
+      />
+
+      {/* Modal Create Schedule Change */}
+      <ScheduleChangeModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSubmitSuccess={() => refetch()}
       />
 
       {/* Modal Detail Slot Schedule */}
@@ -306,12 +349,12 @@ export default function DoctorScheduleChangesPage() {
                         </span>
                       </div>
 
-                    <div className="text-gray-600 font-normal">
-                      Mode: {slot.booking_mode || "FIXED_SLOT"} • Durasi: {slot.slot_duration_minutes || 30} mnt • Max {slot.capacity || 1} pas
+                      <div className="text-gray-600 font-normal">
+                        Mode: {slot.booking_mode || "FIXED_SLOT"} • Durasi: {slot.slot_duration_minutes || 30} mnt • Max {slot.capacity || 1} pas
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
               </div>
 
               <div className="flex justify-end pt-3 border-t border-gray-100">

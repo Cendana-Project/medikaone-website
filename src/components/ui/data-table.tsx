@@ -203,7 +203,7 @@ export function DataTable<T>({
           {createButtonLabel && onCreateButtonClick && (
             <Button
               onClick={onCreateButtonClick}
-              className="bg-[#EBF8F5] hover:bg-[#D8F2EC] text-[#3BB49F] font-semibold border border-[#C4E9E2] px-4 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
+              className="bg-[#3BB49F] hover:bg-[#329a88] text-white font-semibold h-10 px-4 rounded-xl text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer shadow-xs"
             >
               {createButtonIcon || <Plus className="h-4 w-4" />}
               <span>{cleanedLabel}</span>

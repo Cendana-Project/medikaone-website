@@ -8,7 +8,6 @@ export const useDeleteDoctorInvitation = (hospitalId: string) => {
   return useMutation({
     mutationFn: (invitationId: string) => deleteDoctorInvitation(hospitalId, invitationId),
     onSuccess: () => {
-      toast.success("Undangan dokter berhasil dihapus!");
       queryClient.invalidateQueries({ queryKey: ["doctor-invitations", hospitalId] });
     },
   });

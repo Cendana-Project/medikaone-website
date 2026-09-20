@@ -10,7 +10,6 @@ export const useUpdateDepartment = (hospitalId: string) => {
     mutationFn: ({ departmentId, payload }: { departmentId: string; payload: Partial<CreateDepartmentRequest> }) =>
       updateDepartment(hospitalId, departmentId, payload),
     onSuccess: () => {
-      toast.success("Departemen berhasil diperbarui!");
       queryClient.invalidateQueries({ queryKey: ["departments", hospitalId] });
     },
   });

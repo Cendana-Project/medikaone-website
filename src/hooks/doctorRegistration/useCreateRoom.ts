@@ -12,7 +12,6 @@ export const useCreateRoom = (hospitalId: string) => {
     return useMutation({
         mutationFn: (payload: CreateRoomRequest) => createRoom(hospitalId, payload),
         onSuccess: () => {
-            toast.success("Ruangan berhasil dibuat!");
             queryClient.invalidateQueries({ queryKey: ["rooms", hospitalId] });
         },
         onError: (error) => {

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Clock, Calendar, Users, ChevronDown, ChevronUp, Edit2, Check, X } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface SchedulePickerProps {
   schedules: DoctorSchedule[];
@@ -22,9 +23,23 @@ const DAYS = [
   { value: 6, label: "Sabtu" },
 ];
 
+const HOURS_24 = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+const MINUTES = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0"));
+if (!MINUTES.includes("59")) MINUTES.push("59");
+
 const getDayIndex = (dayOfWeek: number | number[]): number => {
   if (Array.isArray(dayOfWeek)) return dayOfWeek[0] ?? 1;
   return dayOfWeek;
+};
+
+// Helper to calculate end time 30 mins after start time
+const getSuggestedEndTime = (start: string): string => {
+  const [h, m] = (start || "08:00").split(":").map(Number);
+  let totalMin = (h || 0) * 60 + (m || 0) + 30;
+  if (totalMin >= 1439) totalMin = 1439; // 23:59 max
+  const newH = Math.floor(totalMin / 60);
+  const newM = totalMin % 60;
+  return `${String(newH).padStart(2, "0")}:${String(newM).padStart(2, "0")}`;
 };
 
 export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
@@ -39,10 +54,32 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
   const [slotDuration, setSlotDuration] = useState<number>(30);
   const [capacity, setCapacity] = useState<number>(1);
 
-  const handleSaveSlot = () => {
-    if (!startTime || !endTime) return;
+  const handleStartTimeChange = (newStart: string) => {
+    setStartTime(newStart);
+    // If end time is less than or equal to start time, auto adjust end time to be greater
+    if (endTime <= newStart) {
+      setEndTime(getSuggestedEndTime(newStart));
+    }
+  };
 
-    // Maximum time check: max is 23:59
+  const handleEndTimeChange = (newEnd: string) => {
+    if (newEnd <= startTime) {
+      toast.error(`Jam selesai (${newEnd}) harus lebih dari Jam mulai (${startTime}).`);
+    }
+    setEndTime(newEnd);
+  };
+
+  const handleSaveSlot = () => {
+    if (!startTime || !endTime) {
+      toast.error("Jam mulai dan jam selesai wajib diisi.");
+      return;
+    }
+
+    if (endTime <= startTime) {
+      toast.error(`Jam selesai (${endTime}) harus lebih dari jam mulai (${startTime}).`);
+      return;
+    }
+
     const cappedStart = startTime > "23:59" ? "23:59" : startTime;
     const cappedEnd = endTime > "23:59" ? "23:59" : endTime;
 
@@ -90,6 +127,11 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
     const updated = schedules.filter((_, i) => i !== index);
     onChange(updated);
   };
+
+  const startHour = (startTime || "08:00").split(":")[0] || "08";
+  const startMin = (startTime || "08:00").split(":")[1] || "00";
+  const endHour = (endTime || "12:00").split(":")[0] || "12";
+  const endMin = (endTime || "12:00").split(":")[1] || "00";
 
   return (
     <div className="flex flex-col bg-[#F8FAFC] border border-gray-200 rounded-xl overflow-hidden shadow-2xs">
@@ -211,7 +253,7 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
             )}
           </div>
 
-          {/* 2. FORM TAMBAH / EDIT SLOT JADWAL (DITARUH DI BAWAH DAFTAR JADWAL) */}
+          {/* 2. FORM TAMBAH / EDIT SLOT JADWAL */}
           <div className="flex flex-col gap-3 pt-3 border-t border-gray-100">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
@@ -241,12 +283,13 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
             <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 rounded-xl border transition-colors ${
               editingIndex !== null ? "bg-amber-50/50 border-amber-200" : "bg-[#F8FAFC] border-gray-200"
             }`}>
+              {/* Hari */}
               <div>
                 <Label className="text-xs font-semibold text-gray-700 mb-1 block">Hari</Label>
                 <select
                   value={dayOfWeek}
                   onChange={(e) => setDayOfWeek(Number(e.target.value))}
-                  className="w-full h-9 px-2.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#3BB49F]"
+                  className="w-full h-9 px-2.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#3BB49F] cursor-pointer"
                 >
                   {DAYS.map((d) => (
                     <option key={d.value} value={d.value}>
@@ -256,52 +299,51 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
                 </select>
               </div>
 
+              {/* Jam Mulai (Single Time Input) */}
               <div>
                 <Label className="text-xs font-semibold text-gray-700 mb-1 block">
-                  Jam Mulai (Format 24 Jam, Max 23:59)
+                  Jam Mulai
                 </Label>
                 <Input
                   type="time"
                   step="60"
                   max="23:59"
                   value={startTime}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setStartTime(val > "23:59" ? "23:59" : val);
-                  }}
-                  className="h-9 px-2.5 text-xs bg-white border-gray-200 rounded-lg focus-visible:ring-[#3BB49F]"
+                  onChange={(e) => handleStartTimeChange(e.target.value)}
+                  className="h-9 px-3 text-xs font-semibold text-gray-900 bg-white border-gray-200 rounded-lg focus-visible:ring-[#3BB49F] cursor-pointer"
                 />
               </div>
 
+              {/* Jam Selesai (Single Time Input) */}
               <div>
                 <Label className="text-xs font-semibold text-gray-700 mb-1 block">
-                  Jam Selesai (Format 24 Jam, Max 23:59)
+                  Jam Selesai
                 </Label>
                 <Input
                   type="time"
                   step="60"
                   max="23:59"
+                  min={startTime || undefined}
                   value={endTime}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setEndTime(val > "23:59" ? "23:59" : val);
-                  }}
-                  className="h-9 px-2.5 text-xs bg-white border-gray-200 rounded-lg focus-visible:ring-[#3BB49F]"
+                  onChange={(e) => handleEndTimeChange(e.target.value)}
+                  className="h-9 px-3 text-xs font-semibold text-gray-900 bg-white border-gray-200 rounded-lg focus-visible:ring-[#3BB49F] cursor-pointer"
                 />
               </div>
 
+              {/* Mode Booking */}
               <div>
                 <Label className="text-xs font-semibold text-gray-700 mb-1 block">Mode Booking</Label>
                 <select
                   value={bookingMode}
                   onChange={(e) => setBookingMode(e.target.value as "FIXED_SLOT" | "SESSION_QUEUE")}
-                  className="w-full h-9 px-2.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#3BB49F]"
+                  className="w-full h-9 px-2.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#3BB49F] cursor-pointer"
                 >
                   <option value="FIXED_SLOT">Fixed Slot</option>
                   <option value="SESSION_QUEUE">Session Queue</option>
                 </select>
               </div>
 
+              {/* Durasi */}
               <div>
                 <Label className="text-xs font-semibold text-gray-700 mb-1 block">Durasi (Menit)</Label>
                 <Input
@@ -314,6 +356,7 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
                 />
               </div>
 
+              {/* Kapasitas Pasien */}
               <div>
                 <Label className="text-xs font-semibold text-gray-700 mb-1 block">Kapasitas Pasien</Label>
                 <Input
@@ -326,12 +369,13 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
                 />
               </div>
 
+              {/* Zona Waktu */}
               <div>
                 <Label className="text-xs font-semibold text-gray-700 mb-1 block">Zona Waktu</Label>
                 <select
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full h-9 px-2.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#3BB49F]"
+                  className="w-full h-9 px-2.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#3BB49F] cursor-pointer"
                 >
                   <option value="Asia/Jakarta">WIB (Asia/Jakarta)</option>
                   <option value="Asia/Makassar">WITA (Asia/Makassar)</option>
@@ -339,6 +383,7 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
                 </select>
               </div>
 
+              {/* Action Button */}
               <div className="flex items-end gap-2">
                 <Button
                   type="button"
@@ -381,4 +426,3 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
     </div>
   );
 }
-

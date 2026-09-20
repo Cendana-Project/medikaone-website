@@ -8,7 +8,6 @@ export const useDeleteDoctorAffiliation = (hospitalId: string) => {
   return useMutation({
     mutationFn: (doctorId: string) => deleteDoctorAffiliation(hospitalId, doctorId),
     onSuccess: () => {
-      toast.success("Afiliasi dokter berhasil dihapus!");
       queryClient.invalidateQueries({ queryKey: ["doctors", hospitalId] });
     },
   });

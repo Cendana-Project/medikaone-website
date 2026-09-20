@@ -10,7 +10,6 @@ export const useUpdateRoom = (hospitalId: string) => {
     mutationFn: ({ roomId, payload }: { roomId: string; payload: Partial<CreateRoomRequest> }) =>
       updateRoom(hospitalId, roomId, payload),
     onSuccess: () => {
-      toast.success("Ruangan berhasil diperbarui!");
       queryClient.invalidateQueries({ queryKey: ["rooms", hospitalId] });
     },
   });
