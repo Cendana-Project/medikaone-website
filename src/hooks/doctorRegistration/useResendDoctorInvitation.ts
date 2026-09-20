@@ -11,7 +11,6 @@ export const useResendDoctorInvitation = (hospitalId: string) => {
     return useMutation({
         mutationFn: (invitationId: string) => resendDoctorInvitation(hospitalId, invitationId),
         onSuccess: () => {
-            toast.success("Undangan berhasil dikirim ulang!");
             queryClient.invalidateQueries({ queryKey: ["doctor-invitations", hospitalId] });
         },
         onError: (error) => {

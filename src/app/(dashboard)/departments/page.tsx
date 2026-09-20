@@ -8,22 +8,28 @@ import { Building2, Plus, Trash2, Eye, Edit } from "lucide-react";
 import { DepartmentModal } from "@/components/departments/DepartmentModal";
 import { DepartmentDetailModal, DepartmentItem } from "@/components/departments/DepartmentDetailModal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
-import toast from "react-hot-toast";
-
 import { useGetDepartments } from "@/hooks/doctorRegistration/useGetDepartments";
+import { useDeleteDepartment } from "@/hooks/doctorRegistration/useDeleteDepartment";
 import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
+import { handleApiError } from "@/lib/handleError";
 import Cookies from "js-cookie";
 
 export default function DepartmentsPage() {
   const { userInfo } = useGetUserInfo();
   const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
-  const { departments: apiDepts } = useGetDepartments(hospitalId);
+  const { departments: apiDepts, refetch } = useGetDepartments(hospitalId);
+  const deleteDeptMutation = useDeleteDepartment(hospitalId);
+
   const [localDepartments, setLocalDepartments] = useState<DepartmentItem[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [detailItem, setDetailItem] = useState<DepartmentItem | null>(null);
   const [editItem, setEditItem] = useState<DepartmentItem | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Exclude local items that are already fetched from the backend API (prevents 2 items bug)
+  const localFiltered = localDepartments.filter(
+    (loc) => !apiDepts.some((api) => api.id === loc.id || api.code === loc.code)
+  );
 
   const departments: DepartmentItem[] = [
     ...apiDepts.map((d) => ({
@@ -33,21 +39,18 @@ export default function DepartmentsPage() {
       status: "Active" as const,
       createdAt: "Terintegrasi",
     })),
-    ...localDepartments,
+    ...localFiltered,
   ];
 
   const handleDeleteConfirm = async () => {
     if (!deleteTargetId) return;
-    setIsDeleting(true);
     try {
-      await new Promise((r) => setTimeout(r, 500));
+      await deleteDeptMutation.mutateAsync(deleteTargetId);
       setLocalDepartments((prev) => prev.filter((d) => d.id !== deleteTargetId));
-      toast.success("Departemen berhasil dihapus.");
       setDeleteTargetId(null);
-    } catch {
-      toast.error("Gagal menghapus departemen.");
-    } finally {
-      setIsDeleting(false);
+      refetch();
+    } catch (err) {
+      handleApiError(err, "Gagal menghapus departemen");
     }
   };
 
@@ -150,19 +153,8 @@ export default function DepartmentsPage() {
       <DepartmentModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        onSubmitSuccess={(newItem) => {
-          if (newItem) {
-            setLocalDepartments((prev) => [
-              ...prev,
-              {
-                id: String(Date.now()),
-                code: newItem.code,
-                name: newItem.name,
-                status: "Active",
-                createdAt: new Date().toISOString().split("T")[0],
-              },
-            ]);
-          }
+        onSubmitSuccess={() => {
+          refetch();
         }}
       />
 
@@ -182,12 +174,8 @@ export default function DepartmentsPage() {
         initialData={editItem}
         isOpen={Boolean(editItem)}
         onClose={() => setEditItem(null)}
-        onSubmitSuccess={(updated) => {
-          if (updated && editItem) {
-            setLocalDepartments((prev) =>
-              prev.map((d) => (d.id === editItem.id ? { ...d, code: updated.code, name: updated.name } : d))
-            );
-          }
+        onSubmitSuccess={() => {
+          refetch();
         }}
       />
 
@@ -196,8 +184,10 @@ export default function DepartmentsPage() {
         isOpen={deleteTargetId !== null}
         onClose={() => setDeleteTargetId(null)}
         onConfirm={handleDeleteConfirm}
-        isLoading={isDeleting}
-        subtitle="Apakah anda yakin menghapus departemen ini?"
+        isLoading={deleteDeptMutation.isPending}
+        title="Konfirmasi Hapus Departemen"
+        subtitle="Apakah Anda yakin ingin menghapus departemen ini?"
+        confirmLabel="Hapus Departemen"
       />
     </div>
   );

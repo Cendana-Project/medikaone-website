@@ -8,10 +8,10 @@ import { DoorOpen, Plus, Eye, Edit, Trash2 } from "lucide-react";
 import { RoomModal } from "@/components/rooms/RoomModal";
 import { RoomDetailModal, RoomItem } from "@/components/rooms/RoomDetailModal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
-import toast from "react-hot-toast";
-
 import { useGetRooms } from "@/hooks/doctorRegistration/useGetRooms";
+import { useDeleteRoom } from "@/hooks/doctorRegistration/useDeleteRoom";
 import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
+import { handleApiError } from "@/lib/handleError";
 import Cookies from "js-cookie";
 
 interface RoomRow {
@@ -25,13 +25,19 @@ interface RoomRow {
 export default function RoomsPage() {
   const { userInfo } = useGetUserInfo();
   const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
-  const { rooms: apiRooms } = useGetRooms(hospitalId);
+  const { rooms: apiRooms, refetch } = useGetRooms(hospitalId);
+  const deleteRoomMutation = useDeleteRoom(hospitalId);
+
   const [localRooms, setLocalRooms] = useState<RoomRow[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<RoomItem | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Exclude local items already present in API response
+  const localFiltered = localRooms.filter(
+    (loc) => !apiRooms.some((api) => api.id === loc.id || api.code === loc.code)
+  );
 
   const rooms: RoomRow[] = [
     ...apiRooms.map((r) => ({
@@ -41,21 +47,18 @@ export default function RoomsPage() {
       departmentName: r.department_id || "Poli Utama",
       status: "Active" as const,
     })),
-    ...localRooms,
+    ...localFiltered,
   ];
 
   const handleDeleteConfirm = async () => {
     if (!deleteTargetId) return;
-    setIsDeleting(true);
     try {
-      await new Promise((r) => setTimeout(r, 600));
+      await deleteRoomMutation.mutateAsync(deleteTargetId);
       setLocalRooms((prev) => prev.filter((r) => r.id !== deleteTargetId));
-      toast.success("Ruangan berhasil dihapus.");
       setDeleteTargetId(null);
-    } catch {
-      toast.error("Gagal menghapus ruangan.");
-    } finally {
-      setIsDeleting(false);
+      refetch();
+    } catch (err) {
+      handleApiError(err, "Gagal menghapus ruangan");
     }
   };
 
@@ -182,7 +185,7 @@ export default function RoomsPage() {
         }}
         initialData={selectedRoom}
         onSubmitSuccess={() => {
-          // Re-fetch rooms or update state
+          refetch();
         }}
       />
 
@@ -190,8 +193,10 @@ export default function RoomsPage() {
         isOpen={deleteTargetId !== null}
         onClose={() => setDeleteTargetId(null)}
         onConfirm={handleDeleteConfirm}
-        isLoading={isDeleting}
-        subtitle="Apakah anda yakin menghapus ruangan ini?"
+        isLoading={deleteRoomMutation.isPending}
+        title="Konfirmasi Hapus Ruangan"
+        subtitle="Apakah Anda yakin ingin menghapus ruangan ini?"
+        confirmLabel="Hapus Ruangan"
       />
     </div>
   );

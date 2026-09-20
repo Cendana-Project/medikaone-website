@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,36 +14,50 @@ import { DoctorSchedule } from "@/types/doctorRegistration";
 import { SchedulePicker } from "./SchedulePicker";
 import { useCreateScheduleChange } from "@/hooks/doctorRegistration/useCreateScheduleChange";
 import { handleApiError, handleApiSuccess } from "@/lib/handleError";
-import { Edit3 } from "lucide-react";
+import { useGetDoctors } from "@/hooks/doctorRegistration/useGetDoctors";
+import { ChevronDown, Edit3 } from "lucide-react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
 interface ScheduleChangeModalProps {
-  affiliationId: string;
+  affiliationId?: string;
   doctorName?: string;
+  initialSchedules?: DoctorSchedule[];
   isOpen: boolean;
   onClose: () => void;
   onSubmitSuccess?: () => void;
 }
 
 export function ScheduleChangeModal({
-  affiliationId,
-  doctorName,
+  affiliationId: propAffiliationId,
+  doctorName: propDoctorName,
+  initialSchedules,
   isOpen,
   onClose,
   onSubmitSuccess,
 }: ScheduleChangeModalProps) {
   const hospitalId = Cookies.get("hospitalId") || "";
+  const { doctors, isLoading: isLoadingDoctors } = useGetDoctors(hospitalId);
 
+  const [selectedAffiliationId, setSelectedAffiliationId] = useState<string>(propAffiliationId || "");
   const [reason, setReason] = useState("");
-  const [schedules, setSchedules] = useState<DoctorSchedule[]>([]);
+  const [schedules, setSchedules] = useState<DoctorSchedule[]>(initialSchedules || []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedAffiliationId(propAffiliationId || "");
+      setSchedules(initialSchedules || []);
+    }
+  }, [isOpen, propAffiliationId, initialSchedules]);
+
+  const activeAffiliationId = propAffiliationId || selectedAffiliationId;
 
   const createScheduleChangeMutation = useCreateScheduleChange(hospitalId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!affiliationId) {
-      toast.error("Afiliasi dokter tidak valid.");
+    if (!activeAffiliationId) {
+      toast.error("Pilih dokter terlebih dahulu.");
       return;
     }
     if (schedules.length === 0) {
@@ -53,7 +67,7 @@ export function ScheduleChangeModal({
 
     try {
       const res = await createScheduleChangeMutation.mutateAsync({
-        affiliation_id: affiliationId,
+        affiliation_id: activeAffiliationId,
         reason: reason || undefined,
         schedules,
       });
@@ -65,6 +79,7 @@ export function ScheduleChangeModal({
       // Reset
       setReason("");
       setSchedules([]);
+      setSelectedAffiliationId("");
     } catch (err) {
       handleApiError(err, "Gagal Mengajukan Perubahan Jadwal");
     }
@@ -79,11 +94,36 @@ export function ScheduleChangeModal({
             <span>Pengajuan Perubahan Jadwal Praktik</span>
           </DialogTitle>
           <p className="text-gray-500 text-xs md:text-sm font-normal mt-1">
-            {doctorName ? `Dokter: ${doctorName}` : `Afiliasi ID: ${affiliationId}`}
+            {propDoctorName ? `Dokter: ${propDoctorName}` : "Pilih dokter dan atur usulan jam praktik baru"}
           </p>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 pt-4">
+          {/* Doctor Selection Dropdown (Only if propAffiliationId not provided) */}
+          {!propAffiliationId && (
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm font-semibold text-gray-800">
+                Pilih Dokter RS <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative">
+                <select
+                  value={selectedAffiliationId}
+                  onChange={(e) => setSelectedAffiliationId(e.target.value)}
+                  disabled={isLoadingDoctors}
+                  className="w-full py-3 px-4 h-12 bg-gray-50/50 border border-gray-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#3BB49F] appearance-none cursor-pointer"
+                >
+                  <option value="">-- Pilih Dokter Terdaftar --</option>
+                  {doctors.map((doc) => (
+                    <option key={doc.affiliation_id || doc.doctor_id} value={doc.affiliation_id || doc.doctor_id}>
+                      {doc.first_name} {doc.last_name} ({doc.specialty || "Dokter"}) - SIP: {doc.sip_number || "-"}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+          )}
+
           {/* Reason Field */}
           <div className="flex flex-col gap-2">
             <Label className="text-sm font-semibold text-gray-800">

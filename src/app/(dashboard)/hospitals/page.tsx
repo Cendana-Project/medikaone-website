@@ -107,66 +107,70 @@ export default function HospitalsPage() {
   return (
     <div className="flex flex-col gap-6 w-full max-w-full p-4 md:p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-[#3BB49F]" />
-            <span>Daftar Rumah Sakit Terdaftar</span>
-          </h1>
-          <p className="text-gray-500 text-xs md:text-sm mt-1">
-            Kelola data fasilitas kesehatan & rumah sakit yang terintegrasi di MedikaOne.
-          </p>
-        </div>
-
-        <Button
-          onClick={() => setIsRegisterOpen(true)}
-          className="bg-[#3BB49F] hover:bg-[#329a88] text-white text-xs font-semibold h-11 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs cursor-pointer w-full sm:w-auto"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Register Rumah Sakit Baru</span>
-        </Button>
+      <div className="border-b border-gray-200 pb-4">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+          <Building2 className="h-6 w-6 text-[#3BB49F]" />
+          <span>Daftar Rumah Sakit Terdaftar</span>
+        </h1>
+        <p className="text-gray-500 text-xs md:text-sm mt-1">
+          Kelola data fasilitas kesehatan & rumah sakit yang terintegrasi di MedikaOne.
+        </p>
       </div>
 
-      {/* Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5 w-full">
-        <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-6 flex flex-col justify-between shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
-            <Building2 className="h-4 w-4 text-[#3BB49F]" /> Total RS Terdaftar
-          </span>
-          <div className="flex items-baseline gap-2 mt-3">
-            <span className="text-2xl md:text-3xl font-bold text-gray-900">{hospitals.length}</span>
-            <span className="text-xs md:text-sm font-medium text-gray-500">Rumah Sakit</span>
+      {/* Metric Cards (Styled like /dashboard/roles DashboardCards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 w-full">
+        <div className="flex flex-col rounded-lg border border-black/10 bg-white shadow-xs transition hover:shadow-md w-full overflow-hidden">
+          <div className="bg-gray-50 border-b border-black/10 p-4 px-6 rounded-t-xl">
+            <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <Building2 className="h-4 w-4 text-[#3BB49F]" />
+              <span>Total RS Terdaftar</span>
+            </p>
+          </div>
+          <div className="flex-1 flex items-center p-5 px-6">
+            <p className="text-3xl font-bold text-gray-900">
+              {hospitals.length}{" "}
+              <span className="text-base font-medium text-gray-500">Rumah Sakit</span>
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-6 flex flex-col justify-between shadow-xs">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
-            <MapPin className="h-4 w-4 text-emerald-500" /> Wilayah Jangkauan
-          </span>
-          <div className="flex items-baseline gap-2 mt-3">
-            <span className="text-2xl md:text-3xl font-bold text-gray-900">
-              {new Set(hospitals.map((h) => h.city).filter(Boolean)).size || 1}
-            </span>
-            <span className="text-xs md:text-sm font-medium text-gray-500">Kota / Kabupaten</span>
+        <div className="flex flex-col rounded-lg border border-black/10 bg-white shadow-xs transition hover:shadow-md w-full overflow-hidden">
+          <div className="bg-gray-50 border-b border-black/10 p-4 px-6 rounded-t-xl">
+            <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <MapPin className="h-4 w-4 text-emerald-500" />
+              <span>Wilayah Jangkauan</span>
+            </p>
+          </div>
+          <div className="flex-1 flex items-center p-5 px-6">
+            <p className="text-3xl font-bold text-gray-900">
+              {new Set(hospitals.map((h) => h.city).filter(Boolean)).size || 1}{" "}
+              <span className="text-base font-medium text-gray-500">Kota / Kabupaten</span>
+            </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-6 flex flex-col justify-between shadow-xs col-span-1 sm:col-span-2 md:col-span-1">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
-            <Phone className="h-4 w-4 text-indigo-500" /> Status Sistem
-          </span>
-          <div className="flex items-baseline gap-2 mt-3">
-            <span className="text-lg md:text-xl font-bold text-emerald-600">Online & Active</span>
+        <div className="flex flex-col rounded-lg border border-black/10 bg-white shadow-xs transition hover:shadow-md w-full overflow-hidden col-span-1 sm:col-span-2 md:col-span-1">
+          <div className="bg-gray-50 border-b border-black/10 p-4 px-6 rounded-t-xl">
+            <p className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+              <Phone className="h-4 w-4 text-indigo-500" />
+              <span>Status Sistem</span>
+            </p>
+          </div>
+          <div className="flex-1 flex items-center p-5 px-6">
+            <p className="text-xl font-bold text-emerald-600">Online & Active</p>
           </div>
         </div>
       </div>
 
-      {/* Desktop & Tablet DataTable View */}
+      {/* Desktop & Tablet DataTable View (Register Button placed on the left of search bar) */}
       <div className="hidden md:block">
         <DataTable
           columns={columns}
           data={hospitals}
           keyExtractor={(row) => row.id}
+          createButtonLabel="Register Rumah Sakit Baru"
+          createButtonIcon={<Plus className="h-4 w-4" />}
+          onCreateButtonClick={() => setIsRegisterOpen(true)}
           searchPlaceholder="Cari Nama Rumah Sakit, Kode RS, atau Kota..."
           searchField={(row) => `${row.name} ${row.code} ${row.city || ""} ${row.province || ""}`}
           emptyText={isLoading ? "Memuat data rumah sakit..." : "Tidak ada data rumah sakit yang ditemukan"}

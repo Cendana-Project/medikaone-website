@@ -11,7 +11,6 @@ export const useCancelDoctorInvitation = (hospitalId: string) => {
     return useMutation({
         mutationFn: (invitationId: string) => cancelDoctorInvitation(hospitalId, invitationId),
         onSuccess: () => {
-            toast.success("Undangan berhasil dibatalkan!");
             queryClient.invalidateQueries({ queryKey: ["doctor-invitations", hospitalId] });
         },
         onError: (error) => {

@@ -12,8 +12,8 @@ export const useCreateDoctorInvitation = (hospitalId: string) => {
     return useMutation({
         mutationFn: (payload: CreateInvitationRequest) => createDoctorInvitation(hospitalId, payload),
         onSuccess: () => {
-            toast.success("Undangan dokter berhasil dikirim!");
             queryClient.invalidateQueries({ queryKey: ["doctor-invitations", hospitalId] });
+            queryClient.invalidateQueries({ queryKey: ["doctors", hospitalId] });
         },
         onError: (error) => {
             handleApiError(error, "Gagal mengirim undangan dokter");

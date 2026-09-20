@@ -14,6 +14,7 @@ import { ChevronDown } from "lucide-react";
 import { RoomItem } from "./RoomDetailModal";
 import { useGetDepartments } from "@/hooks/doctorRegistration/useGetDepartments";
 import { useCreateRoom } from "@/hooks/doctorRegistration/useCreateRoom";
+import { useUpdateRoom } from "@/hooks/doctorRegistration/useUpdateRoom";
 import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
@@ -35,11 +36,11 @@ export function RoomModal({
   const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
   const { departments, isLoading: isLoadingDepts } = useGetDepartments(hospitalId);
   const createRoomMutation = useCreateRoom(hospitalId);
+  const updateRoomMutation = useUpdateRoom(hospitalId);
 
   const [departmentId, setDepartmentId] = useState("");
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -53,6 +54,8 @@ export function RoomModal({
     }
   }, [initialData, isOpen, departments]);
 
+  const isLoading = createRoomMutation.isPending || updateRoomMutation.isPending;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code || !name) {
@@ -60,15 +63,17 @@ export function RoomModal({
       return;
     }
 
-    setIsLoading(true);
     try {
       const selectedDept = departments.find((d) => d.id === departmentId || d.name === departmentId);
       const deptName = selectedDept ? selectedDept.name : (departmentId || "Poli Utama");
 
-      if (!initialData && hospitalId && departmentId) {
+      if (initialData && initialData.id && hospitalId) {
+        await updateRoomMutation.mutateAsync({
+          roomId: initialData.id,
+          payload: { department_id: departmentId, code, name },
+        });
+      } else if (hospitalId && departmentId) {
         await createRoomMutation.mutateAsync({ department_id: departmentId, code, name });
-      } else if (initialData) {
-        toast.success(`Ruangan ${name} (${code}) berhasil diperbarui.`);
       } else {
         toast.success(`Ruangan ${name} (${code}) berhasil dibuat.`);
       }
@@ -77,8 +82,6 @@ export function RoomModal({
       onClose();
     } catch {
       toast.error("Gagal menyimpan ruangan");
-    } finally {
-      setIsLoading(false);
     }
   };
 

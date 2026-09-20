@@ -13,7 +13,6 @@ export const useApproveScheduleChange = (hospitalId: string) => {
                 handleApiError(data.error, "Gagal menyetujui perubahan jadwal");
                 return;
             }
-            handleApiSuccess(data, "Permintaan perubahan jadwal berhasil disetujui");
             queryClient.invalidateQueries({ queryKey: ["scheduleChanges", hospitalId] });
             queryClient.invalidateQueries({ queryKey: ["doctors", hospitalId] });
         },

@@ -17,7 +17,6 @@ export const useUpdateDoctorStatus = (hospitalId: string) => {
     return useMutation({
         mutationFn: ({ doctorId, payload }: MutationArgs) => updateDoctorStatus(hospitalId, doctorId, payload),
         onSuccess: () => {
-            toast.success("Status dokter berhasil diperbarui!");
             queryClient.invalidateQueries({ queryKey: ["doctors", hospitalId] });
         },
         onError: (error) => {

@@ -25,6 +25,25 @@ export const createDepartment = async (hospitalId: string, payload: CreateDepart
     });
 };
 
+export const updateDepartment = async (hospitalId: string, departmentId: string, payload: Partial<CreateDepartmentRequest>) => {
+    return safeRequest(async () => {
+        try {
+            const response = await api.patch(`hospitals/${hospitalId}/departments/${departmentId}`, payload);
+            return response.data;
+        } catch {
+            const response = await api.put(`hospitals/${hospitalId}/departments/${departmentId}`, payload);
+            return response.data;
+        }
+    });
+};
+
+export const deleteDepartment = async (hospitalId: string, departmentId: string) => {
+    return safeRequest(async () => {
+        const response = await api.delete(`hospitals/${hospitalId}/departments/${departmentId}`);
+        return response.data;
+    });
+};
+
 // --- ROOMS ---
 
 export const getRooms = async (hospitalId: string, departmentId?: string) => {
@@ -39,6 +58,25 @@ export const getRooms = async (hospitalId: string, departmentId?: string) => {
 export const createRoom = async (hospitalId: string, payload: CreateRoomRequest) => {
     return safeRequest(async () => {
         const response = await api.post(`hospitals/${hospitalId}/rooms`, payload);
+        return response.data;
+    });
+};
+
+export const updateRoom = async (hospitalId: string, roomId: string, payload: Partial<CreateRoomRequest>) => {
+    return safeRequest(async () => {
+        try {
+            const response = await api.patch(`hospitals/${hospitalId}/rooms/${roomId}`, payload);
+            return response.data;
+        } catch {
+            const response = await api.put(`hospitals/${hospitalId}/rooms/${roomId}`, payload);
+            return response.data;
+        }
+    });
+};
+
+export const deleteRoom = async (hospitalId: string, roomId: string) => {
+    return safeRequest(async () => {
+        const response = await api.delete(`hospitals/${hospitalId}/rooms/${roomId}`);
         return response.data;
     });
 };
@@ -178,6 +216,13 @@ export const resendDoctorInvitation = async (hospitalId: string, invitationId: s
     });
 };
 
+export const deleteDoctorInvitation = async (hospitalId: string, invitationId: string) => {
+    return safeRequest(async () => {
+        const response = await api.delete(`hospitals/${hospitalId}/doctor-invitations/${invitationId}`);
+        return response.data;
+    });
+};
+
 // --- DOCTOR MANAGEMENT & AFFILIATIONS ---
 
 export const getDoctors = async (hospitalId: string, status?: string) => {
@@ -185,6 +230,13 @@ export const getDoctors = async (hospitalId: string, status?: string) => {
         const response = await api.get(`hospitals/${hospitalId}/doctors`, {
             params: status ? { status } : undefined,
         });
+        return response.data;
+    });
+};
+
+export const deleteDoctorAffiliation = async (hospitalId: string, doctorId: string) => {
+    return safeRequest(async () => {
+        const response = await api.delete(`hospitals/${hospitalId}/doctors/${doctorId}`);
         return response.data;
     });
 };
