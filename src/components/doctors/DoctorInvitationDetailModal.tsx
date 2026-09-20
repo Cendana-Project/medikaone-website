@@ -13,9 +13,10 @@ import { DoctorInvitation } from "@/types/doctorRegistration";
 import { useGetContractUrl } from "@/hooks/doctorRegistration/useGetContractUrl";
 import { useCancelDoctorInvitation } from "@/hooks/doctorRegistration/useCancelDoctorInvitation";
 import { useResendDoctorInvitation } from "@/hooks/doctorRegistration/useResendDoctorInvitation";
+import { useDeleteDoctorInvitation } from "@/hooks/doctorRegistration/useDeleteDoctorInvitation";
 import { handleApiError, handleApiSuccess } from "@/lib/handleError";
 import ConfirmModal from "@/components/ui/confirm-modal";
-import { FileText, Send, XCircle, ExternalLink, Calendar, Clock, MapPin, Building } from "lucide-react";
+import { FileText, Send, XCircle, ExternalLink, Calendar, Clock, MapPin, Building, Trash2 } from "lucide-react";
 import Cookies from "js-cookie";
 
 interface DoctorInvitationDetailModalProps {
@@ -33,7 +34,7 @@ export function DoctorInvitationDetailModal({
 }: DoctorInvitationDetailModalProps) {
   const hospitalId = Cookies.get("hospitalId") || "";
   const [showContractViewer, setShowContractViewer] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<"resend" | "cancel" | null>(null);
+  const [confirmAction, setConfirmAction] = useState<"resend" | "cancel" | "delete" | null>(null);
 
   const { contractData, isLoading: isLoadingContract } = useGetContractUrl(
     hospitalId,
@@ -43,6 +44,7 @@ export function DoctorInvitationDetailModal({
 
   const cancelMutation = useCancelDoctorInvitation(hospitalId);
   const resendMutation = useResendDoctorInvitation(hospitalId);
+  const deleteMutation = useDeleteDoctorInvitation(hospitalId);
 
   if (!invitation) return null;
 
@@ -68,6 +70,18 @@ export function DoctorInvitationDetailModal({
       onRefresh?.();
     } catch (err) {
       handleApiError(err, "Gagal mengirim ulang undangan");
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const res = await deleteMutation.mutateAsync(invitation.id);
+      handleApiSuccess(res, "Undangan Berhasil Dihapus", "Arsip undangan dokter telah dihapus dari sistem.");
+      setConfirmAction(null);
+      onRefresh?.();
+      onClose();
+    } catch (err) {
+      handleApiError(err, "Gagal menghapus undangan");
     }
   };
 
@@ -217,14 +231,28 @@ export function DoctorInvitationDetailModal({
 
             {/* Footer Action Buttons */}
             <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-100 mt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="py-2.5 px-5 h-11 text-xs font-medium border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl cursor-pointer"
-              >
-                Tutup
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="py-2.5 px-5 h-11 text-xs font-medium border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl cursor-pointer"
+                >
+                  Tutup
+                </Button>
+
+                {invitation.status !== "ACCEPTED" && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setConfirmAction("delete")}
+                    className="py-2.5 px-4 h-11 text-xs font-semibold border-red-200 text-red-600 hover:bg-red-50 rounded-xl cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Hapus Undangan</span>
+                  </Button>
+                )}
+              </div>
 
               {invitation.status === "PENDING" && (
                 <div className="flex items-center gap-2">
@@ -233,7 +261,7 @@ export function DoctorInvitationDetailModal({
                     variant="outline"
                     onClick={() => setConfirmAction("cancel")}
                     disabled={cancelMutation.isPending}
-                    className="py-2.5 px-4 h-11 text-xs font-semibold border-red-200 text-red-600 hover:bg-red-50 rounded-xl cursor-pointer flex items-center gap-1.5"
+                    className="py-2.5 px-4 h-11 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl cursor-pointer flex items-center gap-1.5"
                   >
                     <XCircle className="h-4 w-4" />
                     <span>Batalkan Undangan</span>
@@ -285,6 +313,24 @@ export function DoctorInvitationDetailModal({
         details={[
           { label: "Dokter", value: `${invitation.doctor_first_name} ${invitation.doctor_last_name}` },
           { label: "Email", value: invitation.doctor_email },
+        ]}
+      />
+
+      {/* Confirmation Modal for Delete inside Detail */}
+      <ConfirmModal
+        isOpen={confirmAction === "delete"}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={deleteMutation.isPending}
+        variant="destructive"
+        title="Konfirmasi Hapus Undangan"
+        description={`Apakah Anda yakin ingin menghapus arsip undangan dokter ${invitation.doctor_first_name} ${invitation.doctor_last_name}?`}
+        confirmText="Ya, Hapus Undangan"
+        cancelText="Kembali"
+        details={[
+          { label: "Dokter", value: `${invitation.doctor_first_name} ${invitation.doctor_last_name}` },
+          { label: "Email", value: invitation.doctor_email },
+          { label: "Status", value: invitation.status },
         ]}
       />
     </>

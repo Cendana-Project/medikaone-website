@@ -5,11 +5,12 @@ import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { UserPlus, Eye, Send, XCircle, ShieldCheck, Mail, Clock } from "lucide-react";
+import { UserPlus, Eye, Send, XCircle, ShieldCheck, Mail, Clock, Trash2 } from "lucide-react";
 import { DoctorInvitation } from "@/types/doctorRegistration";
 import { useGetDoctorInvitations } from "@/hooks/doctorRegistration/useGetDoctorInvitations";
 import { useResendDoctorInvitation } from "@/hooks/doctorRegistration/useResendDoctorInvitation";
 import { useCancelDoctorInvitation } from "@/hooks/doctorRegistration/useCancelDoctorInvitation";
+import { useDeleteDoctorInvitation } from "@/hooks/doctorRegistration/useDeleteDoctorInvitation";
 import { CreateDoctorModal } from "@/components/doctors/CreateDoctorModal";
 import { DoctorInvitationDetailModal } from "@/components/doctors/DoctorInvitationDetailModal";
 import ConfirmModal from "@/components/ui/confirm-modal";
@@ -24,6 +25,7 @@ export default function DoctorInvitationsPage() {
   const [selectedInvitation, setSelectedInvitation] = useState<DoctorInvitation | null>(null);
   const [resendTarget, setResendTarget] = useState<DoctorInvitation | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DoctorInvitation | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<DoctorInvitation | null>(null);
 
   const { invitations, isLoading, refetch } = useGetDoctorInvitations(
     hospitalId,
@@ -32,6 +34,7 @@ export default function DoctorInvitationsPage() {
 
   const resendMutation = useResendDoctorInvitation(hospitalId);
   const cancelMutation = useCancelDoctorInvitation(hospitalId);
+  const deleteMutation = useDeleteDoctorInvitation(hospitalId);
 
   const handleResendConfirm = async () => {
     if (!resendTarget) return;
@@ -58,6 +61,18 @@ export default function DoctorInvitationsPage() {
       refetch();
     } catch (err) {
       handleApiError(err, "Gagal membatalkan undangan");
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    try {
+      const res = await deleteMutation.mutateAsync(deleteTarget.id);
+      handleApiSuccess(res, "Undangan Berhasil Dihapus", "Arsip undangan dokter telah dihapus.");
+      setDeleteTarget(null);
+      refetch();
+    } catch (err) {
+      handleApiError(err, "Gagal menghapus undangan");
     }
   };
 
@@ -169,12 +184,24 @@ export default function DoctorInvitationsPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setCancelTarget(row)}
-                className="flex items-center justify-center p-2 h-8 w-8 border-gray-200 text-red-500 hover:bg-red-50 rounded-lg cursor-pointer"
+                className="flex items-center justify-center p-2 h-8 w-8 border-amber-200 text-amber-700 hover:bg-amber-50 rounded-lg cursor-pointer"
                 title="Batalkan Undangan"
               >
                 <XCircle className="h-3.5 w-3.5" />
               </Button>
             </>
+          )}
+
+          {row.status !== "ACCEPTED" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setDeleteTarget(row)}
+              className="flex items-center justify-center p-2 h-8 w-8 border-red-200 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+              title="Hapus Undangan"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
           )}
         </div>
       ),
@@ -324,6 +351,28 @@ export default function DoctorInvitationsPage() {
                 { label: "Dokter", value: `${cancelTarget.doctor_first_name} ${cancelTarget.doctor_last_name}` },
                 { label: "Email", value: cancelTarget.doctor_email },
                 { label: "SIP", value: cancelTarget.sip_number || "-" },
+              ]
+            : []
+        }
+      />
+
+      {/* Confirmation Modal: Delete Invitation */}
+      <ConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        isLoading={deleteMutation.isPending}
+        variant="destructive"
+        title="Konfirmasi Hapus Undangan"
+        description={`Apakah Anda yakin ingin menghapus arsip undangan dokter ${deleteTarget?.doctor_first_name || ""} ${deleteTarget?.doctor_last_name || ""}?`}
+        confirmText="Ya, Hapus Undangan"
+        cancelText="Kembali"
+        details={
+          deleteTarget
+            ? [
+                { label: "Dokter", value: `${deleteTarget.doctor_first_name} ${deleteTarget.doctor_last_name}` },
+                { label: "Email", value: deleteTarget.doctor_email },
+                { label: "Status", value: deleteTarget.status },
               ]
             : []
         }

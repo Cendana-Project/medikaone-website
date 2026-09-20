@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,7 @@ import toast from "react-hot-toast";
 interface ScheduleChangeModalProps {
   affiliationId: string;
   doctorName?: string;
+  initialSchedules?: DoctorSchedule[];
   isOpen: boolean;
   onClose: () => void;
   onSubmitSuccess?: () => void;
@@ -29,6 +30,7 @@ interface ScheduleChangeModalProps {
 export function ScheduleChangeModal({
   affiliationId,
   doctorName,
+  initialSchedules,
   isOpen,
   onClose,
   onSubmitSuccess,
@@ -36,7 +38,13 @@ export function ScheduleChangeModal({
   const hospitalId = Cookies.get("hospitalId") || "";
 
   const [reason, setReason] = useState("");
-  const [schedules, setSchedules] = useState<DoctorSchedule[]>([]);
+  const [schedules, setSchedules] = useState<DoctorSchedule[]>(initialSchedules || []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSchedules(initialSchedules || []);
+    }
+  }, [isOpen, initialSchedules]);
 
   const createScheduleChangeMutation = useCreateScheduleChange(hospitalId);
 

@@ -206,6 +206,13 @@ export const resendDoctorInvitation = async (hospitalId: string, invitationId: s
     });
 };
 
+export const deleteDoctorInvitation = async (hospitalId: string, invitationId: string) => {
+    return safeRequest(async () => {
+        const response = await api.delete(`hospitals/${hospitalId}/doctor-invitations/${invitationId}`);
+        return response.data;
+    });
+};
+
 // --- DOCTOR MANAGEMENT & AFFILIATIONS ---
 
 export const getDoctors = async (hospitalId: string, status?: string) => {
@@ -213,6 +220,13 @@ export const getDoctors = async (hospitalId: string, status?: string) => {
         const response = await api.get(`hospitals/${hospitalId}/doctors`, {
             params: status ? { status } : undefined,
         });
+        return response.data;
+    });
+};
+
+export const deleteDoctorAffiliation = async (hospitalId: string, doctorId: string) => {
+    return safeRequest(async () => {
+        const response = await api.delete(`hospitals/${hospitalId}/doctors/${doctorId}`);
         return response.data;
     });
 };
