@@ -27,8 +27,13 @@ export const createDepartment = async (hospitalId: string, payload: CreateDepart
 
 export const updateDepartment = async (hospitalId: string, departmentId: string, payload: Partial<CreateDepartmentRequest>) => {
     return safeRequest(async () => {
-        const response = await api.put(`hospitals/${hospitalId}/departments/${departmentId}`, payload);
-        return response.data;
+        try {
+            const response = await api.patch(`hospitals/${hospitalId}/departments/${departmentId}`, payload);
+            return response.data;
+        } catch {
+            const response = await api.put(`hospitals/${hospitalId}/departments/${departmentId}`, payload);
+            return response.data;
+        }
     });
 };
 
@@ -59,8 +64,13 @@ export const createRoom = async (hospitalId: string, payload: CreateRoomRequest)
 
 export const updateRoom = async (hospitalId: string, roomId: string, payload: Partial<CreateRoomRequest>) => {
     return safeRequest(async () => {
-        const response = await api.put(`hospitals/${hospitalId}/rooms/${roomId}`, payload);
-        return response.data;
+        try {
+            const response = await api.patch(`hospitals/${hospitalId}/rooms/${roomId}`, payload);
+            return response.data;
+        } catch {
+            const response = await api.put(`hospitals/${hospitalId}/rooms/${roomId}`, payload);
+            return response.data;
+        }
     });
 };
 

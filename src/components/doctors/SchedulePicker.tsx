@@ -258,10 +258,11 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
 
               <div>
                 <Label className="text-xs font-semibold text-gray-700 mb-1 block">
-                  Jam Mulai (Max 23:59)
+                  Jam Mulai (Format 24 Jam, Max 23:59)
                 </Label>
                 <Input
                   type="time"
+                  step="60"
                   max="23:59"
                   value={startTime}
                   onChange={(e) => {
@@ -274,10 +275,11 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
 
               <div>
                 <Label className="text-xs font-semibold text-gray-700 mb-1 block">
-                  Jam Selesai (Max 23:59)
+                  Jam Selesai (Format 24 Jam, Max 23:59)
                 </Label>
                 <Input
                   type="time"
+                  step="60"
                   max="23:59"
                   value={endTime}
                   onChange={(e) => {
