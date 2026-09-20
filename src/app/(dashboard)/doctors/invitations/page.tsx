@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
