@@ -155,13 +155,13 @@ export function CreateDoctorModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-xl p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl md:max-w-4xl p-6 md:p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-4 border-b border-gray-100">
-          <DialogTitle className="text-2xl font-bold text-[#101828] tracking-tight">
-            Tambahkan Akun Dokter
+          <DialogTitle className="text-xl md:text-2xl font-bold text-[#101828] tracking-tight">
+            Assign Dokter ke Rumah Sakit
           </DialogTitle>
-          <p className="text-gray-500 text-sm font-normal mt-1">
-            Pastikan identitas akun sesuai dengan user
+          <p className="text-gray-500 text-xs md:text-sm font-normal mt-1">
+            Assign dan daftarkan dokter ke fasilitas rumah sakit ini
           </p>
         </DialogHeader>
 
@@ -403,7 +403,7 @@ export function CreateDoctorModal({
               disabled={createInvitationMutation.isPending}
               className="py-3 px-8 h-12 text-sm font-semibold bg-[#008A72] hover:bg-[#007661] text-white rounded-xl cursor-pointer shadow-xs"
             >
-              {createInvitationMutation.isPending ? "Memproses..." : "Daftar"}
+              {createInvitationMutation.isPending ? "Memproses..." : "Assign Dokter"}
             </Button>
           </div>
         </form>

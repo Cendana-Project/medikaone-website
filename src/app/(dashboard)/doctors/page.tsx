@@ -364,7 +364,7 @@ export default function DoctorsPage() {
           keyExtractor={(row) => row.affiliation_id || row.doctor_id}
           searchPlaceholder="Cari Dokter, SIP, atau Spesialis..."
           searchField={(row) => `${row.first_name} ${row.last_name} ${row.email} ${row.sip_number || ""} ${row.specialty || ""}`}
-          createButtonLabel="Tambahkan Akun Dokter"
+          createButtonLabel="Assign Dokter ke RS"
           createButtonIcon={<UserPlus className="h-4 w-4" />}
           onCreateButtonClick={() => setIsCreateOpen(true)}
           extraHeaderControls={
