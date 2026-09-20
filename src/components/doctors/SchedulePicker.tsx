@@ -180,7 +180,8 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
             <div className="flex flex-col gap-2 mt-1">
               <Label className="text-xs font-semibold text-gray-700">Daftar Slot Ditambahkan:</Label>
               {schedules.map((slot, idx) => {
-                const dayLabel = DAYS.find((d) => d.value === slot.day_of_week)?.label || `Hari ${slot.day_of_week}`;
+                const firstDayVal = Array.isArray(slot.day_of_week) ? slot.day_of_week[0] : slot.day_of_week;
+                const dayLabel = DAYS.find((d) => d.value === firstDayVal)?.label || `Hari ${firstDayVal}`;
                 return (
                   <div
                     key={idx}

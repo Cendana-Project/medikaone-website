@@ -48,7 +48,7 @@ export type DoctorSearchResult = {
 
 export type DoctorSchedule = {
     id?: string;
-    day_of_week: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
+    day_of_week: number | number[]; // e.g. [1] or 1
     start_time: string; // HH:mm
     end_time: string; // HH:mm
     timezone?: string; // e.g. "Asia/Jakarta"
@@ -63,7 +63,7 @@ export type CreateInvitationRequest = {
     room_id?: string;
     message?: string;
     schedules?: DoctorSchedule[];
-    contract: File;
+    contract?: File | string;
 };
 
 export type DoctorInvitation = {

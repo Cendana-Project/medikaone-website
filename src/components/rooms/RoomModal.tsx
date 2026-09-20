@@ -12,6 +12,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronDown } from "lucide-react";
 import { RoomItem } from "./RoomDetailModal";
+import { useGetDepartments } from "@/hooks/doctorRegistration/useGetDepartments";
+import { useCreateRoom } from "@/hooks/doctorRegistration/useCreateRoom";
+import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
+import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
 interface RoomModalProps {
@@ -27,7 +31,12 @@ export function RoomModal({
   initialData,
   onSubmitSuccess,
 }: RoomModalProps) {
-  const [departmentId, setDepartmentId] = useState("Poli anak");
+  const { userInfo } = useGetUserInfo();
+  const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
+  const { departments, isLoading: isLoadingDepts } = useGetDepartments(hospitalId);
+  const createRoomMutation = useCreateRoom(hospitalId);
+
+  const [departmentId, setDepartmentId] = useState("");
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -36,13 +45,13 @@ export function RoomModal({
     if (initialData) {
       setCode(initialData.code || "");
       setName(initialData.name || "");
-      setDepartmentId(initialData.departmentName || "Poli anak");
+      setDepartmentId(initialData.departmentName || (departments[0]?.id || ""));
     } else {
       setCode("");
       setName("");
-      setDepartmentId("Poli anak");
+      setDepartmentId(departments[0]?.id || "");
     }
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, departments]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,13 +62,18 @@ export function RoomModal({
 
     setIsLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 500));
-      if (initialData) {
+      const selectedDept = departments.find((d) => d.id === departmentId || d.name === departmentId);
+      const deptName = selectedDept ? selectedDept.name : (departmentId || "Poli Utama");
+
+      if (!initialData && hospitalId && departmentId) {
+        await createRoomMutation.mutateAsync({ department_id: departmentId, code, name });
+      } else if (initialData) {
         toast.success(`Ruangan ${name} (${code}) berhasil diperbarui.`);
       } else {
         toast.success(`Ruangan ${name} (${code}) berhasil dibuat.`);
       }
-      onSubmitSuccess?.({ code, name, departmentName: departmentId });
+
+      onSubmitSuccess?.({ code, name, departmentName: deptName });
       onClose();
     } catch {
       toast.error("Gagal menyimpan ruangan");
@@ -86,13 +100,19 @@ export function RoomModal({
               <select
                 value={departmentId}
                 onChange={(e) => setDepartmentId(e.target.value)}
+                disabled={isLoadingDepts}
                 className="w-full py-2.5 px-3 h-11 border border-gray-200 rounded-xl text-sm bg-gray-50/50 appearance-none cursor-pointer"
               >
-                <option value="Poli anak">Poli anak</option>
-                <option value="Kandungan">Kandungan</option>
-                <option value="Penyakit Dalam">Penyakit Dalam</option>
-                <option value="Poli THT (Telinga)">Poli THT (Telinga)</option>
-                <option value="Poli Estetika">Poli Estetika</option>
+                <option value="">-- Pilih Departemen --</option>
+                {isLoadingDepts && <option value="" disabled>Memuat daftar departemen...</option>}
+                {!isLoadingDepts && departments.length === 0 && (
+                  <option value="" disabled>Belum ada departemen. Silakan buat di Kelola Departemen.</option>
+                )}
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name} {dept.code ? `(${dept.code})` : ""}
+                  </option>
+                ))}
               </select>
               <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
             </div>

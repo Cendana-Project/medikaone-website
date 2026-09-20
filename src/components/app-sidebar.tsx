@@ -185,18 +185,50 @@ export function AppSidebar({ role }: AppSidebarProps) {
                 </Link>
             </SidebarHeader>
 
-            {/* Scrollable Container for Navigation Menu & Profile */}
-            <div className="flex-1 overflow-y-auto min-h-0 flex flex-col justify-between p-3 gap-6">
-                {/* Navigation Sections */}
-                <SidebarContent className="flex flex-col gap-6 p-0 overflow-visible">
-                    {/* Frame 121017: MAIN Group */}
+            {/* Scrollable Navigation Menu Area */}
+            <SidebarContent className="flex-1 overflow-y-auto min-h-0 p-3 flex flex-col gap-6 custom-scrollbar">
+                {/* Frame 121017: MAIN Group */}
+                <SidebarGroup className="p-0 flex flex-col gap-1">
+                    <SidebarGroupLabel className="text-[12px] font-semibold text-[#858585] uppercase tracking-[-0.006em] px-2 h-6 mb-1">
+                        MAIN
+                    </SidebarGroupLabel>
+
+                    <SidebarMenu className="gap-1">
+                        {mainMenus.map((menu) => {
+                            const isActive = pathname === menu.path;
+                            return (
+                                <SidebarMenuItem key={menu.name}>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={isActive}
+                                        className={`flex items-center gap-2 px-3 py-3 rounded-[4px] h-[48px] text-[14px] font-sans transition-colors ${
+                                            isActive
+                                                ? "bg-[#EBF8F5] text-[#3BB49F] font-semibold"
+                                                : "text-[#767676] font-normal hover:bg-gray-50 hover:text-gray-900"
+                                        }`}
+                                    >
+                                        <Link href={menu.path} className="flex items-center gap-2 w-full">
+                                            {getMenuIcon(menu.name, isActive)}
+                                            <span className="truncate leading-[24px] tracking-[-0.006em]">
+                                                {menu.name}
+                                            </span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            );
+                        })}
+                    </SidebarMenu>
+                </SidebarGroup>
+
+                {/* Frame 121018: SYSTEM Group */}
+                {systemMenus.length > 0 && (
                     <SidebarGroup className="p-0 flex flex-col gap-1">
                         <SidebarGroupLabel className="text-[12px] font-semibold text-[#858585] uppercase tracking-[-0.006em] px-2 h-6 mb-1">
-                            MAIN
+                            SYSTEM
                         </SidebarGroupLabel>
 
                         <SidebarMenu className="gap-1">
-                            {mainMenus.map((menu) => {
+                            {systemMenus.map((menu) => {
                                 const isActive = pathname === menu.path;
                                 return (
                                     <SidebarMenuItem key={menu.name}>
@@ -210,9 +242,9 @@ export function AppSidebar({ role }: AppSidebarProps) {
                                             }`}
                                         >
                                             <Link href={menu.path} className="flex items-center gap-2 w-full">
-                                                {getMenuIcon(menu.name, isActive)}
+                                                {getMenuIcon("Settings", isActive)}
                                                 <span className="truncate leading-[24px] tracking-[-0.006em]">
-                                                    {menu.name}
+                                                    {menu.name === "System Setting" ? "Settings" : menu.name}
                                                 </span>
                                             </Link>
                                         </SidebarMenuButton>
@@ -221,90 +253,55 @@ export function AppSidebar({ role }: AppSidebarProps) {
                             })}
                         </SidebarMenu>
                     </SidebarGroup>
+                )}
+            </SidebarContent>
 
-                    {/* Frame 121018: SYSTEM Group */}
-                    {systemMenus.length > 0 && (
-                        <SidebarGroup className="p-0 flex flex-col gap-1">
-                            <SidebarGroupLabel className="text-[12px] font-semibold text-[#858585] uppercase tracking-[-0.006em] px-2 h-6 mb-1">
-                                SYSTEM
-                            </SidebarGroupLabel>
+            {/* Bottom Container (Gradient Tenant Profile Card + Log Out) */}
+            <SidebarFooter className="p-3 pt-2 flex flex-col gap-4 shrink-0 border-t border-[#EAECF0] bg-white mt-auto">
+                {/* Tenant User Info Card - Click to navigate to Profile */}
+                <Link 
+                    href="/dashboard/profile"
+                    className="w-full min-h-[96px] rounded-[12px] p-[24px_12px_24px_10px] border border-[#EAECF0] flex items-center gap-[10px] box-border transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                    style={{
+                        background: "linear-gradient(148.58deg, #3BB49F 18.96%, #00FFD3 176.22%)"
+                    }}
+                >
+                    <div className="relative w-[48px] h-[48px] rounded-full bg-[#D8F0EC] overflow-hidden shrink-0 flex items-center justify-center">
+                        {userAvatarUrl && !imgError ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img
+                                src={userAvatarUrl}
+                                alt="User Avatar"
+                                onError={() => setImgError(true)}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : initials ? (
+                            <span className="text-[#3BB49F] font-bold text-[16px] select-none">
+                                {initials}
+                            </span>
+                        ) : (
+                            <User size={24} className="text-[#3BB49F]" />
+                        )}
+                    </div>
+                    <div className="flex flex-col justify-center overflow-hidden min-w-0">
+                        <h4 className="text-[14px] font-bold text-white leading-[24px] tracking-[-0.006em] truncate">
+                            {getDisplayName()}
+                        </h4>
+                        <p className="text-[14px] font-normal text-white leading-[24px] tracking-[-0.006em] truncate opacity-90">
+                            {getDisplayRole()}
+                        </p>
+                    </div>
+                </Link>
 
-                            <SidebarMenu className="gap-1">
-                                {systemMenus.map((menu) => {
-                                    const isActive = pathname === menu.path;
-                                    return (
-                                        <SidebarMenuItem key={menu.name}>
-                                            <SidebarMenuButton
-                                                asChild
-                                                isActive={isActive}
-                                                className={`flex items-center gap-2 px-3 py-3 rounded-[4px] h-[48px] text-[14px] font-sans transition-colors ${
-                                                    isActive
-                                                        ? "bg-[#EBF8F5] text-[#3BB49F] font-semibold"
-                                                        : "text-[#767676] font-normal hover:bg-gray-50 hover:text-gray-900"
-                                                }`}
-                                            >
-                                                <Link href={menu.path} className="flex items-center gap-2 w-full">
-                                                    {getMenuIcon("Settings", isActive)}
-                                                    <span className="truncate leading-[24px] tracking-[-0.006em]">
-                                                        {menu.name === "System Setting" ? "Settings" : menu.name}
-                                                    </span>
-                                                </Link>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    );
-                                })}
-                            </SidebarMenu>
-                        </SidebarGroup>
-                    )}
-                </SidebarContent>
-
-                {/* Frame 121022: Bottom Container (Gradient Tenant Profile Card + Log Out) */}
-                <SidebarFooter className="p-0 flex flex-col gap-4 mt-auto shrink-0">
-                    {/* Tenant User Info Card - Click to navigate to Profile */}
-                    <Link 
-                        href="/dashboard/profile"
-                        className="w-full min-h-[96px] rounded-[12px] p-[24px_12px_24px_10px] border border-[#EAECF0] flex items-center gap-[10px] box-border transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                        style={{
-                            background: "linear-gradient(148.58deg, #3BB49F 18.96%, #00FFD3 176.22%)"
-                        }}
-                    >
-                        <div className="relative w-[48px] h-[48px] rounded-full bg-[#D8F0EC] overflow-hidden shrink-0 flex items-center justify-center">
-                            {userAvatarUrl && !imgError ? (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
-                                    src={userAvatarUrl}
-                                    alt="User Avatar"
-                                    onError={() => setImgError(true)}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : initials ? (
-                                <span className="text-[#3BB49F] font-bold text-[16px] select-none">
-                                    {initials}
-                                </span>
-                            ) : (
-                                <User size={24} className="text-[#3BB49F]" />
-                            )}
-                        </div>
-                        <div className="flex flex-col justify-center overflow-hidden min-w-0">
-                            <h4 className="text-[14px] font-bold text-white leading-[24px] tracking-[-0.006em] truncate">
-                                {getDisplayName()}
-                            </h4>
-                            <p className="text-[14px] font-normal text-white leading-[24px] tracking-[-0.006em] truncate opacity-90">
-                                {getDisplayRole()}
-                            </p>
-                        </div>
-                    </Link>
-
-                    {/* Sidenav Log Out Item */}
-                    <button
-                        onClick={handleLogout}
-                        className="w-full h-[48px] px-3 py-3 rounded-[4px] flex items-center gap-2 text-[#767676] text-[14px] font-semibold tracking-[-0.006em] hover:bg-gray-100 hover:text-red-600 transition-colors"
-                    >
-                        <LogOut size={20} className="shrink-0 text-[#767676]" />
-                        <span>Log Out</span>
-                    </button>
-                </SidebarFooter>
-            </div>
+                {/* Sidenav Log Out Item */}
+                <button
+                    onClick={handleLogout}
+                    className="w-full h-[48px] px-3 py-3 rounded-[4px] flex items-center gap-2 text-[#767676] text-[14px] font-semibold tracking-[-0.006em] hover:bg-gray-100 hover:text-red-600 transition-colors"
+                >
+                    <LogOut size={20} className="shrink-0 text-[#767676]" />
+                    <span>Log Out</span>
+                </button>
+            </SidebarFooter>
         </Sidebar>
     );
 }

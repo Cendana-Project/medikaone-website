@@ -124,3 +124,26 @@
     bottom: 0.5rem;
   }
 }
+
+/* Custom sleek scrollbar for sidebar & scrollable containers */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #D0D5DD transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #D0D5DD;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3BB49F;
+}

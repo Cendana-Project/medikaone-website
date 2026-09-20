@@ -11,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DepartmentItem } from "./DepartmentDetailModal";
+import { useCreateDepartment } from "@/hooks/doctorRegistration/useCreateDepartment";
+import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
+import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
 interface DepartmentModalProps {
@@ -26,6 +29,10 @@ export function DepartmentModal({
   initialData,
   onSubmitSuccess,
 }: DepartmentModalProps) {
+  const { userInfo } = useGetUserInfo();
+  const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
+  const createDeptMutation = useCreateDepartment(hospitalId);
+
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,8 +56,9 @@ export function DepartmentModal({
 
     setIsLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 500));
-      if (initialData) {
+      if (!initialData && hospitalId) {
+        await createDeptMutation.mutateAsync({ code, name });
+      } else if (initialData) {
         toast.success(`Departemen ${name} (${code}) berhasil diperbarui.`);
       } else {
         toast.success(`Departemen ${name} (${code}) berhasil dibuat.`);

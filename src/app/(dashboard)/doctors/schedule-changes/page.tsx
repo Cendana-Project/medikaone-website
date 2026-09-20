@@ -285,25 +285,29 @@ export default function DoctorScheduleChangesPage() {
 
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-semibold text-gray-800">Daftar Slot Jam Praktik:</span>
-                {detailItem.schedules?.map((slot, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 bg-[#EBF8F5] border border-[#C4E9E2] rounded-xl flex items-center justify-between text-xs"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#008A72]">
-                        Hari {slot.day_of_week === 0 ? "Minggu" : slot.day_of_week === 1 ? "Senin" : slot.day_of_week === 2 ? "Selasa" : slot.day_of_week === 3 ? "Rabu" : slot.day_of_week === 4 ? "Kamis" : slot.day_of_week === 5 ? "Jumat" : "Sabtu"}
-                      </span>
-                      <span className="text-gray-700 font-medium">
-                        {slot.start_time} - {slot.end_time}
-                      </span>
-                    </div>
+                {detailItem.schedules?.map((slot, idx) => {
+                  const dVal = Array.isArray(slot.day_of_week) ? slot.day_of_week[0] : slot.day_of_week;
+                  const dayName = dVal === 0 ? "Minggu" : dVal === 1 ? "Senin" : dVal === 2 ? "Selasa" : dVal === 3 ? "Rabu" : dVal === 4 ? "Kamis" : dVal === 5 ? "Jumat" : "Sabtu";
+                  return (
+                    <div
+                      key={idx}
+                      className="p-3 bg-[#EBF8F5] border border-[#C4E9E2] rounded-xl flex items-center justify-between text-xs"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-[#008A72]">
+                          Hari {dayName}
+                        </span>
+                        <span className="text-gray-700 font-medium">
+                          {slot.start_time} - {slot.end_time}
+                        </span>
+                      </div>
 
                     <div className="text-gray-600 font-normal">
                       Mode: {slot.booking_mode || "FIXED_SLOT"} • Durasi: {slot.slot_duration_minutes || 30} mnt • Max {slot.capacity || 1} pas
                     </div>
                   </div>
-                ))}
+                );
+              })}
               </div>
 
               <div className="flex justify-end pt-3 border-t border-gray-100">

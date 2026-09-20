@@ -11,6 +11,7 @@ import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import toast from "react-hot-toast";
 
 import { useGetRooms } from "@/hooks/doctorRegistration/useGetRooms";
+import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
 import Cookies from "js-cookie";
 
 interface RoomRow {
@@ -22,7 +23,8 @@ interface RoomRow {
 }
 
 export default function RoomsPage() {
-  const hospitalId = Cookies.get("hospitalId") || "";
+  const { userInfo } = useGetUserInfo();
+  const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
   const { rooms: apiRooms } = useGetRooms(hospitalId);
   const [localRooms, setLocalRooms] = useState<RoomRow[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

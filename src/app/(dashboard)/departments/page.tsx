@@ -11,10 +11,12 @@ import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import toast from "react-hot-toast";
 
 import { useGetDepartments } from "@/hooks/doctorRegistration/useGetDepartments";
+import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
 import Cookies from "js-cookie";
 
 export default function DepartmentsPage() {
-  const hospitalId = Cookies.get("hospitalId") || "";
+  const { userInfo } = useGetUserInfo();
+  const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
   const { departments: apiDepts } = useGetDepartments(hospitalId);
   const [localDepartments, setLocalDepartments] = useState<DepartmentItem[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);

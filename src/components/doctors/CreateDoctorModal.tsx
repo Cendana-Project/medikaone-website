@@ -20,6 +20,7 @@ import { useCreateDoctorInvitation } from "@/hooks/doctorRegistration/useCreateD
 import { useCreateDepartment } from "@/hooks/doctorRegistration/useCreateDepartment";
 import { useCreateRoom } from "@/hooks/doctorRegistration/useCreateRoom";
 import { handleApiError, handleApiSuccess } from "@/lib/handleError";
+import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
@@ -34,7 +35,8 @@ export function CreateDoctorModal({
   onClose,
   onSubmitSuccess,
 }: CreateDoctorModalProps) {
-  const hospitalId = Cookies.get("hospitalId") || "";
+  const { userInfo } = useGetUserInfo();
+  const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
 
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorSearchResult | null>(null);
@@ -132,10 +134,6 @@ export function CreateDoctorModal({
       return;
     }
 
-    const dummyContract = new File(["dummy contract content"], "kontrak-dokter.pdf", {
-      type: "application/pdf",
-    });
-
     try {
       const res = await createInvitationMutation.mutateAsync({
         doctor_id: selectedDoctor.id,
@@ -143,7 +141,7 @@ export function CreateDoctorModal({
         room_id: roomId || undefined,
         message: message || undefined,
         schedules: schedules.length > 0 ? schedules : undefined,
-        contract: contractFile || dummyContract,
+        contract: contractFile || undefined,
       });
 
       handleApiSuccess(res, "Dokter Berhasil Di-assign ke RS", "Penugasan dokter ke rumah sakit berhasil diproses.");
@@ -363,7 +361,7 @@ export function CreateDoctorModal({
                   disabled={isLoadingDepts}
                   className="w-full py-3 px-4 h-12 bg-gray-50/50 border border-gray-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#3BB49F] appearance-none cursor-pointer"
                 >
-                  <option value="">Poli anak</option>
+                  <option value="">-- Pilih Departemen --</option>
                   {departments.map((dept: Department) => (
                     <option key={dept.id} value={dept.id}>
                       {dept.name} ({dept.code})
@@ -427,7 +425,7 @@ export function CreateDoctorModal({
                   disabled={isLoadingRooms}
                   className="w-full py-3 px-4 h-12 bg-gray-50/50 border border-gray-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#3BB49F] appearance-none cursor-pointer"
                 >
-                  <option value="">Poli anak</option>
+                  <option value="">-- Pilih Ruangan --</option>
                   {rooms.map((room: Room) => (
                     <option key={room.id} value={room.id}>
                       {room.name} ({room.code})
