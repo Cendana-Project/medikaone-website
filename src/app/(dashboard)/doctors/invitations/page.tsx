@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
@@ -12,6 +10,7 @@ import { useResendDoctorInvitation } from "@/hooks/doctorRegistration/useResendD
 import { useCancelDoctorInvitation } from "@/hooks/doctorRegistration/useCancelDoctorInvitation";
 import { CreateDoctorModal } from "@/components/doctors/CreateDoctorModal";
 import { DoctorInvitationDetailModal } from "@/components/doctors/DoctorInvitationDetailModal";
+import ConfirmModal from "@/components/ui/confirm-modal";
 import { handleApiError, handleApiSuccess } from "@/lib/handleError";
 import Cookies from "js-cookie";
 
@@ -21,6 +20,8 @@ export default function DoctorInvitationsPage() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedInvitation, setSelectedInvitation] = useState<DoctorInvitation | null>(null);
+  const [resendTarget, setResendTarget] = useState<DoctorInvitation | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<DoctorInvitation | null>(null);
 
   const { invitations, isLoading, refetch } = useGetDoctorInvitations(
     hospitalId,
@@ -30,20 +31,28 @@ export default function DoctorInvitationsPage() {
   const resendMutation = useResendDoctorInvitation(hospitalId);
   const cancelMutation = useCancelDoctorInvitation(hospitalId);
 
-  const handleResend = async (invitationId: string) => {
+  const handleResendConfirm = async () => {
+    if (!resendTarget) return;
     try {
-      const res = await resendMutation.mutateAsync(invitationId);
-      handleApiSuccess(res, "Undangan Berhasil Dikirim Ulang", "Pemberitahuan undangan baru telah dikirimkan ke email dokter.");
+      const res = await resendMutation.mutateAsync(resendTarget.id);
+      handleApiSuccess(
+        res,
+        "Undangan Berhasil Dikirim Ulang",
+        `Pemberitahuan undangan baru telah dikirimkan ke email ${resendTarget.doctor_email}.`
+      );
+      setResendTarget(null);
       refetch();
     } catch (err) {
       handleApiError(err, "Gagal mengirim ulang undangan");
     }
   };
 
-  const handleCancel = async (invitationId: string) => {
+  const handleCancelConfirm = async () => {
+    if (!cancelTarget) return;
     try {
-      const res = await cancelMutation.mutateAsync(invitationId);
+      const res = await cancelMutation.mutateAsync(cancelTarget.id);
       handleApiSuccess(res, "Undangan Berhasil Dibatalkan");
+      setCancelTarget(null);
       refetch();
     } catch (err) {
       handleApiError(err, "Gagal membatalkan undangan");
@@ -147,8 +156,7 @@ export default function DoctorInvitationsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleResend(row.id)}
-                disabled={resendMutation.isPending}
+                onClick={() => setResendTarget(row)}
                 className="flex items-center justify-center p-2 h-8 w-8 border-gray-200 text-[#3BB49F] hover:bg-[#EBF8F5] rounded-lg cursor-pointer"
                 title="Kirim Ulang Undangan"
               >
@@ -158,8 +166,7 @@ export default function DoctorInvitationsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleCancel(row.id)}
-                disabled={cancelMutation.isPending}
+                onClick={() => setCancelTarget(row)}
                 className="flex items-center justify-center p-2 h-8 w-8 border-gray-200 text-red-500 hover:bg-red-50 rounded-lg cursor-pointer"
                 title="Batalkan Undangan"
               >
@@ -276,6 +283,50 @@ export default function DoctorInvitationsPage() {
         onClose={() => setSelectedInvitation(null)}
         onRefresh={() => refetch()}
       />
+
+      {/* Confirmation Modal: Resend Invitation */}
+      <ConfirmModal
+        isOpen={Boolean(resendTarget)}
+        onClose={() => setResendTarget(null)}
+        onConfirm={handleResendConfirm}
+        isLoading={resendMutation.isPending}
+        title="Konfirmasi Kirim Ulang Undangan"
+        description={`Apakah Anda yakin ingin mengirim ulang email undangan pendaftaran ke dokter ${resendTarget?.doctor_first_name || ""} ${resendTarget?.doctor_last_name || ""}?`}
+        confirmText="Ya, Kirim Ulang"
+        cancelText="Batal"
+        details={
+          resendTarget
+            ? [
+                { label: "Dokter", value: `${resendTarget.doctor_first_name} ${resendTarget.doctor_last_name}` },
+                { label: "Email", value: resendTarget.doctor_email },
+                { label: "Departemen", value: resendTarget.department_name || "-" },
+              ]
+            : []
+        }
+      />
+
+      {/* Confirmation Modal: Cancel Invitation */}
+      <ConfirmModal
+        isOpen={Boolean(cancelTarget)}
+        onClose={() => setCancelTarget(null)}
+        onConfirm={handleCancelConfirm}
+        isLoading={cancelMutation.isPending}
+        variant="destructive"
+        title="Konfirmasi Batalkan Undangan"
+        description={`Apakah Anda yakin ingin membatalkan undangan pendaftaran untuk dokter ${cancelTarget?.doctor_first_name || ""} ${cancelTarget?.doctor_last_name || ""}?`}
+        confirmText="Ya, Batalkan Undangan"
+        cancelText="Kembali"
+        details={
+          cancelTarget
+            ? [
+                { label: "Dokter", value: `${cancelTarget.doctor_first_name} ${cancelTarget.doctor_last_name}` },
+                { label: "Email", value: cancelTarget.doctor_email },
+                { label: "SIP", value: cancelTarget.sip_number || "-" },
+              ]
+            : []
+        }
+      />
     </div>
   );
 }
+

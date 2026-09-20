@@ -16,6 +16,7 @@ import { ScheduleChangeRequestItem } from "@/types/doctorRegistration";
 import { useGetScheduleChanges } from "@/hooks/doctorRegistration/useGetScheduleChanges";
 import { useApproveScheduleChange } from "@/hooks/doctorRegistration/useApproveScheduleChange";
 import { useRejectScheduleChange } from "@/hooks/doctorRegistration/useRejectScheduleChange";
+import ConfirmModal from "@/components/ui/confirm-modal";
 import { handleApiError, handleApiSuccess } from "@/lib/handleError";
 import Cookies from "js-cookie";
 
@@ -24,6 +25,7 @@ export default function DoctorScheduleChangesPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>("PENDING");
 
   const [detailItem, setDetailItem] = useState<ScheduleChangeRequestItem | null>(null);
+  const [approveTargetItem, setApproveTargetItem] = useState<ScheduleChangeRequestItem | null>(null);
   const [rejectTargetItem, setRejectTargetItem] = useState<ScheduleChangeRequestItem | null>(null);
   const [rejectReason, setRejectReason] = useState("");
 
@@ -35,10 +37,12 @@ export default function DoctorScheduleChangesPage() {
   const approveMutation = useApproveScheduleChange(hospitalId);
   const rejectMutation = useRejectScheduleChange(hospitalId);
 
-  const handleApprove = async (scheduleChangeId: string) => {
+  const handleApproveConfirm = async () => {
+    if (!approveTargetItem) return;
     try {
-      const res = await approveMutation.mutateAsync(scheduleChangeId);
+      const res = await approveMutation.mutateAsync(approveTargetItem.id);
       handleApiSuccess(res, "Perubahan Jadwal Disetujui", "Jadwal praktik dokter berhasil diperbarui.");
+      setApproveTargetItem(null);
       refetch();
     } catch (err) {
       handleApiError(err, "Gagal menyetujui perubahan jadwal");
@@ -156,7 +160,7 @@ export default function DoctorScheduleChangesPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleApprove(row.id)}
+                onClick={() => setApproveTargetItem(row)}
                 disabled={approveMutation.isPending}
                 className="flex items-center gap-1 px-2.5 h-8 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50 rounded-lg cursor-pointer"
                 title="Setujui Perubahan"
@@ -319,6 +323,27 @@ export default function DoctorScheduleChangesPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Modal Setujui Pengajuan */}
+      <ConfirmModal
+        isOpen={Boolean(approveTargetItem)}
+        onClose={() => setApproveTargetItem(null)}
+        onConfirm={handleApproveConfirm}
+        isLoading={approveMutation.isPending}
+        title="Konfirmasi Persetujuan Perubahan Jadwal"
+        description={`Apakah Anda yakin ingin menyetujui pengajuan perubahan jadwal praktik dokter ${approveTargetItem?.doctor_name || ""}?`}
+        confirmText="Ya, Setujui"
+        cancelText="Batal"
+        details={
+          approveTargetItem
+            ? [
+                { label: "Dokter", value: approveTargetItem.doctor_name || "-" },
+                { label: "Pihak Pengaju", value: approveTargetItem.requested_by_party === "HOSPITAL" ? "Rumah Sakit" : "Dokter" },
+                { label: "Alasan", value: approveTargetItem.reason || "-" },
+              ]
+            : []
+        }
+      />
 
       {/* Modal Tolak Pengajuan */}
       <Dialog open={Boolean(rejectTargetItem)} onOpenChange={(open) => !open && setRejectTargetItem(null)}>
