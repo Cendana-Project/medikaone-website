@@ -51,7 +51,10 @@ export type DoctorSchedule = {
     day_of_week: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
     start_time: string; // HH:mm
     end_time: string; // HH:mm
-    timezone: string; // e.g. "Asia/Jakarta"
+    timezone?: string; // e.g. "Asia/Jakarta"
+    booking_mode?: "FIXED_SLOT" | "SESSION_QUEUE";
+    slot_duration_minutes?: number;
+    capacity?: number;
 };
 
 export type CreateInvitationRequest = {
@@ -114,3 +117,31 @@ export type DoctorAffiliation = {
 export type UpdateDoctorStatusRequest = {
     status: "ACTIVE" | "SUSPENDED";
 };
+
+export type CreateScheduleChangePayload = {
+    affiliation_id: string;
+    reason?: string;
+    schedules: DoctorSchedule[];
+};
+
+export type ScheduleChangeRequestItem = {
+    id: string;
+    affiliation_id: string;
+    hospital_id: string;
+    hospital_name?: string;
+    doctor_id: string;
+    doctor_name?: string;
+    requested_by?: string;
+    requested_by_party: "HOSPITAL" | "DOCTOR";
+    status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+    reason?: string;
+    expires_at?: string;
+    created_at?: string;
+    updated_at?: string;
+    schedules: DoctorSchedule[];
+};
+
+export type RejectScheduleChangePayload = {
+    reason?: string;
+};
+

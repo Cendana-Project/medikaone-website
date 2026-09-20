@@ -7,6 +7,8 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
     ADMIN: [
         { name: "Kelola Role", path: "/dashboard/roles" },
         { name: "Kelola Doctor", path: "/doctors" },
+        { name: "Undangan & Verifikasi", path: "/doctors/invitations" },
+        { name: "Perubahan Jadwal", path: "/doctors/schedule-changes" },
         { name: "Kelola Departemen", path: "/departments" },
         { name: "Kelola Ruangan", path: "/rooms" },
     ],
@@ -14,6 +16,9 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
     SUPER_ADMIN: [
         { name: "Kelola Role", path: "/dashboard/roles" },
         { name: "Kelola Doctor", path: "/doctors" },
+        { name: "Undangan & Verifikasi", path: "/doctors/invitations" },
+        { name: "Perubahan Jadwal", path: "/doctors/schedule-changes" },
+        { name: "Daftar Rumah Sakit", path: "/hospitals" },
         { name: "Kelola Departemen", path: "/departments" },
         { name: "Kelola Ruangan", path: "/rooms" },
     ],
@@ -37,6 +42,7 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
     DOCTOR: [
         { name: "Dashboard", path: "/dashboard" },
         { name: "Appointment", path: "/appointments" },
+        { name: "Pengajuan Jadwal", path: "/doctors/schedule-changes" },
     ],
 
     default: [

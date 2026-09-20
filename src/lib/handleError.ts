@@ -145,3 +145,35 @@ export function handleApiError(error: unknown, fallbackTitle: string = "Terjadi 
         toast.error(mainTitle || detailMessage || "Terjadi kesalahan saat memproses permintaan.");
     }
 }
+
+export function handleApiSuccess(
+    response: any,
+    fallbackTitle: string = "Berhasil",
+    fallbackDesc?: string
+): void {
+    const messageDetail = response?.message_detail || response?.data?.message_detail;
+
+    const title =
+        typeof messageDetail === "object"
+            ? messageDetail?.title_idn || messageDetail?.title_eng || fallbackTitle
+            : fallbackTitle;
+
+    const desc =
+        typeof messageDetail === "object"
+            ? messageDetail?.desc_idn || messageDetail?.desc_eng || fallbackDesc
+            : fallbackDesc;
+
+    if (desc && desc !== title) {
+        toast.success(
+            React.createElement(
+                "div",
+                { className: "flex flex-col gap-0.5 text-left" },
+                React.createElement("span", { className: "font-semibold text-sm" }, title),
+                React.createElement("span", { className: "text-xs text-gray-700 font-normal font-medium" }, desc)
+            )
+        );
+    } else {
+        toast.success(title);
+    }
+}
+

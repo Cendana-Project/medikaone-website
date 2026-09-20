@@ -130,3 +130,36 @@ export const updateDoctorStatus = async (hospitalId: string, doctorId: string, p
         return response.data;
     });
 };
+
+// --- SCHEDULE CHANGE REQUESTS ---
+
+export const createScheduleChangeRequest = async (hospitalId: string, payload: any) => {
+    return safeRequest(async () => {
+        const response = await api.post(`hospitals/${hospitalId}/schedule-change-requests`, payload);
+        return response.data;
+    });
+};
+
+export const getScheduleChangeRequests = async (hospitalId: string, status?: string) => {
+    return safeRequest(async () => {
+        const response = await api.get(`hospitals/${hospitalId}/schedule-change-requests`, {
+            params: status ? { status } : undefined,
+        });
+        return response.data;
+    });
+};
+
+export const approveScheduleChangeRequest = async (hospitalId: string, scheduleChangeId: string) => {
+    return safeRequest(async () => {
+        const response = await api.post(`hospitals/${hospitalId}/schedule-change-requests/${scheduleChangeId}/approve`);
+        return response.data;
+    });
+};
+
+export const rejectScheduleChangeRequest = async (hospitalId: string, scheduleChangeId: string, payload?: { reason?: string }) => {
+    return safeRequest(async () => {
+        const response = await api.post(`hospitals/${hospitalId}/schedule-change-requests/${scheduleChangeId}/reject`, payload || {});
+        return response.data;
+    });
+};
+

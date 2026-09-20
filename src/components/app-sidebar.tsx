@@ -18,7 +18,8 @@ import {
     TrendingUp, 
     LayoutDashboard, 
     Stethoscope,
-    User
+    User,
+    ShieldCheck
 } from "lucide-react";
 import {
     Sidebar,
@@ -51,12 +52,18 @@ const getMenuIcon = (name: string, isActive: boolean) => {
         case "Kelola Dokter":
         case "Kelola Doctor":
             return <FileText size={iconSize} style={{ color: iconColor }} />;
+        case "Undangan & Verifikasi":
+            return <ShieldCheck size={iconSize} style={{ color: iconColor }} />;
+        case "Perubahan Jadwal":
+        case "Pengajuan Jadwal":
+        case "Cek Jadwal Dokter":
+            return <Clock size={iconSize} style={{ color: iconColor }} />;
+        case "Daftar Rumah Sakit":
+        case "Tambah Rumah Sakit":
         case "Kelola Departemen":
             return <Building2 size={iconSize} style={{ color: iconColor }} />;
         case "Kelola Ruangan":
             return <UserPlus size={iconSize} style={{ color: iconColor }} />;
-        case "Tambah Rumah Sakit":
-            return <Building2 size={iconSize} style={{ color: iconColor }} />;
         case "Tambah Admin RS":
             return <UserPlus size={iconSize} style={{ color: iconColor }} />;
         case "Data Appointment":
@@ -64,8 +71,6 @@ const getMenuIcon = (name: string, isActive: boolean) => {
             return <Calendar size={iconSize} style={{ color: iconColor }} />;
         case "Chat":
             return <MessageSquare size={iconSize} style={{ color: iconColor }} />;
-        case "Cek Jadwal Dokter":
-            return <Clock size={iconSize} style={{ color: iconColor }} />;
         case "Antrian Pasien":
         case "Data User":
             return <Users size={iconSize} style={{ color: iconColor }} />;

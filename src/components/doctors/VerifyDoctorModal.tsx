@@ -13,6 +13,9 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle2, Info, Calendar } from "lucide-react";
 import { DoctorSearchInput } from "./DoctorSearchInput";
 import { DoctorSearchResult } from "@/types/doctorRegistration";
+import { useUpdateDoctorStatus } from "@/hooks/doctorRegistration/useUpdateDoctorStatus";
+import { handleApiError, handleApiSuccess } from "@/lib/handleError";
+import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
 interface VerifyDoctorModalProps {
@@ -26,6 +29,7 @@ export function VerifyDoctorModal({
   onClose,
   onSubmitSuccess,
 }: VerifyDoctorModalProps) {
+  const hospitalId = Cookies.get("hospitalId") || "";
   const [doctor, setDoctor] = useState<DoctorSearchResult | null>({
     id: "5146846548465",
     email: "cornelius@medikaone.id",
@@ -36,7 +40,8 @@ export function VerifyDoctorModal({
   });
   const [department, setDepartment] = useState("Poli anak");
   const [dob] = useState("31 - 10 - 2002");
-  const [isLoading, setIsLoading] = useState(false);
+
+  const updateStatusMutation = useUpdateDoctorStatus(hospitalId);
 
   const handleConfirm = async () => {
     if (!doctor) {
@@ -44,16 +49,21 @@ export function VerifyDoctorModal({
       return;
     }
 
-    setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      toast.success(`Dokter ${doctor.first_name} ${doctor.last_name} berhasil diverifikasi & terdaftar.`);
+      const res = await updateStatusMutation.mutateAsync({
+        doctorId: doctor.id,
+        payload: { status: "ACTIVE" },
+      });
+
+      handleApiSuccess(
+        res,
+        "Verifikasi Dokter Berhasil",
+        `Dokter ${doctor.first_name} ${doctor.last_name || ""} berhasil diverifikasi & terdaftar.`
+      );
       onSubmitSuccess?.();
       onClose();
-    } catch {
-      toast.error("Gagal mengonfirmasi pendaftaran dokter");
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      handleApiError(err, "Gagal mengonfirmasi pendaftaran dokter");
     }
   };
 
@@ -70,9 +80,9 @@ export function VerifyDoctorModal({
         </DialogHeader>
 
         <div className="flex flex-col gap-5 pt-4">
-          {/* ID Dokter Search */}
-          <div className="flex flex-col gap-2">
-            <Label className="text-sm font-semibold text-gray-800">
+          {/* ID Dokter Search Input + Hint */}
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-sm font-medium text-gray-800">
               ID Dokter
             </Label>
             <DoctorSearchInput
@@ -80,98 +90,115 @@ export function VerifyDoctorModal({
               onSelectDoctor={(doc) => setDoctor(doc)}
               placeholder="5146846548465"
             />
+            <p className="text-xs text-gray-400 font-normal">
+              Bisa memasukkan ID Dokter, SIP, Email, NIK, MedikaOne ID, dll.
+            </p>
           </div>
 
-          {/* Green Card Section: Data Teridentifikasi */}
+          {/* Green Card Section: Data Teridentifikasi (Figma Specs) */}
           {doctor && (
-            <div className="bg-[#008A72] text-white p-6 rounded-2xl border border-[#007A65] flex flex-col gap-4 shadow-md">
-              <div className="flex items-center gap-2 justify-center text-center border-b border-white/20 pb-3">
-                <CheckCircle2 className="h-5 w-5 text-white" />
-                <h4 className="text-lg font-bold">Data Teridentifikasi</h4>
+            <div
+              className="w-full flex flex-col gap-6 p-8 rounded-xl shadow-lg transition-all"
+              style={{
+                background: "linear-gradient(147.77deg, #009B80 10.39%, #00352B 162.6%)",
+                border: "6px solid rgba(0, 155, 128, 0.3)",
+                borderRadius: "12px",
+              }}
+            >
+              {/* Header Title inside card */}
+              <div className="flex flex-col justify-center items-center text-center gap-1.5 border-b border-[#89D2C5] pb-4">
+                <div className="flex items-center justify-center gap-2">
+                  <CheckCircle2 className="h-6 w-6 text-white" />
+                  <h4 className="text-[24px] font-bold text-white leading-[28px] tracking-tight">
+                    Data Teridentifikasi
+                  </h4>
+                </div>
+                <p className="text-[16px] text-[#D8F0EC] font-normal leading-[24px]">
+                  Pastikan identitas akun sesuai dengan user
+                </p>
               </div>
-              <p className="text-xs text-white/80 text-center -mt-2">
-                Pastikan identitas akun sesuai dengan user
-              </p>
 
-              {/* Avatar + Nama */}
-              <div className="flex items-center gap-3 pt-2">
-                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg text-white border border-white/30 shrink-0">
+              {/* Avatar + Nama Lengkap */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#D4B5AD] text-white flex items-center justify-center font-bold text-base border border-white/30 shrink-0">
                   {doctor.first_name[0]}
                 </div>
-                <div>
-                  <p className="text-xs text-white/70">Nama Lengkap</p>
-                  <p className="text-base font-bold text-white">
-                    {doctor.first_name} {doctor.last_name}
-                  </p>
+                <div className="flex flex-col justify-center">
+                  <span className="text-xs text-white/90 font-normal leading-tight">
+                    Nama Lengkap
+                  </span>
+                  <span className="text-lg font-bold text-white leading-tight">
+                    {doctor.first_name} {doctor.last_name || ""}
+                  </span>
                 </div>
               </div>
 
-              {/* SIP Input Field */}
-              <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium text-white/90">
+              {/* Input SIP */}
+              <div className="flex flex-col gap-2">
+                <Label className="text-sm font-normal text-white">
                   SIP
                 </Label>
-                <Input
-                  type="text"
-                  readOnly
-                  value={doctor.sip_number}
-                  className="bg-white text-gray-900 font-medium py-2.5 h-11 rounded-xl text-sm border-none shadow-xs"
-                />
+                <div className="h-[52px] w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[10px] px-5 flex items-center shadow-xs">
+                  <span className="text-base text-gray-900 font-medium">
+                    {doctor.sip_number || "35041120392003"}
+                  </span>
+                </div>
               </div>
 
-              {/* Grid: Departemen & Tanggal Lahir */}
+              {/* Grid 2 Columns: Departemen & Tanggal Lahir */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-medium text-white/90">
+                <div className="flex flex-col gap-2">
+                  <Label className="text-sm font-normal text-white">
                     Departemen
                   </Label>
-                  <Input
-                    type="text"
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                    className="bg-white text-gray-900 font-medium py-2.5 h-11 rounded-xl text-sm border-none shadow-xs"
-                  />
+                  <div className="h-[52px] w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[10px] px-5 flex items-center shadow-xs">
+                    <input
+                      type="text"
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="w-full bg-transparent text-gray-900 font-medium text-base focus:outline-none"
+                    />
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-medium text-white/90 flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" /> Tanggal Lahir
+                <div className="flex flex-col gap-2">
+                  <Label className="text-sm font-normal text-white flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4 text-white" /> Tanggal Lahir
                   </Label>
-                  <Input
-                    type="text"
-                    readOnly
-                    value={dob}
-                    className="bg-white text-gray-900 font-medium py-2.5 h-11 rounded-xl text-sm border-none shadow-xs"
-                  />
+                  <div className="h-[52px] w-full bg-[#F9FAFB] border border-[#D0D5DD] rounded-[10px] px-5 flex items-center shadow-xs">
+                    <span className="text-base text-gray-900 font-medium">
+                      {dob}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Subtitle warning */}
-          <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
-            <Info className="h-3.5 w-3.5" />
+          {/* Warning Subtitle */}
+          <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500 font-medium">
+            <Info className="h-3.5 w-3.5 text-gray-400" />
             <span>Jangan Sebarkan data pasien ke orang lain.</span>
           </div>
 
-          {/* Footer Actions */}
+          {/* Footer Action Buttons */}
           <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-100 mt-2">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
-              disabled={isLoading}
-              className="py-3 px-8 h-12 text-sm font-medium border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl cursor-pointer"
+              disabled={updateStatusMutation.isPending}
+              className="py-3 px-8 h-12 text-sm font-semibold border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl cursor-pointer"
             >
               Kembali
             </Button>
             <Button
               type="button"
               onClick={handleConfirm}
-              disabled={isLoading}
-              className="py-3 px-8 h-12 text-sm font-semibold bg-[#3BB49F] hover:bg-[#329a88] text-white rounded-xl cursor-pointer shadow-xs"
+              disabled={updateStatusMutation.isPending || !doctor}
+              className="py-3 px-8 h-12 text-sm font-semibold bg-[#008A72] hover:bg-[#007661] text-white rounded-xl cursor-pointer shadow-xs"
             >
-              {isLoading ? "Memproses..." : "Konfirmasi Daftarkan Dokter"}
+              {updateStatusMutation.isPending ? "Memproses..." : "Konfirmasi Daftarkan Dokter"}
             </Button>
           </div>
         </div>
