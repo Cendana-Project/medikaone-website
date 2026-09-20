@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Filter, RotateCcw } from "lucide-react";
+import { Filter, RotateCcw, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import DashboardCards from "@/components/dashboard/dashboardCards";
@@ -23,7 +23,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-function DashboardContent() {
+function RoleContent() {
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
@@ -42,28 +42,33 @@ function DashboardContent() {
 
     useEffect(() => {
         const modalParam = searchParams.get("modal");
-        const targetUrl = modalParam ? `/dashboard/roles?modal=${modalParam}` : "/dashboard/roles";
-        router.replace(targetUrl);
-    }, [router, searchParams]);
+        if (modalParam === "register-hospital") {
+            setIsRegisterHospitalOpen(true);
+        } else if (modalParam === "register-admin") {
+            setIsRegisterAdminOpen(true);
+        } else if (modalParam === "register-staff") {
+            setIsRegisterStaffOpen(true);
+        }
+    }, [searchParams]);
 
     const handleCloseHospitalModal = () => {
         setIsRegisterHospitalOpen(false);
         if (searchParams.get("modal")) {
-            router.replace("/dashboard");
+            router.replace("/dashboard/roles");
         }
     };
 
     const handleCloseAdminModal = () => {
         setIsRegisterAdminOpen(false);
         if (searchParams.get("modal")) {
-            router.replace("/dashboard");
+            router.replace("/dashboard/roles");
         }
     };
 
     const handleCloseStaffModal = () => {
         setIsRegisterStaffOpen(false);
         if (searchParams.get("modal")) {
-            router.replace("/dashboard");
+            router.replace("/dashboard/roles");
         }
     };
 
@@ -88,16 +93,18 @@ function DashboardContent() {
                                 <Button
                                     type="button"
                                     onClick={() => setIsRegisterHospitalOpen(true)}
-                                    className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs"
+                                    className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs flex items-center gap-1.5"
                                 >
-                                    Register Rumah Sakit +
+                                    <Plus className="h-4 w-4" />
+                                    <span>Register Rumah Sakit</span>
                                 </Button>
                                 <Button
                                     type="button"
                                     onClick={() => setIsRegisterAdminOpen(true)}
-                                    className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs"
+                                    className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs flex items-center gap-1.5"
                                 >
-                                    Register Admin Hospital +
+                                    <Plus className="h-4 w-4" />
+                                    <span>Register Admin Hospital</span>
                                 </Button>
                             </>
                         )}
@@ -106,9 +113,10 @@ function DashboardContent() {
                             <Button
                                 type="button"
                                 onClick={() => setIsRegisterStaffOpen(true)}
-                                className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs"
+                                className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs flex items-center gap-1.5"
                             >
-                                Register Staff Hospital +
+                                <Plus className="h-4 w-4" />
+                                <span>Register Staff Hospital</span>
                             </Button>
                         )}
                     </div>
@@ -121,11 +129,10 @@ function DashboardContent() {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    className={`flex items-center gap-2 py-2 px-3.5 text-xs sm:text-sm font-medium rounded-lg cursor-pointer border ${
-                                        hasActiveFilter
-                                            ? "bg-[#EBF8F5] text-[#3BB49F] border-[#3BB49F] font-semibold"
-                                            : "border-gray-200 text-gray-700 bg-white hover:bg-gray-50"
-                                    }`}
+                                    className={`flex items-center gap-2 py-2 px-3.5 text-xs sm:text-sm font-medium rounded-lg cursor-pointer border ${hasActiveFilter
+                                        ? "bg-[#EBF8F5] text-[#3BB49F] border-[#3BB49F] font-semibold"
+                                        : "border-gray-200 text-gray-700 bg-white hover:bg-gray-50"
+                                        }`}
                                 >
                                     <Filter size={15} className={hasActiveFilter ? "text-[#3BB49F]" : "text-gray-500"} />
                                     <span>Filter</span>
@@ -236,10 +243,10 @@ function DashboardContent() {
     );
 }
 
-export default function Dashboard() {
+export default function RolesDashboardPage() {
     return (
-        <Suspense fallback={<div className="p-6">Loading dashboard...</div>}>
-            <DashboardContent />
+        <Suspense fallback={<div className="p-6">Loading roles...</div>}>
+            <RoleContent />
         </Suspense>
     );
 }

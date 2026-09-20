@@ -9,9 +9,7 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { PinInput } from "@/components/ui/pin-input";
-import { TermsModal } from "@/components/auth/TermsModal";
 import { useForgotPassword } from "@/hooks/auth/useForgotPassword";
 import { useVerifyPin } from "@/hooks/auth/useVerifyPin";
 import { useChangePassword } from "@/hooks/auth/useChangePassword";
@@ -30,26 +28,10 @@ export default function ForgotPassword() {
     const [pinValue, setPinValue] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [agreedTerms, setAgreedTerms] = useState(false);
-    const [hasReadTerms, setHasReadTerms] = useState(false);
-    const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
-    const [termsModalTab, setTermsModalTab] = useState<"terms" | "privacy">("terms");
 
     const forgotPasswordMutation = useForgotPassword();
     const verifyPinMutation = useVerifyPin();
     const changePasswordMutation = useChangePassword();
-
-    const openTermsModal = (tab: "terms" | "privacy" = "terms") => {
-        setTermsModalTab(tab);
-        setIsTermsModalOpen(true);
-    };
-
-    const handleCheckboxClick = (e: React.MouseEvent) => {
-        if (!hasReadTerms) {
-            e.preventDefault();
-            openTermsModal("terms");
-        }
-    };
 
     // Step 1 Form
     const formStep1 = useForm<Step1Data>({
@@ -107,15 +89,6 @@ export default function ForgotPassword() {
 
     return (
         <div className="w-full flex flex-col items-center justify-center gap-8">
-            <TermsModal
-                isOpen={isTermsModalOpen}
-                onClose={() => setIsTermsModalOpen(false)}
-                defaultTab={termsModalTab}
-                onAccept={() => {
-                    setHasReadTerms(true);
-                    setAgreedTerms(true);
-                }}
-            />
 
             {/* Back button only for Step 2 and Step 3 */}
                 {step !== 1 && (

@@ -9,7 +9,6 @@ import Cookies from "js-cookie";
 import {
     Dialog,
     DialogContent,
-    DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -92,7 +91,15 @@ export default function RegisterStaffHospitalModal({
     useEffect(() => {
         if (isOpen) {
             if (!isSuperAdmin) {
-                const hId = getActiveHospitalCode();
+                const record = (userInfo || {}) as unknown as Record<string, unknown>;
+                const hId = userInfo?.hospitals?.[0]?.code ||
+                    userInfo?.hospitals?.[0]?.id ||
+                    (record?.hospital as Record<string, string>)?.code ||
+                    (record?.hospital as Record<string, string>)?.id ||
+                    (record?.hospital_code as string) ||
+                    Cookies.get("hospitalId") ||
+                    (typeof window !== "undefined" ? localStorage.getItem("remembered_hospital_code") : "") ||
+                    "DEFAULT_HOSPITAL";
                 setValue("hospitalId", hId);
             } else {
                 setValue("hospitalId", "");

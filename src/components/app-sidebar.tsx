@@ -18,7 +18,8 @@ import {
     TrendingUp, 
     LayoutDashboard, 
     Stethoscope,
-    User
+    User,
+    ShieldCheck
 } from "lucide-react";
 import {
     Sidebar,
@@ -46,13 +47,24 @@ const getMenuIcon = (name: string, isActive: boolean) => {
     const iconSize = 20;
 
     switch (name) {
+        case "Kelola User":
         case "Kelola Role":
             return <UserCheck size={iconSize} style={{ color: iconColor }} />;
         case "Kelola Dokter":
         case "Kelola Doctor":
             return <FileText size={iconSize} style={{ color: iconColor }} />;
+        case "Undangan & Verifikasi":
+            return <ShieldCheck size={iconSize} style={{ color: iconColor }} />;
+        case "Perubahan Jadwal":
+        case "Pengajuan Jadwal":
+        case "Cek Jadwal Dokter":
+            return <Clock size={iconSize} style={{ color: iconColor }} />;
+        case "Daftar Rumah Sakit":
         case "Tambah Rumah Sakit":
+        case "Kelola Departemen":
             return <Building2 size={iconSize} style={{ color: iconColor }} />;
+        case "Kelola Ruangan":
+            return <UserPlus size={iconSize} style={{ color: iconColor }} />;
         case "Tambah Admin RS":
             return <UserPlus size={iconSize} style={{ color: iconColor }} />;
         case "Data Appointment":
@@ -60,8 +72,6 @@ const getMenuIcon = (name: string, isActive: boolean) => {
             return <Calendar size={iconSize} style={{ color: iconColor }} />;
         case "Chat":
             return <MessageSquare size={iconSize} style={{ color: iconColor }} />;
-        case "Cek Jadwal Dokter":
-            return <Clock size={iconSize} style={{ color: iconColor }} />;
         case "Antrian Pasien":
         case "Data User":
             return <Users size={iconSize} style={{ color: iconColor }} />;
@@ -160,33 +170,65 @@ export function AppSidebar({ role }: AppSidebarProps) {
     const initials = getInitials();
 
     return (
-        <Sidebar className="w-[240px] border-r border-[#EAECF0] bg-white flex flex-col justify-between py-12 px-3">
-            {/* Frame 681: Top Container for Logo and Navigation */}
-            <div className="flex flex-col gap-10 w-full">
-                {/* Frame 42 / Frame 120957: Header Logo */}
-                <SidebarHeader className="flex items-center justify-center p-0">
-                    <Link href="/dashboard" className="flex items-center justify-center py-1.5 px-3">
-                        <Image
-                            src="/sidebar/Logo-MedikaOne.png"
-                            alt="Medika One Logo"
-                            width={160}
-                            height={40}
-                            className="object-contain"
-                            priority
-                        />
-                    </Link>
-                </SidebarHeader>
+        <Sidebar className="w-[240px] border-r border-[#EAECF0] bg-white flex flex-col h-full p-0">
+            {/* Header Logo - Fixed at top, aligned with Navbar Header */}
+            <SidebarHeader className="h-[65px] flex items-center justify-start px-4 shrink-0 border-b border-[#EAECF0] bg-white">
+                <Link href="/dashboard" className="flex items-center">
+                    <Image
+                        src="/sidebar/Logo-MedikaOne.png"
+                        alt="Medika One Logo"
+                        width={145}
+                        height={36}
+                        className="object-contain"
+                        priority
+                    />
+                </Link>
+            </SidebarHeader>
 
-                {/* Sections */}
-                <SidebarContent className="flex flex-col gap-6 p-0 overflow-visible">
-                    {/* Frame 121017: MAIN Group */}
+            {/* Scrollable Navigation Menu Area */}
+            <SidebarContent className="flex-1 overflow-y-auto min-h-0 p-3 flex flex-col gap-6 custom-scrollbar">
+                {/* Frame 121017: MAIN Group */}
+                <SidebarGroup className="p-0 flex flex-col gap-1">
+                    <SidebarGroupLabel className="text-[12px] font-semibold text-[#858585] uppercase tracking-[-0.006em] px-2 h-6 mb-1">
+                        MAIN
+                    </SidebarGroupLabel>
+
+                    <SidebarMenu className="gap-1">
+                        {mainMenus.map((menu) => {
+                            const isActive = pathname === menu.path;
+                            return (
+                                <SidebarMenuItem key={menu.name}>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={isActive}
+                                        className={`flex items-center gap-2 px-3 py-3 rounded-[4px] h-[48px] text-[14px] font-sans transition-colors ${
+                                            isActive
+                                                ? "bg-[#EBF8F5] text-[#3BB49F] font-semibold"
+                                                : "text-[#767676] font-normal hover:bg-gray-50 hover:text-gray-900"
+                                        }`}
+                                    >
+                                        <Link href={menu.path} className="flex items-center gap-2 w-full">
+                                            {getMenuIcon(menu.name, isActive)}
+                                            <span className="truncate leading-[24px] tracking-[-0.006em]">
+                                                {menu.name}
+                                            </span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            );
+                        })}
+                    </SidebarMenu>
+                </SidebarGroup>
+
+                {/* Frame 121018: SYSTEM Group */}
+                {systemMenus.length > 0 && (
                     <SidebarGroup className="p-0 flex flex-col gap-1">
                         <SidebarGroupLabel className="text-[12px] font-semibold text-[#858585] uppercase tracking-[-0.006em] px-2 h-6 mb-1">
-                            MAIN
+                            SYSTEM
                         </SidebarGroupLabel>
 
                         <SidebarMenu className="gap-1">
-                            {mainMenus.map((menu) => {
+                            {systemMenus.map((menu) => {
                                 const isActive = pathname === menu.path;
                                 return (
                                     <SidebarMenuItem key={menu.name}>
@@ -200,9 +242,9 @@ export function AppSidebar({ role }: AppSidebarProps) {
                                             }`}
                                         >
                                             <Link href={menu.path} className="flex items-center gap-2 w-full">
-                                                {getMenuIcon(menu.name, isActive)}
+                                                {getMenuIcon("Settings", isActive)}
                                                 <span className="truncate leading-[24px] tracking-[-0.006em]">
-                                                    {menu.name}
+                                                    {menu.name === "System Setting" ? "Settings" : menu.name}
                                                 </span>
                                             </Link>
                                         </SidebarMenuButton>
@@ -211,46 +253,11 @@ export function AppSidebar({ role }: AppSidebarProps) {
                             })}
                         </SidebarMenu>
                     </SidebarGroup>
+                )}
+            </SidebarContent>
 
-                    {/* Frame 121018: SYSTEM Group */}
-                    {systemMenus.length > 0 && (
-                        <SidebarGroup className="p-0 flex flex-col gap-1">
-                            <SidebarGroupLabel className="text-[12px] font-semibold text-[#858585] uppercase tracking-[-0.006em] px-2 h-6 mb-1">
-                                SYSTEM
-                            </SidebarGroupLabel>
-
-                            <SidebarMenu className="gap-1">
-                                {systemMenus.map((menu) => {
-                                    const isActive = pathname === menu.path;
-                                    return (
-                                        <SidebarMenuItem key={menu.name}>
-                                            <SidebarMenuButton
-                                                asChild
-                                                isActive={isActive}
-                                                className={`flex items-center gap-2 px-3 py-3 rounded-[4px] h-[48px] text-[14px] font-sans transition-colors ${
-                                                    isActive
-                                                        ? "bg-[#EBF8F5] text-[#3BB49F] font-semibold"
-                                                        : "text-[#767676] font-normal hover:bg-gray-50 hover:text-gray-900"
-                                                }`}
-                                            >
-                                                <Link href={menu.path} className="flex items-center gap-2 w-full">
-                                                    {getMenuIcon("Settings", isActive)}
-                                                    <span className="truncate leading-[24px] tracking-[-0.006em]">
-                                                        {menu.name === "System Setting" ? "Settings" : menu.name}
-                                                    </span>
-                                                </Link>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    );
-                                })}
-                            </SidebarMenu>
-                        </SidebarGroup>
-                    )}
-                </SidebarContent>
-            </div>
-
-            {/* Frame 121022: Bottom Container (Gradient Tenant Profile Card + Log Out) */}
-            <SidebarFooter className="p-0 flex flex-col gap-6 mt-auto">
+            {/* Bottom Container (Gradient Tenant Profile Card + Log Out) */}
+            <SidebarFooter className="p-3 pt-2 flex flex-col gap-4 shrink-0 border-t border-[#EAECF0] bg-white mt-auto">
                 {/* Tenant User Info Card - Click to navigate to Profile */}
                 <Link 
                     href="/dashboard/profile"

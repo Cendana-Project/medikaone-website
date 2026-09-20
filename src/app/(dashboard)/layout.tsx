@@ -14,11 +14,17 @@ const getHeaderInfo = (pathname: string) => {
     if (pathname.includes("/profile")) {
         return { title: "Pengaturan Profil", badge: null };
     }
-    if (pathname.includes("/roles")) {
-        return { title: "Kelola Role", badge: null };
+    if (pathname.includes("/roles") || pathname.includes("/users")) {
+        return { title: "Kelola User", badge: null };
     }
     if (pathname.includes("/doctors")) {
         return { title: "Kelola Dokter", badge: null };
+    }
+    if (pathname.includes("/departments")) {
+        return { title: "Kelola Departemen", badge: null };
+    }
+    if (pathname.includes("/rooms")) {
+        return { title: "Kelola Ruangan", badge: null };
     }
     if (pathname.includes("/system")) {
         return { title: "System Setting", badge: null };
@@ -72,20 +78,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <AppSidebar role={userInfo.role} />
                 <div className="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
                     {/* Fixed Top Navbar Header */}
-                    <header className="sticky top-0 z-40 bg-white py-4 px-6 border-b border-black/10 shrink-0 shadow-2xs">
-                        <div className="flex justify-between items-center">
-                            <div className="self-start flex items-center gap-4">
-                                <SidebarTrigger />
-                                <h2 className="font-bold text-lg text-gray-900">{headerInfo.title}</h2>
-                                {headerInfo.badge && (
-                                    <span className="text-[#2596be] bg-[#f0f8fd] px-3 py-1 rounded-full text-xs font-semibold">
-                                        {headerInfo.badge}
-                                    </span>
-                                )}
-                            </div>
-                            <div>
-                                <LanguageAndNotification />
-                            </div>
+                    <header className="sticky top-0 z-40 bg-white h-[65px] px-6 border-b border-[#EAECF0] shrink-0 flex items-center justify-between shadow-2xs">
+                        <div className="flex items-center gap-4">
+                            <SidebarTrigger />
+                            <h2 className="font-bold text-lg text-gray-900">{headerInfo.title}</h2>
+                            {headerInfo.badge && (
+                                <span className="text-[#2596be] bg-[#f0f8fd] px-3 py-1 rounded-full text-xs font-semibold">
+                                    {headerInfo.badge}
+                                </span>
+                            )}
+                        </div>
+                        <div>
+                            <LanguageAndNotification />
                         </div>
                     </header>
 

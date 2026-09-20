@@ -145,3 +145,36 @@ export function handleApiError(error: unknown, fallbackTitle: string = "Terjadi 
         toast.error(mainTitle || detailMessage || "Terjadi kesalahan saat memproses permintaan.");
     }
 }
+
+export function handleApiSuccess(
+    response: unknown,
+    fallbackTitle: string = "Berhasil",
+    fallbackDesc?: string
+): void {
+    const resObj = response as Record<string, unknown> | undefined;
+    const messageDetail = (resObj?.message_detail || (resObj?.data as Record<string, unknown> | undefined)?.message_detail) as Record<string, string> | undefined;
+
+    const title =
+        messageDetail && typeof messageDetail === "object"
+            ? messageDetail.title_idn || messageDetail.title_eng || fallbackTitle
+            : fallbackTitle;
+
+    const desc =
+        messageDetail && typeof messageDetail === "object"
+            ? messageDetail.desc_idn || messageDetail.desc_eng || fallbackDesc
+            : fallbackDesc;
+
+    if (desc && desc !== title) {
+        toast.success(
+            React.createElement(
+                "div",
+                { className: "flex flex-col gap-0.5 text-left" },
+                React.createElement("span", { className: "font-semibold text-sm" }, title),
+                React.createElement("span", { className: "text-xs text-gray-700 font-normal font-medium" }, desc)
+            )
+        );
+    } else {
+        toast.success(title);
+    }
+}
+

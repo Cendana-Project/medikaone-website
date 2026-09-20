@@ -22,9 +22,14 @@ src/
 │   │   ├── login/page.tsx               # Login page (/login)
 │   │   ├── forgot-password/page.tsx     # 3-step password reset (/forgot-password)
 │   │   └── layout.tsx                   # Auth carousel layout with route guard
+│   ├── (dashboard)/
+│   │   ├── dashboard/page.tsx           # Primary dashboard page (/dashboard, redirects to /dashboard/roles)
+│   │   ├── doctors/page.tsx             # Kelola Dokter (/doctors)
+│   │   ├── departments/page.tsx         # Kelola Departemen (/departments)
+│   │   ├── rooms/page.tsx               # Kelola Ruangan (/rooms)
+│   │   └── layout.tsx                   # Shared dashboard sidebar & top navbar layout
 │   ├── dashboard/
 │   │   ├── page.tsx                     # Main dashboard entry (Auto-redirect to /dashboard/roles)
-│   │   ├── layout.tsx                   # Unified Dashboard Navbar, Header, & AppSidebar Provider
 │   │   ├── profile/page.tsx             # User Profile & Hospital Info (/dashboard/profile)
 │   │   ├── roles/page.tsx               # Role & Staff RS Management (/dashboard/roles)
 │   │   └── system/page.tsx              # System Settings page (/dashboard/system)

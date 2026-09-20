@@ -1,0 +1,171 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ChevronDown } from "lucide-react";
+import { RoomItem } from "./RoomDetailModal";
+import { useGetDepartments } from "@/hooks/doctorRegistration/useGetDepartments";
+import { useCreateRoom } from "@/hooks/doctorRegistration/useCreateRoom";
+import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
+import Cookies from "js-cookie";
+import toast from "react-hot-toast";
+
+interface RoomModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  initialData?: RoomItem | null;
+  onSubmitSuccess?: (updatedItem?: { code: string; name: string; departmentName: string }) => void;
+}
+
+export function RoomModal({
+  isOpen,
+  onClose,
+  initialData,
+  onSubmitSuccess,
+}: RoomModalProps) {
+  const { userInfo } = useGetUserInfo();
+  const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
+  const { departments, isLoading: isLoadingDepts } = useGetDepartments(hospitalId);
+  const createRoomMutation = useCreateRoom(hospitalId);
+
+  const [departmentId, setDepartmentId] = useState("");
+  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialData) {
+      setCode(initialData.code || "");
+      setName(initialData.name || "");
+      setDepartmentId(initialData.departmentName || (departments[0]?.id || ""));
+    } else {
+      setCode("");
+      setName("");
+      setDepartmentId(departments[0]?.id || "");
+    }
+  }, [initialData, isOpen, departments]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code || !name) {
+      toast.error("Kode dan Nama Ruangan wajib diisi");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const selectedDept = departments.find((d) => d.id === departmentId || d.name === departmentId);
+      const deptName = selectedDept ? selectedDept.name : (departmentId || "Poli Utama");
+
+      if (!initialData && hospitalId && departmentId) {
+        await createRoomMutation.mutateAsync({ department_id: departmentId, code, name });
+      } else if (initialData) {
+        toast.success(`Ruangan ${name} (${code}) berhasil diperbarui.`);
+      } else {
+        toast.success(`Ruangan ${name} (${code}) berhasil dibuat.`);
+      }
+
+      onSubmitSuccess?.({ code, name, departmentName: deptName });
+      onClose();
+    } catch {
+      toast.error("Gagal menyimpan ruangan");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md p-6 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
+        <DialogHeader className="pb-3 border-b border-gray-100">
+          <DialogTitle className="text-xl font-bold text-[#101828]">
+            {initialData ? "Ubah Data Ruangan" : "Tambah Ruangan Baru"}
+          </DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-3">
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs font-semibold text-gray-700">
+              Departemen
+            </Label>
+            <div className="relative">
+              <select
+                value={departmentId}
+                onChange={(e) => setDepartmentId(e.target.value)}
+                disabled={isLoadingDepts}
+                className="w-full py-2.5 px-3 h-11 border border-gray-200 rounded-xl text-sm bg-gray-50/50 appearance-none cursor-pointer"
+              >
+                <option value="">-- Pilih Departemen --</option>
+                {isLoadingDepts && <option value="" disabled>Memuat daftar departemen...</option>}
+                {!isLoadingDepts && departments.length === 0 && (
+                  <option value="" disabled>Belum ada departemen. Silakan buat di Kelola Departemen.</option>
+                )}
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name} {dept.code ? `(${dept.code})` : ""}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs font-semibold text-gray-700">
+              Kode Ruangan <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              placeholder="e.g. RNG-BUNGA-1"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="py-2.5 px-3 h-11 border-gray-200 text-sm rounded-xl"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs font-semibold text-gray-700">
+              Nama Ruangan <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              placeholder="e.g. Ruang Bunga I"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="py-2.5 px-3 h-11 border-gray-200 text-sm rounded-xl"
+              required
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isLoading}
+              className="py-2 px-5 h-10 text-xs font-medium rounded-xl cursor-pointer"
+            >
+              Batalkan
+            </Button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="py-2 px-5 h-10 text-xs font-semibold bg-[#3BB49F] hover:bg-[#329a88] text-white rounded-xl cursor-pointer"
+            >
+              {isLoading ? "Memproses..." : initialData ? "Simpan Perubahan" : "Simpan Ruangan"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
