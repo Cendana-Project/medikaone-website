@@ -47,6 +47,7 @@ const getMenuIcon = (name: string, isActive: boolean) => {
     const iconSize = 20;
 
     switch (name) {
+        case "Kelola User":
         case "Kelola Role":
             return <UserCheck size={iconSize} style={{ color: iconColor }} />;
         case "Kelola Dokter":
@@ -169,24 +170,24 @@ export function AppSidebar({ role }: AppSidebarProps) {
     const initials = getInitials();
 
     return (
-        <Sidebar className="w-[240px] border-r border-[#EAECF0] bg-white flex flex-col justify-between py-12 px-3">
-            {/* Frame 681: Top Container for Logo and Navigation */}
-            <div className="flex flex-col gap-10 w-full">
-                {/* Frame 42 / Frame 120957: Header Logo */}
-                <SidebarHeader className="flex items-center justify-center p-0">
-                    <Link href="/dashboard" className="flex items-center justify-center py-1.5 px-3">
-                        <Image
-                            src="/sidebar/Logo-MedikaOne.png"
-                            alt="Medika One Logo"
-                            width={160}
-                            height={40}
-                            className="object-contain"
-                            priority
-                        />
-                    </Link>
-                </SidebarHeader>
+        <Sidebar className="w-[240px] border-r border-[#EAECF0] bg-white flex flex-col h-full p-0">
+            {/* Header Logo - Fixed at top, aligned with Navbar Header */}
+            <SidebarHeader className="h-[65px] flex items-center justify-start px-4 shrink-0 border-b border-[#EAECF0] bg-white">
+                <Link href="/dashboard" className="flex items-center">
+                    <Image
+                        src="/sidebar/Logo-MedikaOne.png"
+                        alt="Medika One Logo"
+                        width={145}
+                        height={36}
+                        className="object-contain"
+                        priority
+                    />
+                </Link>
+            </SidebarHeader>
 
-                {/* Sections */}
+            {/* Scrollable Container for Navigation Menu & Profile */}
+            <div className="flex-1 overflow-y-auto min-h-0 flex flex-col justify-between p-3 gap-6">
+                {/* Navigation Sections */}
                 <SidebarContent className="flex flex-col gap-6 p-0 overflow-visible">
                     {/* Frame 121017: MAIN Group */}
                     <SidebarGroup className="p-0 flex flex-col gap-1">
@@ -256,54 +257,54 @@ export function AppSidebar({ role }: AppSidebarProps) {
                         </SidebarGroup>
                     )}
                 </SidebarContent>
+
+                {/* Frame 121022: Bottom Container (Gradient Tenant Profile Card + Log Out) */}
+                <SidebarFooter className="p-0 flex flex-col gap-4 mt-auto shrink-0">
+                    {/* Tenant User Info Card - Click to navigate to Profile */}
+                    <Link 
+                        href="/dashboard/profile"
+                        className="w-full min-h-[96px] rounded-[12px] p-[24px_12px_24px_10px] border border-[#EAECF0] flex items-center gap-[10px] box-border transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                        style={{
+                            background: "linear-gradient(148.58deg, #3BB49F 18.96%, #00FFD3 176.22%)"
+                        }}
+                    >
+                        <div className="relative w-[48px] h-[48px] rounded-full bg-[#D8F0EC] overflow-hidden shrink-0 flex items-center justify-center">
+                            {userAvatarUrl && !imgError ? (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
+                                    src={userAvatarUrl}
+                                    alt="User Avatar"
+                                    onError={() => setImgError(true)}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : initials ? (
+                                <span className="text-[#3BB49F] font-bold text-[16px] select-none">
+                                    {initials}
+                                </span>
+                            ) : (
+                                <User size={24} className="text-[#3BB49F]" />
+                            )}
+                        </div>
+                        <div className="flex flex-col justify-center overflow-hidden min-w-0">
+                            <h4 className="text-[14px] font-bold text-white leading-[24px] tracking-[-0.006em] truncate">
+                                {getDisplayName()}
+                            </h4>
+                            <p className="text-[14px] font-normal text-white leading-[24px] tracking-[-0.006em] truncate opacity-90">
+                                {getDisplayRole()}
+                            </p>
+                        </div>
+                    </Link>
+
+                    {/* Sidenav Log Out Item */}
+                    <button
+                        onClick={handleLogout}
+                        className="w-full h-[48px] px-3 py-3 rounded-[4px] flex items-center gap-2 text-[#767676] text-[14px] font-semibold tracking-[-0.006em] hover:bg-gray-100 hover:text-red-600 transition-colors"
+                    >
+                        <LogOut size={20} className="shrink-0 text-[#767676]" />
+                        <span>Log Out</span>
+                    </button>
+                </SidebarFooter>
             </div>
-
-            {/* Frame 121022: Bottom Container (Gradient Tenant Profile Card + Log Out) */}
-            <SidebarFooter className="p-0 flex flex-col gap-6 mt-auto">
-                {/* Tenant User Info Card - Click to navigate to Profile */}
-                <Link 
-                    href="/dashboard/profile"
-                    className="w-full min-h-[96px] rounded-[12px] p-[24px_12px_24px_10px] border border-[#EAECF0] flex items-center gap-[10px] box-border transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                    style={{
-                        background: "linear-gradient(148.58deg, #3BB49F 18.96%, #00FFD3 176.22%)"
-                    }}
-                >
-                    <div className="relative w-[48px] h-[48px] rounded-full bg-[#D8F0EC] overflow-hidden shrink-0 flex items-center justify-center">
-                        {userAvatarUrl && !imgError ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img
-                                src={userAvatarUrl}
-                                alt="User Avatar"
-                                onError={() => setImgError(true)}
-                                className="w-full h-full object-cover"
-                            />
-                        ) : initials ? (
-                            <span className="text-[#3BB49F] font-bold text-[16px] select-none">
-                                {initials}
-                            </span>
-                        ) : (
-                            <User size={24} className="text-[#3BB49F]" />
-                        )}
-                    </div>
-                    <div className="flex flex-col justify-center overflow-hidden min-w-0">
-                        <h4 className="text-[14px] font-bold text-white leading-[24px] tracking-[-0.006em] truncate">
-                            {getDisplayName()}
-                        </h4>
-                        <p className="text-[14px] font-normal text-white leading-[24px] tracking-[-0.006em] truncate opacity-90">
-                            {getDisplayRole()}
-                        </p>
-                    </div>
-                </Link>
-
-                {/* Sidenav Log Out Item */}
-                <button
-                    onClick={handleLogout}
-                    className="w-full h-[48px] px-3 py-3 rounded-[4px] flex items-center gap-2 text-[#767676] text-[14px] font-semibold tracking-[-0.006em] hover:bg-gray-100 hover:text-red-600 transition-colors"
-                >
-                    <LogOut size={20} className="shrink-0 text-[#767676]" />
-                    <span>Log Out</span>
-                </button>
-            </SidebarFooter>
         </Sidebar>
     );
 }

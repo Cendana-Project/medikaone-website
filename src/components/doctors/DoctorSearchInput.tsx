@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Search, Loader2, UserCheck, Stethoscope } from "lucide-react";
 import { useSearchDoctor } from "@/hooks/doctorRegistration/useSearchDoctor";
+import { useGetDoctorById } from "@/hooks/doctorRegistration/useGetDoctorById";
 import { DoctorSearchResult } from "@/types/doctorRegistration";
 import Cookies from "js-cookie";
 
@@ -54,18 +55,45 @@ export function DoctorSearchInput({
 
   const hospitalId = Cookies.get("hospitalId") || "";
 
-  const { data: searchData, isLoading } = useSearchDoctor(
+  // Check if query looks like a Doctor ID / UUID
+  const isLikelyDoctorId = /^[0-[#a-fA-F0-9-]{6,36}$/.test(query.trim()) || query.trim().startsWith("doc-");
+
+  const { data: searchData, isLoading: isSearchLoading } = useSearchDoctor(
     hospitalId,
     { identity: query, email: query, sip_number: query },
     query.length >= 2
   );
 
-  // Parse API search results or fallback to mock
+  const { doctor: doctorById, isLoading: isDoctorByIdLoading } = useGetDoctorById(
+    query.trim(),
+    isLikelyDoctorId && query.length >= 3
+  );
+
+  const isLoading = isSearchLoading || isDoctorByIdLoading;
+
+  // Parse API search results, Doctor By ID, or fallback to mock
   const results: DoctorSearchResult[] = (() => {
-    if (searchData) {
-      if (Array.isArray(searchData)) return searchData;
-      return [searchData];
+    const combined: DoctorSearchResult[] = [];
+    if (doctorById) {
+      combined.push({
+        id: doctorById.id || (doctorById as unknown as Record<string, string>).doctor_id || query,
+        first_name: doctorById.first_name || "Dokter",
+        last_name: doctorById.last_name || "",
+        email: doctorById.email || "-",
+        sip_number: doctorById.sip_number || "-",
+        specialty: doctorById.specialty || "Umum",
+      });
     }
+    if (searchData) {
+      const items = Array.isArray(searchData) ? searchData : [searchData];
+      items.forEach((item) => {
+        if (!combined.some((c) => c.id === item.id)) {
+          combined.push(item);
+        }
+      });
+    }
+    if (combined.length > 0) return combined;
+
     if (query.length >= 2) {
       const q = query.toLowerCase();
       return MOCK_DOCTORS.filter(

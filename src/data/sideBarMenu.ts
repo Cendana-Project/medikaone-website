@@ -5,7 +5,7 @@ export type SidebarMenuItem = {
 
 const baseMenus: Record<string, SidebarMenuItem[]> = {
     ADMIN: [
-        { name: "Kelola Role", path: "/dashboard/roles" },
+        { name: "Kelola User", path: "/dashboard/roles" },
         { name: "Kelola Doctor", path: "/doctors" },
         { name: "Undangan & Verifikasi", path: "/doctors/invitations" },
         { name: "Perubahan Jadwal", path: "/doctors/schedule-changes" },
@@ -14,7 +14,7 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
     ],
 
     SUPER_ADMIN: [
-        { name: "Kelola Role", path: "/dashboard/roles" },
+        { name: "Kelola User", path: "/dashboard/roles" },
         { name: "Kelola Doctor", path: "/doctors" },
         { name: "Undangan & Verifikasi", path: "/doctors/invitations" },
         { name: "Perubahan Jadwal", path: "/doctors/schedule-changes" },

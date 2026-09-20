@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Filter, RotateCcw } from "lucide-react";
+import { Filter, RotateCcw, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import DashboardCards from "@/components/dashboard/dashboardCards";
@@ -42,9 +42,14 @@ function DashboardContent() {
 
     useEffect(() => {
         const modalParam = searchParams.get("modal");
-        const targetUrl = modalParam ? `/dashboard/roles?modal=${modalParam}` : "/dashboard/roles";
-        router.replace(targetUrl);
-    }, [router, searchParams]);
+        if (modalParam === "register-hospital") {
+            setIsRegisterHospitalOpen(true);
+        } else if (modalParam === "register-admin") {
+            setIsRegisterAdminOpen(true);
+        } else if (modalParam === "register-staff") {
+            setIsRegisterStaffOpen(true);
+        }
+    }, [searchParams]);
 
     const handleCloseHospitalModal = () => {
         setIsRegisterHospitalOpen(false);
@@ -87,16 +92,18 @@ function DashboardContent() {
                                 <Button
                                     type="button"
                                     onClick={() => setIsRegisterHospitalOpen(true)}
-                                    className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs"
+                                    className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs flex items-center gap-1.5"
                                 >
-                                    Register Rumah Sakit +
+                                    <Plus className="h-4 w-4" />
+                                    <span>Register Rumah Sakit</span>
                                 </Button>
                                 <Button
                                     type="button"
                                     onClick={() => setIsRegisterAdminOpen(true)}
-                                    className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs"
+                                    className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs flex items-center gap-1.5"
                                 >
-                                    Register Admin Hospital +
+                                    <Plus className="h-4 w-4" />
+                                    <span>Register Admin Hospital</span>
                                 </Button>
                             </>
                         )}
@@ -105,9 +112,10 @@ function DashboardContent() {
                             <Button
                                 type="button"
                                 onClick={() => setIsRegisterStaffOpen(true)}
-                                className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs"
+                                className="bg-[#ebf8f5] hover:bg-[#d8f2ec] border border-[#c4e9e2] py-2 px-3.5 text-xs sm:text-sm font-semibold text-[#3bb49f] cursor-pointer shadow-xs flex items-center gap-1.5"
                             >
-                                Register Staff Hospital +
+                                <Plus className="h-4 w-4" />
+                                <span>Register Staff Hospital</span>
                             </Button>
                         )}
                     </div>

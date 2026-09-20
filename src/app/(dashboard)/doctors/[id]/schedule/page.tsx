@@ -5,12 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DoctorSchedule } from "@/types/doctorRegistration";
+import { useGetDoctors } from "@/hooks/doctorRegistration/useGetDoctors";
+import Cookies from "js-cookie";
 import {
   ArrowLeft,
   Calendar,
   Clock,
   User,
-  Stethoscope,
   MapPin,
   FileText,
   CheckCircle2,
@@ -42,17 +43,20 @@ export default function DoctorSchedulePage() {
   const params = useParams();
   const router = useRouter();
   const doctorId = (params?.id as string) || "doc-1";
+  const hospitalId = Cookies.get("hospitalId") || "";
 
   const [viewMode, setViewMode] = useState<"24h-grid" | "cards">("24h-grid");
 
-  // In production, fetch doctor detail by doctorId
+  const { doctors } = useGetDoctors(hospitalId);
+  const foundDoctor = doctors.find((d) => d.doctor_id === doctorId || d.affiliation_id === doctorId);
+
   const doctorData = {
-    doctorName: doctorId === "doc-2" ? "Phoenix Baker" : doctorId === "doc-3" ? "Lana Steiner" : "Olivia Rhye",
-    specialty: doctorId === "doc-3" ? "Spesialis Penyakit Dalam" : "Spesialis Kandungan",
-    sipNumber: doctorId === "doc-2" ? "SIP-3174-2026-002" : doctorId === "doc-3" ? "SIP-3174-2026-003" : "SIP-3174-2026-001",
-    departmentName: doctorId === "doc-3" ? "Poli Penyakit Dalam" : "Poli Kandungan",
-    roomName: doctorId === "doc-2" ? "Ruang Bunga II" : doctorId === "doc-3" ? "Ruang Anggrek I" : "Ruang Bunga I",
-    schedules: DEFAULT_MOCK_SCHEDULES,
+    doctorName: foundDoctor ? `${foundDoctor.first_name} ${foundDoctor.last_name}` : doctorId === "doc-2" ? "Phoenix Baker" : doctorId === "doc-3" ? "Lana Steiner" : "Olivia Rhye",
+    specialty: foundDoctor?.specialty || (doctorId === "doc-3" ? "Spesialis Penyakit Dalam" : "Spesialis Kandungan"),
+    sipNumber: foundDoctor?.sip_number || (doctorId === "doc-2" ? "SIP-3174-2026-002" : doctorId === "doc-3" ? "SIP-3174-2026-003" : "SIP-3174-2026-001"),
+    departmentName: foundDoctor?.department || (doctorId === "doc-3" ? "Poli Penyakit Dalam" : "Poli Kandungan"),
+    roomName: foundDoctor?.room || (doctorId === "doc-2" ? "Ruang Bunga II" : doctorId === "doc-3" ? "Ruang Anggrek I" : "Ruang Bunga I"),
+    schedules: foundDoctor?.schedules && foundDoctor.schedules.length > 0 ? foundDoctor.schedules : DEFAULT_MOCK_SCHEDULES,
   };
 
   const parseHourInt = (timeStr: string) => {
@@ -197,7 +201,7 @@ export default function DoctorSchedulePage() {
                 </thead>
 
                 <tbody>
-                  {HOURS_24.map((hourStr, hourIdx) => {
+                  {HOURS_24.map((hourStr) => {
                     const currentHourInt = parseHourInt(hourStr);
 
                     return (

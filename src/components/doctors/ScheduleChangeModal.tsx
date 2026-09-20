@@ -72,13 +72,13 @@ export function ScheduleChangeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl md:max-w-4xl p-6 md:p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-4 border-b border-gray-100">
-          <DialogTitle className="text-2xl font-bold text-[#101828] tracking-tight flex items-center gap-2">
+          <DialogTitle className="text-xl md:text-2xl font-bold text-[#101828] tracking-tight flex items-center gap-2">
             <Edit3 className="h-6 w-6 text-[#3BB49F]" />
             <span>Pengajuan Perubahan Jadwal Praktik</span>
           </DialogTitle>
-          <p className="text-gray-500 text-xs font-normal mt-1">
+          <p className="text-gray-500 text-xs md:text-sm font-normal mt-1">
             {doctorName ? `Dokter: ${doctorName}` : `Afiliasi ID: ${affiliationId}`}
           </p>
         </DialogHeader>

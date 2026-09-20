@@ -269,8 +269,8 @@ export function CreateDoctorModal({
                 disabled={!selectedDoctor}
                 className="py-3 px-8 h-11 text-xs font-semibold bg-[#008A72] hover:bg-[#007661] text-white rounded-xl cursor-pointer shadow-xs flex items-center gap-2 disabled:opacity-50"
               >
-                <span>Lanjut ke Step 2 (Penugasan)</span>
                 <ArrowRight className="h-4 w-4" />
+                <span>Lanjut ke Step 2 (Penugasan)</span>
               </Button>
             </div>
           </div>
@@ -321,7 +321,7 @@ export function CreateDoctorModal({
                   className="text-xs text-[#3BB49F] hover:underline font-medium flex items-center gap-1 cursor-pointer"
                 >
                   <Plus className="h-3 w-3" />
-                  <span>+ Buat Departemen Baru</span>
+                  <span>Buat Departemen Baru</span>
                 </button>
               </div>
 
@@ -387,7 +387,7 @@ export function CreateDoctorModal({
                     className="text-xs text-[#3BB49F] hover:underline font-medium flex items-center gap-1 cursor-pointer"
                   >
                     <Plus className="h-3 w-3" />
-                    <span>+ Buat Ruangan Baru</span>
+                    <span>Buat Ruangan Baru</span>
                   </button>
                 )}
               </div>

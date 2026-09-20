@@ -10,6 +10,9 @@ import { RoomDetailModal, RoomItem } from "@/components/rooms/RoomDetailModal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import toast from "react-hot-toast";
 
+import { useGetRooms } from "@/hooks/doctorRegistration/useGetRooms";
+import Cookies from "js-cookie";
+
 interface RoomRow {
   id: string;
   code: string;
@@ -18,28 +21,33 @@ interface RoomRow {
   status: "Active" | "Inactive";
 }
 
-const INITIAL_ROOMS: RoomRow[] = [
-  { id: "1", code: "RNG-BUNGA-1", name: "Ruang Bunga I", departmentName: "Poli anak", status: "Active" },
-  { id: "2", code: "RNG-BUNGA-2", name: "Ruang Bunga II", departmentName: "Poli Kandungan", status: "Active" },
-  { id: "3", code: "RNG-BUNGA-3", name: "Ruang Bunga III", departmentName: "Poli Penyakit Dalam", status: "Active" },
-  { id: "4", code: "RNG-MAWAR-1", name: "Ruang Mawar I", departmentName: "Poli THT (Telinga)", status: "Active" },
-  { id: "5", code: "RNG-ANGGREK-1", name: "Ruang Anggrek I", departmentName: "Poli Estetika", status: "Active" },
-];
-
 export default function RoomsPage() {
-  const [rooms, setRooms] = useState<RoomRow[]>(INITIAL_ROOMS);
+  const hospitalId = Cookies.get("hospitalId") || "";
+  const { rooms: apiRooms } = useGetRooms(hospitalId);
+  const [localRooms, setLocalRooms] = useState<RoomRow[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<RoomItem | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const rooms: RoomRow[] = [
+    ...apiRooms.map((r) => ({
+      id: r.id,
+      code: r.code,
+      name: r.name,
+      departmentName: r.department_id || "Poli Utama",
+      status: "Active" as const,
+    })),
+    ...localRooms,
+  ];
+
   const handleDeleteConfirm = async () => {
     if (!deleteTargetId) return;
     setIsDeleting(true);
     try {
       await new Promise((r) => setTimeout(r, 600));
-      setRooms((prev) => prev.filter((r) => r.id !== deleteTargetId));
+      setLocalRooms((prev) => prev.filter((r) => r.id !== deleteTargetId));
       toast.success("Ruangan berhasil dihapus.");
       setDeleteTargetId(null);
     } catch {

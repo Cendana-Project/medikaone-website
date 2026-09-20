@@ -10,28 +10,36 @@ import { DepartmentDetailModal, DepartmentItem } from "@/components/departments/
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import toast from "react-hot-toast";
 
-const INITIAL_DEPARTMENTS: DepartmentItem[] = [
-  { id: "1", code: "POLI-ANAK", name: "Poli anak", status: "Active", createdAt: "2026-08-01" },
-  { id: "2", code: "POLI-KANDUNGAN", name: "Poli Kandungan", status: "Active", createdAt: "2026-08-05" },
-  { id: "3", code: "POLI-[#3064]", name: "Poli Penyakit Dalam", status: "Active", createdAt: "2026-08-10" },
-  { id: "4", code: "POLI-THT", name: "Poli THT (Telinga)", status: "Active", createdAt: "2026-08-15" },
-  { id: "5", code: "POLI-ESTETIKA", name: "Poli Estetika / Kecantikan", status: "Active", createdAt: "2026-08-20" },
-];
+import { useGetDepartments } from "@/hooks/doctorRegistration/useGetDepartments";
+import Cookies from "js-cookie";
 
 export default function DepartmentsPage() {
-  const [departments, setDepartments] = useState<DepartmentItem[]>(INITIAL_DEPARTMENTS);
+  const hospitalId = Cookies.get("hospitalId") || "";
+  const { departments: apiDepts } = useGetDepartments(hospitalId);
+  const [localDepartments, setLocalDepartments] = useState<DepartmentItem[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [detailItem, setDetailItem] = useState<DepartmentItem | null>(null);
   const [editItem, setEditItem] = useState<DepartmentItem | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const departments: DepartmentItem[] = [
+    ...apiDepts.map((d) => ({
+      id: d.id,
+      code: d.code,
+      name: d.name,
+      status: "Active" as const,
+      createdAt: "Terintegrasi",
+    })),
+    ...localDepartments,
+  ];
+
   const handleDeleteConfirm = async () => {
     if (!deleteTargetId) return;
     setIsDeleting(true);
     try {
       await new Promise((r) => setTimeout(r, 500));
-      setDepartments((prev) => prev.filter((d) => d.id !== deleteTargetId));
+      setLocalDepartments((prev) => prev.filter((d) => d.id !== deleteTargetId));
       toast.success("Departemen berhasil dihapus.");
       setDeleteTargetId(null);
     } catch {
@@ -142,7 +150,7 @@ export default function DepartmentsPage() {
         onClose={() => setIsCreateOpen(false)}
         onSubmitSuccess={(newItem) => {
           if (newItem) {
-            setDepartments((prev) => [
+            setLocalDepartments((prev) => [
               ...prev,
               {
                 id: String(Date.now()),
@@ -174,7 +182,7 @@ export default function DepartmentsPage() {
         onClose={() => setEditItem(null)}
         onSubmitSuccess={(updated) => {
           if (updated && editItem) {
-            setDepartments((prev) =>
+            setLocalDepartments((prev) =>
               prev.map((d) => (d.id === editItem.id ? { ...d, code: updated.code, name: updated.name } : d))
             );
           }

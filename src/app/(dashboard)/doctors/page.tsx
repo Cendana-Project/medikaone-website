@@ -11,81 +11,35 @@ import { VerifyDoctorModal } from "@/components/doctors/VerifyDoctorModal";
 import { ScheduleChangeModal } from "@/components/doctors/ScheduleChangeModal";
 import { useGetDoctors } from "@/hooks/doctorRegistration/useGetDoctors";
 import { useGetGlobalDoctors, GlobalDoctorItem } from "@/hooks/doctorRegistration/useGetGlobalDoctors";
+import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
 import { DoctorAffiliation } from "@/types/doctorRegistration";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-
-const FALLBACK_DOCTORS: DoctorAffiliation[] = [
-  {
-    affiliation_id: "aff-1",
-    hospital_id: "hsp-1",
-    doctor_id: "doc-1",
-    first_name: "Olivia",
-    last_name: "Rhye",
-    email: "olivia@untitledui.com",
-    sip_number: "SIP-3174-2026-001",
-    specialty: "Kandungan",
-    department_id: "dept-1",
-    department: "Poli Kandungan",
-    room_id: "room-1",
-    room: "Ruang Bunga I",
-    status: "ACTIVE",
-    joined_at: "2026-01-10T00:00:00Z",
-    schedules: [
-      { day_of_week: 1, start_time: "08:00", end_time: "12:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", capacity: 15 },
-      { day_of_week: 3, start_time: "13:00", end_time: "17:00", timezone: "Asia/Jakarta", booking_mode: "SESSION_QUEUE", capacity: 20 },
-    ],
-  },
-  {
-    affiliation_id: "aff-2",
-    hospital_id: "hsp-1",
-    doctor_id: "doc-2",
-    first_name: "Phoenix",
-    last_name: "Baker",
-    email: "phoenix@untitledui.com",
-    sip_number: "SIP-3174-2026-002",
-    specialty: "Kandungan",
-    department_id: "dept-1",
-    department: "Poli Kandungan",
-    room_id: "room-2",
-    room: "Ruang Bunga II",
-    status: "ACTIVE",
-    joined_at: "2026-01-12T00:00:00Z",
-    schedules: [
-      { day_of_week: 2, start_time: "09:00", end_time: "14:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", capacity: 12 },
-    ],
-  },
-  {
-    affiliation_id: "aff-3",
-    hospital_id: "hsp-1",
-    doctor_id: "doc-3",
-    first_name: "Lana",
-    last_name: "Steiner",
-    email: "lana@untitledui.com",
-    sip_number: "SIP-3174-2026-003",
-    specialty: "Penyakit Dalam",
-    department_id: "dept-2",
-    department: "Poli Penyakit Dalam",
-    room_id: "room-3",
-    room: "Ruang Anggrek I",
-    status: "SUSPENDED",
-    joined_at: "2026-02-01T00:00:00Z",
-  },
-];
+import { useEffect } from "react";
 
 export default function DoctorsPage() {
   const router = useRouter();
   const hospitalId = Cookies.get("hospitalId") || "";
+  const { userInfo } = useGetUserInfo();
+
+  const userRole = (userInfo?.role || "").toUpperCase().replace(/[-\s]+/g, "_");
+  const isSuperAdmin = userRole === "SUPER_ADMIN";
 
   const [activeTab, setActiveTab] = useState<"hospital" | "global">("hospital");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
   const [scheduleTarget, setScheduleTarget] = useState<{ affiliationId: string; doctorName: string } | null>(null);
 
+  useEffect(() => {
+    if (isSuperAdmin) {
+      setActiveTab("global");
+    }
+  }, [isSuperAdmin]);
+
   const { doctors: apiDoctors, isLoading: isHospitalLoading, refetch: refetchHospitalDoctors } = useGetDoctors(hospitalId);
   const { doctors: globalDoctors, isLoading: isGlobalLoading } = useGetGlobalDoctors();
 
-  const doctorsList: DoctorAffiliation[] = apiDoctors.length > 0 ? apiDoctors : FALLBACK_DOCTORS;
+  const doctorsList: DoctorAffiliation[] = apiDoctors;
 
   const activeCount = doctorsList.filter((d) => d.status === "ACTIVE").length;
   const suspendedCount = doctorsList.filter((d) => d.status === "SUSPENDED").length;
