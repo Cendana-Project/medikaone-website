@@ -25,6 +25,20 @@ export const createDepartment = async (hospitalId: string, payload: CreateDepart
     });
 };
 
+export const updateDepartment = async (hospitalId: string, departmentId: string, payload: Partial<CreateDepartmentRequest>) => {
+    return safeRequest(async () => {
+        const response = await api.put(`hospitals/${hospitalId}/departments/${departmentId}`, payload);
+        return response.data;
+    });
+};
+
+export const deleteDepartment = async (hospitalId: string, departmentId: string) => {
+    return safeRequest(async () => {
+        const response = await api.delete(`hospitals/${hospitalId}/departments/${departmentId}`);
+        return response.data;
+    });
+};
+
 // --- ROOMS ---
 
 export const getRooms = async (hospitalId: string, departmentId?: string) => {
@@ -39,6 +53,20 @@ export const getRooms = async (hospitalId: string, departmentId?: string) => {
 export const createRoom = async (hospitalId: string, payload: CreateRoomRequest) => {
     return safeRequest(async () => {
         const response = await api.post(`hospitals/${hospitalId}/rooms`, payload);
+        return response.data;
+    });
+};
+
+export const updateRoom = async (hospitalId: string, roomId: string, payload: Partial<CreateRoomRequest>) => {
+    return safeRequest(async () => {
+        const response = await api.put(`hospitals/${hospitalId}/rooms/${roomId}`, payload);
+        return response.data;
+    });
+};
+
+export const deleteRoom = async (hospitalId: string, roomId: string) => {
+    return safeRequest(async () => {
+        const response = await api.delete(`hospitals/${hospitalId}/rooms/${roomId}`);
         return response.data;
     });
 };

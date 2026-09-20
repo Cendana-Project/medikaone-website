@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DepartmentItem } from "./DepartmentDetailModal";
 import { useCreateDepartment } from "@/hooks/doctorRegistration/useCreateDepartment";
+import { useUpdateDepartment } from "@/hooks/doctorRegistration/useUpdateDepartment";
 import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
@@ -32,10 +33,10 @@ export function DepartmentModal({
   const { userInfo } = useGetUserInfo();
   const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
   const createDeptMutation = useCreateDepartment(hospitalId);
+  const updateDeptMutation = useUpdateDepartment(hospitalId);
 
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -47,6 +48,8 @@ export function DepartmentModal({
     }
   }, [initialData, isOpen]);
 
+  const isLoading = createDeptMutation.isPending || updateDeptMutation.isPending;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code || !name) {
@@ -54,12 +57,14 @@ export function DepartmentModal({
       return;
     }
 
-    setIsLoading(true);
     try {
-      if (!initialData && hospitalId) {
+      if (initialData && initialData.id && hospitalId) {
+        await updateDeptMutation.mutateAsync({
+          departmentId: initialData.id,
+          payload: { code, name },
+        });
+      } else if (hospitalId) {
         await createDeptMutation.mutateAsync({ code, name });
-      } else if (initialData) {
-        toast.success(`Departemen ${name} (${code}) berhasil diperbarui.`);
       } else {
         toast.success(`Departemen ${name} (${code}) berhasil dibuat.`);
       }
@@ -67,8 +72,6 @@ export function DepartmentModal({
       onClose();
     } catch {
       toast.error("Gagal menyimpan departemen");
-    } finally {
-      setIsLoading(false);
     }
   };
 
