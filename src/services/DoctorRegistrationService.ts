@@ -4,6 +4,7 @@ import {
     CreateDepartmentRequest, 
     CreateInvitationRequest, 
     CreateRoomRequest, 
+    CreateScheduleChangePayload,
     SearchDoctorParams, 
     UpdateDoctorStatusRequest 
 } from "@/types/doctorRegistration";
@@ -124,6 +125,20 @@ export const getDoctors = async (hospitalId: string, status?: string) => {
     });
 };
 
+export const getGlobalDoctors = async (params?: { page?: number; limit?: number; q?: string; specialty?: string; hospital_id?: string }) => {
+    return safeRequest(async () => {
+        const response = await api.get("doctors", { params });
+        return response.data;
+    });
+};
+
+export const getDoctorById = async (doctorId: string) => {
+    return safeRequest(async () => {
+        const response = await api.get(`doctors/${doctorId}`);
+        return response.data;
+    });
+};
+
 export const updateDoctorStatus = async (hospitalId: string, doctorId: string, payload: UpdateDoctorStatusRequest) => {
     return safeRequest(async () => {
         const response = await api.patch(`hospitals/${hospitalId}/doctors/${doctorId}/status`, payload);
@@ -133,7 +148,7 @@ export const updateDoctorStatus = async (hospitalId: string, doctorId: string, p
 
 // --- SCHEDULE CHANGE REQUESTS ---
 
-export const createScheduleChangeRequest = async (hospitalId: string, payload: any) => {
+export const createScheduleChangeRequest = async (hospitalId: string, payload: CreateScheduleChangePayload) => {
     return safeRequest(async () => {
         const response = await api.post(`hospitals/${hospitalId}/schedule-change-requests`, payload);
         return response.data;

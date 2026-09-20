@@ -4,8 +4,9 @@ import { useState } from "react";
 import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DoorOpen, Plus, Trash2 } from "lucide-react";
+import { DoorOpen, Plus, Eye, Edit, Trash2 } from "lucide-react";
 import { RoomModal } from "@/components/rooms/RoomModal";
+import { RoomDetailModal, RoomItem } from "@/components/rooms/RoomDetailModal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import toast from "react-hot-toast";
 
@@ -28,6 +29,8 @@ const INITIAL_ROOMS: RoomRow[] = [
 export default function RoomsPage() {
   const [rooms, setRooms] = useState<RoomRow[]>(INITIAL_ROOMS);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<RoomItem | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -89,14 +92,44 @@ export default function RoomsPage() {
       sortable: false,
       align: "center",
       render: (row) => (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setDeleteTargetId(row.id)}
-          className="flex items-center justify-center p-2 h-9 w-9 border-gray-200 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg cursor-pointer"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSelectedRoom(row);
+              setIsDetailOpen(true);
+            }}
+            className="flex items-center justify-center p-2 h-9 w-9 border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer"
+            title="Lihat Detail"
+          >
+            <Eye className="h-4 w-4 text-[#3BB49F]" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSelectedRoom(row);
+              setIsModalOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-3 h-9 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer text-xs"
+            title="Ubah Ruangan"
+          >
+            <Edit className="h-3.5 w-3.5 text-[#3BB49F]" />
+            <span>Edit</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setDeleteTargetId(row.id)}
+            className="flex items-center justify-center p-2 h-9 w-9 border-gray-200 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg cursor-pointer"
+            title="Hapus"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       ),
     },
   ];
@@ -109,17 +142,37 @@ export default function RoomsPage() {
         keyExtractor={(row) => row.id}
         searchPlaceholder="Cari Ruangan..."
         searchField={(row) => `${row.code} ${row.name} ${row.departmentName}`}
-        createButtonLabel="Tambah Ruangan +"
+        createButtonLabel="Tambah Ruangan"
         createButtonIcon={<Plus className="h-4 w-4" />}
-        onCreateButtonClick={() => setIsModalOpen(true)}
+        onCreateButtonClick={() => {
+          setSelectedRoom(null);
+          setIsModalOpen(true);
+        }}
         emptyText="Tidak ada ruangan yang ditemukan"
+      />
+
+      <RoomDetailModal
+        isOpen={isDetailOpen}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setSelectedRoom(null);
+        }}
+        room={selectedRoom}
+        onOpenEdit={() => {
+          setIsDetailOpen(false);
+          setIsModalOpen(true);
+        }}
       />
 
       <RoomModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedRoom(null);
+        }}
+        initialData={selectedRoom}
         onSubmitSuccess={() => {
-          // Re-fetch rooms
+          // Re-fetch rooms or update state
         }}
       />
 

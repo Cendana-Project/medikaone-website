@@ -4,20 +4,13 @@ import { useState } from "react";
 import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Plus, Trash2 } from "lucide-react";
+import { Building2, Plus, Trash2, Eye, Edit } from "lucide-react";
 import { DepartmentModal } from "@/components/departments/DepartmentModal";
+import { DepartmentDetailModal, DepartmentItem } from "@/components/departments/DepartmentDetailModal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import toast from "react-hot-toast";
 
-interface DepartmentRow {
-  id: string;
-  code: string;
-  name: string;
-  status: "Active" | "Inactive";
-  createdAt: string;
-}
-
-const INITIAL_DEPARTMENTS: DepartmentRow[] = [
+const INITIAL_DEPARTMENTS: DepartmentItem[] = [
   { id: "1", code: "POLI-ANAK", name: "Poli anak", status: "Active", createdAt: "2026-08-01" },
   { id: "2", code: "POLI-KANDUNGAN", name: "Poli Kandungan", status: "Active", createdAt: "2026-08-05" },
   { id: "3", code: "POLI-[#3064]", name: "Poli Penyakit Dalam", status: "Active", createdAt: "2026-08-10" },
@@ -26,8 +19,10 @@ const INITIAL_DEPARTMENTS: DepartmentRow[] = [
 ];
 
 export default function DepartmentsPage() {
-  const [departments, setDepartments] = useState<DepartmentRow[]>(INITIAL_DEPARTMENTS);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [departments, setDepartments] = useState<DepartmentItem[]>(INITIAL_DEPARTMENTS);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [detailItem, setDetailItem] = useState<DepartmentItem | null>(null);
+  const [editItem, setEditItem] = useState<DepartmentItem | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -35,7 +30,7 @@ export default function DepartmentsPage() {
     if (!deleteTargetId) return;
     setIsDeleting(true);
     try {
-      await new Promise((r) => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 500));
       setDepartments((prev) => prev.filter((d) => d.id !== deleteTargetId));
       toast.success("Departemen berhasil dihapus.");
       setDeleteTargetId(null);
@@ -46,7 +41,7 @@ export default function DepartmentsPage() {
     }
   };
 
-  const columns: ColumnDef<DepartmentRow>[] = [
+  const columns: ColumnDef<DepartmentItem>[] = [
     {
       key: "code",
       label: "Kode Departemen",
@@ -89,40 +84,104 @@ export default function DepartmentsPage() {
       sortable: false,
       align: "center",
       render: (row) => (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setDeleteTargetId(row.id)}
-          className="flex items-center justify-center p-2 h-9 w-9 border-gray-200 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg cursor-pointer"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center justify-center gap-2">
+          {/* Eye Icon Popup */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setDetailItem(row)}
+            title="Lihat Detail Departemen"
+            className="flex items-center justify-center p-2 h-9 w-9 border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer"
+          >
+            <Eye className="h-4 w-4 text-[#3BB49F]" />
+          </Button>
+
+          {/* Edit Icon Popup */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEditItem(row)}
+            title="Ubah Data Departemen"
+            className="flex items-center justify-center p-2 h-9 w-9 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer"
+          >
+            <Edit className="h-4 w-4 text-gray-500" />
+          </Button>
+
+          {/* Delete Icon */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setDeleteTargetId(row.id)}
+            title="Hapus Departemen"
+            className="flex items-center justify-center p-2 h-9 w-9 border-gray-200 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg cursor-pointer"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       ),
     },
   ];
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-full p-6">
+    <div className="flex flex-col gap-6 w-full max-w-full p-4 md:p-6">
       <DataTable
         columns={columns}
         data={departments}
         keyExtractor={(row) => row.id}
         searchPlaceholder="Cari Departemen..."
         searchField={(row) => `${row.code} ${row.name}`}
-        createButtonLabel="Tambah Departemen +"
+        createButtonLabel="Tambah Departemen"
         createButtonIcon={<Plus className="h-4 w-4" />}
-        onCreateButtonClick={() => setIsModalOpen(true)}
+        onCreateButtonClick={() => setIsCreateOpen(true)}
         emptyText="Tidak ada departemen yang ditemukan"
       />
 
+      {/* Create Modal */}
       <DepartmentModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmitSuccess={() => {
-          // Re-fetch departments
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSubmitSuccess={(newItem) => {
+          if (newItem) {
+            setDepartments((prev) => [
+              ...prev,
+              {
+                id: String(Date.now()),
+                code: newItem.code,
+                name: newItem.name,
+                status: "Active",
+                createdAt: new Date().toISOString().split("T")[0],
+              },
+            ]);
+          }
         }}
       />
 
+      {/* Eye Detail Modal */}
+      <DepartmentDetailModal
+        department={detailItem}
+        isOpen={Boolean(detailItem)}
+        onClose={() => setDetailItem(null)}
+        onOpenEdit={() => {
+          setEditItem(detailItem);
+          setDetailItem(null);
+        }}
+      />
+
+      {/* Edit Modal */}
+      <DepartmentModal
+        initialData={editItem}
+        isOpen={Boolean(editItem)}
+        onClose={() => setEditItem(null)}
+        onSubmitSuccess={(updated) => {
+          if (updated && editItem) {
+            setDepartments((prev) =>
+              prev.map((d) => (d.id === editItem.id ? { ...d, code: updated.code, name: updated.name } : d))
+            );
+          }
+        }}
+      />
+
+      {/* Delete Modal */}
       <ConfirmDeleteModal
         isOpen={deleteTargetId !== null}
         onClose={() => setDeleteTargetId(null)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,22 +10,35 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DepartmentItem } from "./DepartmentDetailModal";
 import toast from "react-hot-toast";
 
 interface DepartmentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmitSuccess?: () => void;
+  initialData?: DepartmentItem | null;
+  onSubmitSuccess?: (updatedItem?: { code: string; name: string }) => void;
 }
 
 export function DepartmentModal({
   isOpen,
   onClose,
+  initialData,
   onSubmitSuccess,
 }: DepartmentModalProps) {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialData) {
+      setCode(initialData.code || "");
+      setName(initialData.name || "");
+    } else {
+      setCode("");
+      setName("");
+    }
+  }, [initialData, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,14 +49,16 @@ export function DepartmentModal({
 
     setIsLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 600));
-      toast.success(`Departemen ${name} (${code}) berhasil dibuat.`);
-      onSubmitSuccess?.();
+      await new Promise((r) => setTimeout(r, 500));
+      if (initialData) {
+        toast.success(`Departemen ${name} (${code}) berhasil diperbarui.`);
+      } else {
+        toast.success(`Departemen ${name} (${code}) berhasil dibuat.`);
+      }
+      onSubmitSuccess?.({ code, name });
       onClose();
-      setCode("");
-      setName("");
     } catch {
-      toast.error("Gagal menambahkan departemen");
+      toast.error("Gagal menyimpan departemen");
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +69,7 @@ export function DepartmentModal({
       <DialogContent className="max-w-md p-6 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
         <DialogHeader className="pb-3 border-b border-gray-100">
           <DialogTitle className="text-xl font-bold text-[#101828]">
-            Tambah Departemen Baru
+            {initialData ? "Ubah Data Departemen" : "Tambah Departemen Baru"}
           </DialogTitle>
         </DialogHeader>
 
@@ -102,7 +117,7 @@ export function DepartmentModal({
               disabled={isLoading}
               className="py-2 px-5 h-10 text-xs font-semibold bg-[#3BB49F] hover:bg-[#329a88] text-white rounded-xl cursor-pointer"
             >
-              {isLoading ? "Memproses..." : "Simpan Departemen"}
+              {isLoading ? "Memproses..." : initialData ? "Simpan Perubahan" : "Simpan Departemen"}
             </Button>
           </div>
         </form>

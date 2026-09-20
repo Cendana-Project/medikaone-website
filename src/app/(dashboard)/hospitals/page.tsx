@@ -5,13 +5,17 @@ import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Building2, Plus, MapPin, Phone, Search } from "lucide-react";
+import { Building2, Plus, MapPin, Phone, Search, Eye, Edit } from "lucide-react";
 import { useGetHospitals, HospitalItem } from "@/hooks/hospital/useGetHospitals";
 import RegisterHospitalModal from "@/components/dashboard/RegisterHospitalModal";
+import { HospitalDetailModal } from "@/components/dashboard/HospitalDetailModal";
+import { EditHospitalModal } from "@/components/dashboard/EditHospitalModal";
 
 export default function HospitalsPage() {
   const [search, setSearch] = useState("");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [detailHospital, setDetailHospital] = useState<HospitalItem | null>(null);
+  const [editHospital, setEditHospital] = useState<HospitalItem | null>(null);
 
   const { hospitals, isLoading, refetch } = useGetHospitals(search);
 
@@ -65,6 +69,39 @@ export default function HospitalsPage() {
         </Badge>
       ),
     },
+    {
+      key: "action",
+      label: "Aksi",
+      sortable: false,
+      align: "center",
+      render: (row) => (
+        <div className="flex items-center justify-center gap-2">
+          {/* Eye Icon Popup Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setDetailHospital(row)}
+            title="Lihat Detail RS"
+            className="flex items-center gap-1 px-3 h-8 border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer text-xs font-medium"
+          >
+            <Eye className="h-3.5 w-3.5 text-[#3BB49F]" />
+            <span className="hidden lg:inline">Detail</span>
+          </Button>
+
+          {/* Edit Icon Popup Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEditHospital(row)}
+            title="Ubah Data RS"
+            className="flex items-center gap-1 px-3 h-8 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer text-xs font-medium"
+          >
+            <Edit className="h-3.5 w-3.5 text-gray-500" />
+            <span className="hidden lg:inline">Ubah</span>
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -86,7 +123,7 @@ export default function HospitalsPage() {
           className="bg-[#3BB49F] hover:bg-[#329a88] text-white text-xs font-semibold h-11 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs cursor-pointer w-full sm:w-auto"
         >
           <Plus className="h-4 w-4" />
-          <span>+ Register Rumah Sakit Baru</span>
+          <span>Register Rumah Sakit Baru</span>
         </Button>
       </div>
 
@@ -124,7 +161,7 @@ export default function HospitalsPage() {
         </div>
       </div>
 
-      {/* Desktop DataTable View */}
+      {/* Desktop & Tablet DataTable View */}
       <div className="hidden md:block">
         <DataTable
           columns={columns}
@@ -136,7 +173,7 @@ export default function HospitalsPage() {
         />
       </div>
 
-      {/* Mobile Card List View */}
+      {/* Mobile Responsive Card List View */}
       <div className="flex md:hidden flex-col gap-3">
         <div className="relative w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -153,7 +190,7 @@ export default function HospitalsPage() {
           hospitals.map((hospital) => (
             <div
               key={hospital.id}
-              className="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs flex flex-col gap-2.5"
+              className="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs flex flex-col gap-3"
             >
               <div className="flex items-center justify-between">
                 <span className="font-bold text-[#008A72] bg-[#EBF8F5] px-2 py-0.5 rounded text-xs font-mono border border-[#C4E9E2]">
@@ -164,7 +201,7 @@ export default function HospitalsPage() {
                 </Badge>
               </div>
 
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#3BB49F] shrink-0">
                   <Building2 className="h-5 w-5" />
                 </div>
@@ -176,6 +213,28 @@ export default function HospitalsPage() {
                   </p>
                 </div>
               </div>
+
+              {/* Mobile Action Buttons */}
+              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDetailHospital(hospital)}
+                  className="flex-1 flex items-center justify-center gap-1.5 h-9 text-xs border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg"
+                >
+                  <Eye className="h-3.5 w-3.5 text-[#3BB49F]" />
+                  <span>Detail</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditHospital(hospital)}
+                  className="flex-1 flex items-center justify-center gap-1.5 h-9 text-xs border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg"
+                >
+                  <Edit className="h-3.5 w-3.5 text-gray-500" />
+                  <span>Ubah</span>
+                </Button>
+              </div>
             </div>
           ))
         ) : (
@@ -185,13 +244,30 @@ export default function HospitalsPage() {
         )}
       </div>
 
-      {/* Register Modal */}
+      {/* Modals */}
       <RegisterHospitalModal
         isOpen={isRegisterOpen}
         onClose={() => {
           setIsRegisterOpen(false);
           refetch();
         }}
+      />
+
+      <HospitalDetailModal
+        hospital={detailHospital}
+        isOpen={Boolean(detailHospital)}
+        onClose={() => setDetailHospital(null)}
+        onOpenEdit={() => {
+          setEditHospital(detailHospital);
+          setDetailHospital(null);
+        }}
+      />
+
+      <EditHospitalModal
+        hospital={editHospital}
+        isOpen={Boolean(editHospital)}
+        onClose={() => setEditHospital(null)}
+        onSubmitSuccess={() => refetch()}
       />
     </div>
   );

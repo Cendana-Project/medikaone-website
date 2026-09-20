@@ -147,20 +147,21 @@ export function handleApiError(error: unknown, fallbackTitle: string = "Terjadi 
 }
 
 export function handleApiSuccess(
-    response: any,
+    response: unknown,
     fallbackTitle: string = "Berhasil",
     fallbackDesc?: string
 ): void {
-    const messageDetail = response?.message_detail || response?.data?.message_detail;
+    const resObj = response as Record<string, unknown> | undefined;
+    const messageDetail = (resObj?.message_detail || (resObj?.data as Record<string, unknown> | undefined)?.message_detail) as Record<string, string> | undefined;
 
     const title =
-        typeof messageDetail === "object"
-            ? messageDetail?.title_idn || messageDetail?.title_eng || fallbackTitle
+        messageDetail && typeof messageDetail === "object"
+            ? messageDetail.title_idn || messageDetail.title_eng || fallbackTitle
             : fallbackTitle;
 
     const desc =
-        typeof messageDetail === "object"
-            ? messageDetail?.desc_idn || messageDetail?.desc_eng || fallbackDesc
+        messageDetail && typeof messageDetail === "object"
+            ? messageDetail.desc_idn || messageDetail.desc_eng || fallbackDesc
             : fallbackDesc;
 
     if (desc && desc !== title) {

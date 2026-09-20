@@ -14,7 +14,7 @@ import { DoctorSchedule } from "@/types/doctorRegistration";
 import { SchedulePicker } from "./SchedulePicker";
 import { useCreateScheduleChange } from "@/hooks/doctorRegistration/useCreateScheduleChange";
 import { handleApiError, handleApiSuccess } from "@/lib/handleError";
-import { Calendar, Clock, Edit3 } from "lucide-react";
+import { Edit3 } from "lucide-react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 

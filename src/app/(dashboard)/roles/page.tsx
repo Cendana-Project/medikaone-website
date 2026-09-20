@@ -5,10 +5,11 @@ import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserPlus, Edit, Trash2 } from "lucide-react";
+import { UserPlus, Edit, Eye, Trash2 } from "lucide-react";
 import { tableData } from "@/data/dashboard/tableData";
 import { CreateEmployeeModal } from "@/components/pegawai/CreateEmployeeModal";
 import { EditEmployeeModal, EmployeeData } from "@/components/pegawai/EditEmployeeModal";
+import { EmployeeDetailModal } from "@/components/pegawai/EmployeeDetailModal";
 import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import toast from "react-hot-toast";
 
@@ -17,7 +18,8 @@ type Employee = (typeof tableData)[number];
 export default function RolesPage() {
   const [data, setData] = useState<Employee[]>(tableData);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeData | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<(EmployeeData & { avatar?: string; username?: string }) | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -108,10 +110,33 @@ export default function RolesPage() {
                 email: row.email,
                 role: row.role,
                 status: row.status,
+                avatar: row.avatar,
+                username: row.username,
+              });
+              setIsDetailOpen(true);
+            }}
+            className="flex items-center justify-center p-2 h-9 w-9 border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg cursor-pointer"
+            title="Lihat Detail"
+          >
+            <Eye className="h-4 w-4 text-[#3BB49F]" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setSelectedEmployee({
+                id: String(row.id),
+                name: row.name,
+                email: row.email,
+                role: row.role,
+                status: row.status,
+                avatar: row.avatar,
+                username: row.username,
               });
               setIsEditOpen(true);
             }}
-            className="flex items-center gap-1.5 px-4 h-9 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer"
+            className="flex items-center gap-1.5 px-3 h-9 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer text-xs"
           >
             <Edit className="h-3.5 w-3.5 text-[#3BB49F]" />
             <span>Edit</span>
@@ -122,6 +147,7 @@ export default function RolesPage() {
             size="sm"
             onClick={() => setDeleteTargetId(row.id)}
             className="flex items-center justify-center p-2 h-9 w-9 border-gray-200 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg cursor-pointer"
+            title="Hapus"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -138,7 +164,7 @@ export default function RolesPage() {
         keyExtractor={(row) => row.id}
         searchPlaceholder="Cari Pegawai..."
         searchField={(row) => `${row.name} ${row.username} ${row.email} ${row.role}`}
-        createButtonLabel="Buat Akun Baru +"
+        createButtonLabel="Buat Akun Baru"
         createButtonIcon={<UserPlus className="h-4 w-4" />}
         onCreateButtonClick={() => setIsCreateOpen(true)}
         emptyText="Tidak ada data pegawai yang cocok"
@@ -150,6 +176,19 @@ export default function RolesPage() {
         onClose={() => setIsCreateOpen(false)}
         onSubmitSuccess={() => {
           // Re-trigger query if connected to backend
+        }}
+      />
+
+      <EmployeeDetailModal
+        isOpen={isDetailOpen}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setSelectedEmployee(null);
+        }}
+        employee={selectedEmployee}
+        onOpenEdit={() => {
+          setIsDetailOpen(false);
+          setIsEditOpen(true);
         }}
       />
 

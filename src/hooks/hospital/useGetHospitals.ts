@@ -7,6 +7,14 @@ export interface HospitalItem {
     name: string;
     city?: string;
     province?: string;
+    country?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    website?: string;
+    description?: string;
+    status?: string;
+    createdAt?: string;
 }
 
 export const useGetHospitals = (search?: string) => {

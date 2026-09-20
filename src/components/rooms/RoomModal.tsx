@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,23 +11,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronDown } from "lucide-react";
+import { RoomItem } from "./RoomDetailModal";
 import toast from "react-hot-toast";
 
 interface RoomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmitSuccess?: () => void;
+  initialData?: RoomItem | null;
+  onSubmitSuccess?: (updatedItem?: { code: string; name: string; departmentName: string }) => void;
 }
 
 export function RoomModal({
   isOpen,
   onClose,
+  initialData,
   onSubmitSuccess,
 }: RoomModalProps) {
   const [departmentId, setDepartmentId] = useState("Poli anak");
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialData) {
+      setCode(initialData.code || "");
+      setName(initialData.name || "");
+      setDepartmentId(initialData.departmentName || "Poli anak");
+    } else {
+      setCode("");
+      setName("");
+      setDepartmentId("Poli anak");
+    }
+  }, [initialData, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,14 +53,16 @@ export function RoomModal({
 
     setIsLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 600));
-      toast.success(`Ruangan ${name} (${code}) berhasil dibuat.`);
-      onSubmitSuccess?.();
+      await new Promise((r) => setTimeout(r, 500));
+      if (initialData) {
+        toast.success(`Ruangan ${name} (${code}) berhasil diperbarui.`);
+      } else {
+        toast.success(`Ruangan ${name} (${code}) berhasil dibuat.`);
+      }
+      onSubmitSuccess?.({ code, name, departmentName: departmentId });
       onClose();
-      setCode("");
-      setName("");
     } catch {
-      toast.error("Gagal menambahkan ruangan");
+      toast.error("Gagal menyimpan ruangan");
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +73,7 @@ export function RoomModal({
       <DialogContent className="max-w-md p-6 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
         <DialogHeader className="pb-3 border-b border-gray-100">
           <DialogTitle className="text-xl font-bold text-[#101828]">
-            Tambah Ruangan Baru
+            {initialData ? "Ubah Data Ruangan" : "Tambah Ruangan Baru"}
           </DialogTitle>
         </DialogHeader>
 
@@ -74,6 +91,8 @@ export function RoomModal({
                 <option value="Poli anak">Poli anak</option>
                 <option value="Kandungan">Kandungan</option>
                 <option value="Penyakit Dalam">Penyakit Dalam</option>
+                <option value="Poli THT (Telinga)">Poli THT (Telinga)</option>
+                <option value="Poli Estetika">Poli Estetika</option>
               </select>
               <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
             </div>
@@ -122,7 +141,7 @@ export function RoomModal({
               disabled={isLoading}
               className="py-2 px-5 h-10 text-xs font-semibold bg-[#3BB49F] hover:bg-[#329a88] text-white rounded-xl cursor-pointer"
             >
-              {isLoading ? "Memproses..." : "Simpan Ruangan"}
+              {isLoading ? "Memproses..." : initialData ? "Simpan Perubahan" : "Simpan Ruangan"}
             </Button>
           </div>
         </form>

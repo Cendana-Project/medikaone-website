@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Clock, CheckCircle, XCircle, Eye, Calendar, UserCheck, AlertCircle } from "lucide-react";
+import { Clock, CheckCircle, XCircle, Eye, AlertCircle } from "lucide-react";
 import { ScheduleChangeRequestItem } from "@/types/doctorRegistration";
 import { useGetScheduleChanges } from "@/hooks/doctorRegistration/useGetScheduleChanges";
 import { useApproveScheduleChange } from "@/hooks/doctorRegistration/useApproveScheduleChange";
