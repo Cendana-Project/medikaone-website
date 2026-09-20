@@ -9,7 +9,6 @@ import { UserPlus, Calendar, ShieldCheck, Clock, Eye, Globe, Building2 } from "l
 import { CreateDoctorModal } from "@/components/doctors/CreateDoctorModal";
 import { VerifyDoctorModal } from "@/components/doctors/VerifyDoctorModal";
 import { ScheduleChangeModal } from "@/components/doctors/ScheduleChangeModal";
-import { DoctorScheduleCalendarModal } from "@/components/doctors/DoctorScheduleCalendarModal";
 import { useGetDoctors } from "@/hooks/doctorRegistration/useGetDoctors";
 import { useGetGlobalDoctors, GlobalDoctorItem } from "@/hooks/doctorRegistration/useGetGlobalDoctors";
 import { DoctorAffiliation } from "@/types/doctorRegistration";
@@ -82,7 +81,6 @@ export default function DoctorsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
   const [scheduleTarget, setScheduleTarget] = useState<{ affiliationId: string; doctorName: string } | null>(null);
-  const [calendarTarget, setCalendarTarget] = useState<DoctorAffiliation | null>(null);
 
   const { doctors: apiDoctors, isLoading: isHospitalLoading, refetch: refetchHospitalDoctors } = useGetDoctors(hospitalId);
   const { doctors: globalDoctors, isLoading: isGlobalLoading } = useGetGlobalDoctors();
@@ -169,7 +167,7 @@ export default function DoctorsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setCalendarTarget(row)}
+            onClick={() => router.push(`/doctors/${row.doctor_id || row.affiliation_id || "doc-1"}/schedule`)}
             title="Lihat Detail & Jadwal 24 Jam"
             className="flex items-center gap-1 px-2.5 h-8 border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer text-xs font-medium"
           >
@@ -180,7 +178,7 @@ export default function DoctorsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setCalendarTarget(row)}
+            onClick={() => router.push(`/doctors/${row.doctor_id || row.affiliation_id || "doc-1"}/schedule`)}
             className="flex items-center gap-1.5 px-3 h-8 border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer text-xs font-medium"
           >
             <Calendar className="h-3.5 w-3.5 text-[#3BB49F]" />
@@ -255,22 +253,7 @@ export default function DoctorsPage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() =>
-            setCalendarTarget({
-              affiliation_id: row.doctor_id,
-              hospital_id: hospitalId,
-              doctor_id: row.doctor_id,
-              first_name: row.first_name,
-              last_name: row.last_name,
-              email: row.email || "doctor@medikaone.id",
-              sip_number: row.sip_number || "-",
-              specialty: row.specialty || "Umum",
-              department_id: "dept-global",
-              department: "Direktori Publik",
-              status: "ACTIVE",
-              joined_at: new Date().toISOString(),
-            })
-          }
+          onClick={() => router.push(`/doctors/${row.doctor_id || "doc-1"}/schedule`)}
           className="flex items-center gap-1.5 px-3 h-8 border-[#C4E9E2] text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer text-xs font-medium"
         >
           <Eye className="h-3.5 w-3.5 text-[#3BB49F]" />
@@ -420,27 +403,6 @@ export default function DoctorsPage() {
           isOpen={Boolean(scheduleTarget)}
           onClose={() => setScheduleTarget(null)}
           onSubmitSuccess={() => refetchHospitalDoctors()}
-        />
-      )}
-
-      {calendarTarget && (
-        <DoctorScheduleCalendarModal
-          doctorName={`${calendarTarget.first_name} ${calendarTarget.last_name}`}
-          specialty={calendarTarget.specialty}
-          roomName={calendarTarget.room}
-          departmentName={calendarTarget.department}
-          sipNumber={calendarTarget.sip_number}
-          email={calendarTarget.email}
-          schedules={calendarTarget.schedules}
-          isOpen={Boolean(calendarTarget)}
-          onClose={() => setCalendarTarget(null)}
-          onOpenEditModal={() => {
-            setScheduleTarget({
-              affiliationId: calendarTarget.affiliation_id || calendarTarget.doctor_id,
-              doctorName: `${calendarTarget.first_name} ${calendarTarget.last_name}`,
-            });
-            setCalendarTarget(null);
-          }}
         />
       )}
     </div>
