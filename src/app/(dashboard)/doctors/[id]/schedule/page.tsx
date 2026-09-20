@@ -34,10 +34,15 @@ const HOURS_24 = Array.from({ length: 24 }, (_, i) => {
 });
 
 const DEFAULT_MOCK_SCHEDULES: DoctorSchedule[] = [
-  { day_of_week: 1, start_time: "08:00", end_time: "12:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", capacity: 15 },
-  { day_of_week: 3, start_time: "13:00", end_time: "17:00", timezone: "Asia/Jakarta", booking_mode: "SESSION_QUEUE", capacity: 20 },
-  { day_of_week: 5, start_time: "09:00", end_time: "14:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", capacity: 10 },
+  { day_of_week: [1], start_time: "08:00", end_time: "12:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", slot_duration_minutes: 30, capacity: 15 },
+  { day_of_week: [3], start_time: "13:00", end_time: "17:00", timezone: "Asia/Jakarta", booking_mode: "SESSION_QUEUE", capacity: 20 },
+  { day_of_week: [5], start_time: "09:00", end_time: "14:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", slot_duration_minutes: 30, capacity: 10 },
 ];
+
+const getDayIndex = (dayOfWeek: number | number[]): number => {
+  if (Array.isArray(dayOfWeek)) return dayOfWeek[0] ?? 1;
+  return dayOfWeek;
+};
 
 export default function DoctorSchedulePage() {
   const params = useParams();
@@ -50,13 +55,27 @@ export default function DoctorSchedulePage() {
   const { doctors } = useGetDoctors(hospitalId);
   const foundDoctor = doctors.find((d) => d.doctor_id === doctorId || d.affiliation_id === doctorId);
 
+  let rawSchedules = foundDoctor?.schedules;
+  if (typeof rawSchedules === "string") {
+    try {
+      rawSchedules = JSON.parse(rawSchedules);
+    } catch {
+      rawSchedules = [];
+    }
+  }
+
+  const doctorSchedules: DoctorSchedule[] =
+    Array.isArray(rawSchedules) && rawSchedules.length > 0
+      ? rawSchedules
+      : DEFAULT_MOCK_SCHEDULES;
+
   const doctorData = {
     doctorName: foundDoctor ? `${foundDoctor.first_name} ${foundDoctor.last_name}` : doctorId === "doc-2" ? "Phoenix Baker" : doctorId === "doc-3" ? "Lana Steiner" : "Olivia Rhye",
     specialty: foundDoctor?.specialty || (doctorId === "doc-3" ? "Spesialis Penyakit Dalam" : "Spesialis Kandungan"),
     sipNumber: foundDoctor?.sip_number || (doctorId === "doc-2" ? "SIP-3174-2026-002" : doctorId === "doc-3" ? "SIP-3174-2026-003" : "SIP-3174-2026-001"),
     departmentName: foundDoctor?.department || (doctorId === "doc-3" ? "Poli Penyakit Dalam" : "Poli Kandungan"),
     roomName: foundDoctor?.room || (doctorId === "doc-2" ? "Ruang Bunga II" : doctorId === "doc-3" ? "Ruang Anggrek I" : "Ruang Bunga I"),
-    schedules: foundDoctor?.schedules && foundDoctor.schedules.length > 0 ? foundDoctor.schedules : DEFAULT_MOCK_SCHEDULES,
+    schedules: doctorSchedules,
   };
 
   const parseHourInt = (timeStr: string) => {
@@ -217,7 +236,8 @@ export default function DoctorSchedulePage() {
                         {/* Day Columns */}
                         {DAYS_OF_WEEK.map((day) => {
                           const matchingSlots = doctorData.schedules.filter((slot) => {
-                            if (slot.day_of_week !== day.index) return false;
+                            const dIndex = getDayIndex(slot.day_of_week);
+                            if (dIndex !== day.index) return false;
                             const startH = parseHourInt(slot.start_time);
                             const endH = parseHourInt(slot.end_time);
                             return currentHourInt >= startH && currentHourInt < endH;
@@ -240,11 +260,17 @@ export default function DoctorSchedulePage() {
                                     </span>
                                   </div>
 
-                                  <div className="flex items-center justify-between text-[10px] text-gray-600 mt-1 font-medium">
-                                    <span className="bg-white/80 px-1.5 py-0.5 rounded border border-[#C4E9E2]">
+                                  <div className="flex items-center justify-between text-[10px] text-gray-600 mt-1 font-medium gap-1">
+                                    <span className="bg-white/80 px-1.5 py-0.5 rounded border border-[#C4E9E2] truncate">
                                       {slot.booking_mode || "FIXED_SLOT"}
                                     </span>
-                                    <span>Max {slot.capacity || 1} Pasien</span>
+                                    <span>
+                                      {slot.booking_mode === "FIXED_SLOT" && slot.slot_duration_minutes
+                                        ? `${slot.slot_duration_minutes}m`
+                                        : slot.capacity
+                                        ? `Max ${slot.capacity} Pas`
+                                        : ""}
+                                    </span>
                                   </div>
                                 </div>
                               ))}
@@ -260,7 +286,9 @@ export default function DoctorSchedulePage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {DAYS_OF_WEEK.map((day) => {
-                const daySlots = doctorData.schedules.filter((s) => s.day_of_week === day.index);
+                const daySlots = doctorData.schedules.filter(
+                  (s) => getDayIndex(s.day_of_week) === day.index
+                );
                 return (
                   <div
                     key={day.index}
@@ -298,7 +326,11 @@ export default function DoctorSchedulePage() {
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-gray-600 mt-1">
                               <span>Mode: {slot.booking_mode || "FIXED_SLOT"}</span>
-                              <span>Kapasitas: {slot.capacity} Pasien</span>
+                              <span>
+                                {slot.booking_mode === "FIXED_SLOT" && slot.slot_duration_minutes
+                                  ? `Durasi: ${slot.slot_duration_minutes} mnt`
+                                  : `Kapasitas: ${slot.capacity || 1} Pasien`}
+                              </span>
                             </div>
                           </div>
                         ))}
