@@ -23,7 +23,6 @@ const DAYS = [
   { value: 6, label: "Sabtu" },
 ];
 
-const HOURS_24 = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 const MINUTES = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0"));
 if (!MINUTES.includes("59")) MINUTES.push("59");
 
@@ -124,14 +123,9 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
     if (editingIndex === index) {
       setEditingIndex(null);
     }
-    const updated = schedules.filter((_, i) => i !== index);
-    onChange(updated);
-  };
-
-  const startHour = (startTime || "08:00").split(":")[0] || "08";
-  const startMin = (startTime || "08:00").split(":")[1] || "00";
-  const endHour = (endTime || "12:00").split(":")[0] || "12";
-  const endMin = (endTime || "12:00").split(":")[1] || "00";
+  const updated = schedules.filter((_, i) => i !== index);
+  onChange(updated);
+};
 
   return (
     <div className="flex flex-col bg-[#F8FAFC] border border-gray-200 rounded-xl overflow-hidden shadow-2xs">

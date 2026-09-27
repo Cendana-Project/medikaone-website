@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteDoctorAffiliation } from "@/services/DoctorRegistrationService";
-import toast from "react-hot-toast";
 
 export const useDeleteDoctorAffiliation = (hospitalId: string) => {
   const queryClient = useQueryClient();

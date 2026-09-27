@@ -24,6 +24,7 @@ interface DoctorInvitationDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRefresh?: () => void;
+  onOpenEdit?: () => void;
 }
 
 export function DoctorInvitationDetailModal({
@@ -31,6 +32,7 @@ export function DoctorInvitationDetailModal({
   isOpen,
   onClose,
   onRefresh,
+  onOpenEdit,
 }: DoctorInvitationDetailModalProps) {
   const hospitalId = Cookies.get("hospitalId") || "";
   const [showContractViewer, setShowContractViewer] = useState(false);
@@ -113,6 +115,22 @@ export function DoctorInvitationDetailModal({
           </DialogHeader>
 
           <div className="flex flex-col gap-5 pt-4">
+            {/* Banner Alasan Penolakan dari Dokter (jika REJECTED) */}
+            {invitation.status === "REJECTED" && (
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex flex-col gap-1.5 text-xs text-amber-900">
+                <div className="flex items-center gap-2 font-bold text-amber-900">
+                  <XCircle className="h-4 w-4 text-red-600" />
+                  <span>Undangan Ditolak oleh Dokter</span>
+                </div>
+                <p className="italic text-amber-800 pl-6">
+                  Catatan Penolakan: &ldquo;{invitation.rejection_reason || "Dokter menolak penawaran tanpa memberikan catatan detail."}&rdquo;
+                </p>
+                <p className="text-[11px] text-amber-700 mt-1 pl-6">
+                  Anda dapat mengubah parameter penawaran (departemen, ruangan, jadwal, atau catatan) lalu mengirim ulang invitation ke dokter.
+                </p>
+              </div>
+            )}
+
             {/* Card Info Dokter */}
             <div className="bg-[#F8FAFC] border border-gray-200 p-4 rounded-xl flex flex-col gap-3">
               <h4 className="text-sm font-semibold text-gray-900 border-b border-gray-200 pb-2">
@@ -254,18 +272,35 @@ export function DoctorInvitationDetailModal({
                 )}
               </div>
 
-              {invitation.status === "PENDING" && (
+              {invitation.status !== "ACCEPTED" && (
                 <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setConfirmAction("cancel")}
-                    disabled={cancelMutation.isPending}
-                    className="py-2.5 px-4 h-11 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl cursor-pointer flex items-center gap-1.5"
-                  >
-                    <XCircle className="h-4 w-4" />
-                    <span>Batalkan Undangan</span>
-                  </Button>
+                  {onOpenEdit && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        onClose();
+                        onOpenEdit();
+                      }}
+                      className="py-2.5 px-4 h-11 text-xs font-semibold border-emerald-200 text-[#008A72] hover:bg-[#EBF8F5] rounded-xl cursor-pointer flex items-center gap-1.5"
+                    >
+                      <FileText className="h-4 w-4 text-[#3BB49F]" />
+                      <span>{invitation.status === "REJECTED" ? "Revisi & Perbarui Undangan" : "Ubah Parameter Undangan"}</span>
+                    </Button>
+                  )}
+
+                  {invitation.status === "PENDING" && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setConfirmAction("cancel")}
+                      disabled={cancelMutation.isPending}
+                      className="py-2.5 px-4 h-11 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl cursor-pointer flex items-center gap-1.5"
+                    >
+                      <XCircle className="h-4 w-4" />
+                      <span>Batalkan Undangan</span>
+                    </Button>
+                  )}
 
                   <Button
                     type="button"

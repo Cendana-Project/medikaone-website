@@ -48,6 +48,9 @@ export default function RegisterHospitalModal({
             province: "",
             country: "Indonesia",
             phone: "",
+            email: "",
+            website: "",
+            timezone: "Asia/Jakarta",
             description: "",
         },
     });
@@ -84,6 +87,7 @@ export default function RegisterHospitalModal({
             { label: "Nama RS", value: formData.name },
             { label: "Kota", value: formData.city },
             { label: "No. Telepon", value: formData.phone },
+            { label: "Email Resmi", value: formData.email || "-" },
         ]
         : [];
 
@@ -102,7 +106,7 @@ export default function RegisterHospitalModal({
                     </div>
 
                     <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col flex-1 overflow-hidden">
-                        <div className="flex-1 overflow-y-auto px-7 pb-5 flex flex-col gap-4">
+                        <div className="flex-1 overflow-y-auto px-7 pb-5 pt-4 flex flex-col gap-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1.5">
                                     <Label htmlFor="code" className="text-sm font-medium text-gray-800">
@@ -203,6 +207,69 @@ export default function RegisterHospitalModal({
                                         className="h-11 bg-[#F8FAFC] border-gray-200 rounded-xl px-4 text-sm focus-visible:bg-white focus-visible:ring-[#3BB49F]/20 focus-visible:border-[#3BB49F]"
                                     />
                                     {errors.phone && <p className="text-red-500 text-xs mt-0.5">{errors.phone.message}</p>}
+                                </div>
+                            </div>
+
+                            {/* Email RS & Website */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="email" className="text-sm font-medium text-gray-800">
+                                        Email Resmi RS <span className="text-xs text-gray-400 font-normal">(Opsional)</span>
+                                    </Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="info@hospital.com"
+                                        {...register("email")}
+                                        className="h-11 bg-[#F8FAFC] border-gray-200 rounded-xl px-4 text-sm focus-visible:bg-white focus-visible:ring-[#3BB49F]/20 focus-visible:border-[#3BB49F]"
+                                    />
+                                    {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email.message}</p>}
+                                </div>
+
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="website" className="text-sm font-medium text-gray-800">
+                                        Website RS <span className="text-xs text-gray-400 font-normal">(Opsional)</span>
+                                    </Label>
+                                    <Input
+                                        id="website"
+                                        placeholder="https://hospital.com"
+                                        {...register("website")}
+                                        className="h-11 bg-[#F8FAFC] border-gray-200 rounded-xl px-4 text-sm focus-visible:bg-white focus-visible:ring-[#3BB49F]/20 focus-visible:border-[#3BB49F]"
+                                    />
+                                    {errors.website && <p className="text-red-500 text-xs mt-0.5">{errors.website.message}</p>}
+                                </div>
+                            </div>
+
+                            {/* Tahun Berdiri & Timezone */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="established_year" className="text-sm font-medium text-gray-800">
+                                        Tahun Berdiri RS <span className="text-xs text-gray-400 font-normal">(Opsional)</span>
+                                    </Label>
+                                    <Input
+                                        id="established_year"
+                                        type="number"
+                                        placeholder="Contoh: 2010"
+                                        {...register("established_year")}
+                                        className="h-11 bg-[#F8FAFC] border-gray-200 rounded-xl px-4 text-sm focus-visible:bg-white focus-visible:ring-[#3BB49F]/20 focus-visible:border-[#3BB49F]"
+                                    />
+                                    {errors.established_year && <p className="text-red-500 text-xs mt-0.5">{errors.established_year.message}</p>}
+                                </div>
+
+                                <div className="flex flex-col gap-1.5">
+                                    <Label htmlFor="timezone" className="text-sm font-medium text-gray-800">
+                                        Zona Waktu (Timezone) <span className="text-xs text-gray-400 font-normal">(Opsional)</span>
+                                    </Label>
+                                    <select
+                                        id="timezone"
+                                        {...register("timezone")}
+                                        className="h-11 bg-[#F8FAFC] border border-gray-200 rounded-xl px-4 text-sm focus-visible:bg-white focus-visible:ring-[#3BB49F]/20 focus-visible:border-[#3BB49F]"
+                                    >
+                                        <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
+                                        <option value="Asia/Makassar">Asia/Makassar (WITA)</option>
+                                        <option value="Asia/Jayapura">Asia/Jayapura (WIT)</option>
+                                    </select>
+                                    {errors.timezone && <p className="text-red-500 text-xs mt-0.5">{errors.timezone.message}</p>}
                                 </div>
                             </div>
 

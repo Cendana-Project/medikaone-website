@@ -2,7 +2,6 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { resendDoctorInvitation } from "@/services/DoctorRegistrationService";
-import toast from "react-hot-toast";
 import { handleApiError } from "@/lib/handleError";
 
 export const useResendDoctorInvitation = (hospitalId: string) => {

@@ -3,6 +3,7 @@ import { safeRequest } from "@/app/utils/safeRequest";
 import { 
     CreateDepartmentRequest, 
     CreateInvitationRequest, 
+    UpdateInvitationRequest,
     CreateRoomRequest, 
     CreateScheduleChangePayload,
     SearchDoctorParams, 
@@ -212,6 +213,13 @@ export const cancelDoctorInvitation = async (hospitalId: string, invitationId: s
 export const resendDoctorInvitation = async (hospitalId: string, invitationId: string) => {
     return safeRequest(async () => {
         const response = await api.post(`hospitals/${hospitalId}/doctor-invitations/${invitationId}/resend`);
+        return response.data;
+    });
+};
+
+export const updateDoctorInvitation = async (hospitalId: string, invitationId: string, payload: UpdateInvitationRequest) => {
+    return safeRequest(async () => {
+        const response = await api.patch(`hospitals/${hospitalId}/doctor-invitations/${invitationId}`, payload);
         return response.data;
     });
 };

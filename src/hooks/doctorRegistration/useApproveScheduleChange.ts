@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { approveScheduleChangeRequest } from "@/services/DoctorRegistrationService";
-import { handleApiError, handleApiSuccess } from "@/lib/handleError";
+import { handleApiError } from "@/lib/handleError";
 
 export const useApproveScheduleChange = (hospitalId: string) => {
     const queryClient = useQueryClient();

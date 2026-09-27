@@ -5,7 +5,7 @@ import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { UserPlus, Calendar, ShieldCheck, Clock, Eye, Globe, Building2, Trash2 } from "lucide-react";
+import { UserPlus, Calendar, Clock, Eye, Globe, Building2, Trash2 } from "lucide-react";
 import { CreateDoctorModal } from "@/components/doctors/CreateDoctorModal";
 import { ScheduleChangeModal } from "@/components/doctors/ScheduleChangeModal";
 import ConfirmModal from "@/components/ui/confirm-modal";
