@@ -1,3 +1,45 @@
+export type HospitalFacility = {
+    code: string;
+    name: string;
+    icon?: string;
+};
+
+export type HospitalOpeningHour = {
+    day_of_week: number;
+    is_closed?: boolean;
+    is_24_hours?: boolean;
+    periods?: Array<{
+        open_time?: string;
+        close_time?: string;
+    }>;
+};
+
+export type HospitalImage = {
+    id: string;
+    hospital_id: string;
+    url: string;
+    caption?: string;
+    sort_order?: number;
+    is_cover?: boolean;
+    file_size?: number;
+    content_type?: string;
+    expires_at?: string;
+    created_at?: string;
+};
+
+export type UploadHospitalImagePayload = {
+    image: File;
+    caption?: string;
+    sort_order?: number;
+    is_cover?: boolean;
+};
+
+export type UpdateHospitalImagePayload = {
+    caption?: string;
+    sort_order?: number;
+    is_cover?: boolean;
+};
+
 export type CreateHospitalRequest = {
     code: string;
     name: string;
@@ -6,10 +48,15 @@ export type CreateHospitalRequest = {
     province: string;
     country: string;
     phone: string;
+    email?: string;
+    website?: string;
+    established_year?: number;
+    timezone?: string;
     latitude?: number;
     longitude?: number;
     description?: string;
-    facilities?: Record<string, unknown> | string;
+    facilities?: HospitalFacility[] | Record<string, unknown> | string;
+    opening_hours?: HospitalOpeningHour[];
 };
 
 export type HospitalData = {
@@ -20,13 +67,21 @@ export type HospitalData = {
     city: string;
     province: string;
     country: string;
-    latitude: number;
-    longitude: number;
     phone: string;
-    description: string;
-    facilities: string;
+    email?: string;
+    website?: string;
+    established_year?: number;
+    timezone?: string;
+    latitude?: number;
+    longitude?: number;
+    description?: string;
+    facilities?: HospitalFacility[] | string;
+    opening_hours?: HospitalOpeningHour[];
+    rating_average?: number;
+    rating_count?: number;
     is_active: boolean;
     created_at: string;
+    updated_at?: string;
 };
 
 export type CreateHospitalAdminRequest = {

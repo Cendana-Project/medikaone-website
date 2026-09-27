@@ -66,6 +66,13 @@ export type CreateInvitationRequest = {
     contract?: File | string;
 };
 
+export type UpdateInvitationRequest = {
+    department_id?: string;
+    room_id?: string;
+    message?: string;
+    schedules?: DoctorSchedule[];
+};
+
 export type DoctorInvitation = {
     id: string;
     hospital_id: string;
@@ -84,11 +91,14 @@ export type DoctorInvitation = {
     invited_by: string;
     status: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELLED" | "EXPIRED";
     message?: string;
+    rejection_reason?: string;
     expires_at: string;
     created_at: string;
     contract_filename?: string;
     supersedes_invitation_id?: string;
     schedules?: DoctorSchedule[];
+    affiliation_id?: string;
+    hospital?: Record<string, unknown>;
 };
 
 export type ContractUrlResponse = {

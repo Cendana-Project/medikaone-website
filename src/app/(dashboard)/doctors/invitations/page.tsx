@@ -5,7 +5,7 @@ import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { UserPlus, Eye, Send, XCircle, ShieldCheck, Mail, Clock, Trash2 } from "lucide-react";
+import { Edit, UserPlus, Eye, Send, XCircle, ShieldCheck, Mail, Clock, Trash2, Edit3 } from "lucide-react";
 import { DoctorInvitation } from "@/types/doctorRegistration";
 import { useGetDoctorInvitations } from "@/hooks/doctorRegistration/useGetDoctorInvitations";
 import { useResendDoctorInvitation } from "@/hooks/doctorRegistration/useResendDoctorInvitation";
@@ -13,6 +13,7 @@ import { useCancelDoctorInvitation } from "@/hooks/doctorRegistration/useCancelD
 import { useDeleteDoctorInvitation } from "@/hooks/doctorRegistration/useDeleteDoctorInvitation";
 import { CreateDoctorModal } from "@/components/doctors/CreateDoctorModal";
 import { DoctorInvitationDetailModal } from "@/components/doctors/DoctorInvitationDetailModal";
+import { EditDoctorInvitationModal } from "@/components/doctors/EditDoctorInvitationModal";
 import ConfirmModal from "@/components/ui/confirm-modal";
 import { StatusFilterDropdown, StatusOption } from "@/components/ui/StatusFilterDropdown";
 import { handleApiError, handleApiSuccess } from "@/lib/handleError";
@@ -33,6 +34,7 @@ export default function DoctorInvitationsPage() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedInvitation, setSelectedInvitation] = useState<DoctorInvitation | null>(null);
+  const [editTarget, setEditTarget] = useState<DoctorInvitation | null>(null);
   const [resendTarget, setResendTarget] = useState<DoctorInvitation | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DoctorInvitation | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DoctorInvitation | null>(null);
@@ -195,39 +197,41 @@ export default function DoctorInvitationsPage() {
               </TooltipContent>
             </Tooltip>
 
-            {row.status === "PENDING" && (
+            {row.status !== "ACCEPTED" && (
               <>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setResendTarget(row)}
-                      className="h-8 w-8 p-0 flex items-center justify-center border-gray-200 text-[#3BB49F] hover:bg-[#EBF8F5] rounded-lg cursor-pointer"
+                      onClick={() => setEditTarget(row)}
+                      className="h-8 w-8 p-0 flex items-center justify-center border-emerald-200 text-[#008A72] hover:bg-[#EBF8F5] rounded-lg cursor-pointer"
                     >
-                      <Send className="h-4 w-4" />
+                      <Edit3 className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="top">
-                    <p>Kirim Ulang Undangan</p>
+                    <p>{row.status === "REJECTED" ? "Revisi & Kirim Ulang" : "Perbarui Parameter Undangan"}</p>
                   </TooltipContent>
                 </Tooltip>
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCancelTarget(row)}
-                      className="h-8 w-8 p-0 flex items-center justify-center border-amber-200 text-amber-700 hover:bg-amber-50 rounded-lg cursor-pointer"
-                    >
-                      <XCircle className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    <p>Batalkan Undangan</p>
-                  </TooltipContent>
-                </Tooltip>
+                {(row.status === "REJECTED" || row.status === "CANCELLED" || row.status === "EXPIRED") && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setResendTarget(row)}
+                        className="h-8 w-8 p-0 flex items-center justify-center border-gray-200 text-[#3BB49F] hover:bg-[#EBF8F5] rounded-lg cursor-pointer"
+                      >
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p>Kirim Ulang Undangan</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
               </>
             )}
 
@@ -347,6 +351,16 @@ export default function DoctorInvitationsPage() {
         invitation={selectedInvitation}
         isOpen={Boolean(selectedInvitation)}
         onClose={() => setSelectedInvitation(null)}
+        onRefresh={() => refetch()}
+        onOpenEdit={() => {
+          if (selectedInvitation) setEditTarget(selectedInvitation);
+        }}
+      />
+
+      <EditDoctorInvitationModal
+        invitation={editTarget}
+        isOpen={Boolean(editTarget)}
+        onClose={() => setEditTarget(null)}
         onRefresh={() => refetch()}
       />
 
