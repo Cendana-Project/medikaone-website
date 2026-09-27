@@ -3,7 +3,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateDoctorStatus } from "@/services/DoctorRegistrationService";
 import { UpdateDoctorStatusRequest } from "@/types/doctorRegistration";
-import toast from "react-hot-toast";
 import { handleApiError } from "@/lib/handleError";
 
 type MutationArgs = {

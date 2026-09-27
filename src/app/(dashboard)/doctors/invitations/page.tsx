@@ -5,7 +5,7 @@ import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Edit, UserPlus, Eye, Send, XCircle, ShieldCheck, Mail, Clock, Trash2, Edit3 } from "lucide-react";
+import { UserPlus, Eye, Send, ShieldCheck, Mail, Clock, Trash2, Edit3 } from "lucide-react";
 import { DoctorInvitation } from "@/types/doctorRegistration";
 import { useGetDoctorInvitations } from "@/hooks/doctorRegistration/useGetDoctorInvitations";
 import { useResendDoctorInvitation } from "@/hooks/doctorRegistration/useResendDoctorInvitation";

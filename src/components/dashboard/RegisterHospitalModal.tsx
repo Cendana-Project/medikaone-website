@@ -39,7 +39,7 @@ export default function RegisterHospitalModal({
         setValue,
         formState: { errors },
     } = useForm<CreateHospitalFormValues>({
-        resolver: zodResolver(createHospitalSchema) as any,
+        resolver: zodResolver(createHospitalSchema),
         defaultValues: {
             code: "",
             name: "",
@@ -62,7 +62,7 @@ export default function RegisterHospitalModal({
 
     const handleConfirmSubmit = () => {
         if (!formData) return;
-        mutate(formData as any, {
+        mutate(formData, {
             onSuccess: () => {
                 setIsConfirmOpen(false);
                 reset();

@@ -55,8 +55,8 @@ export type CreateHospitalRequest = {
     latitude?: number;
     longitude?: number;
     description?: string;
-    facilities?: HospitalFacility[] | Record<string, unknown> | string;
-    opening_hours?: HospitalOpeningHour[];
+    facilities?: HospitalFacility[] | Record<string, unknown> | string | unknown;
+    opening_hours?: HospitalOpeningHour[] | unknown;
 };
 
 export type HospitalData = {
@@ -75,8 +75,8 @@ export type HospitalData = {
     latitude?: number;
     longitude?: number;
     description?: string;
-    facilities?: HospitalFacility[] | string;
-    opening_hours?: HospitalOpeningHour[];
+    facilities?: HospitalFacility[] | string | unknown;
+    opening_hours?: HospitalOpeningHour[] | unknown;
     rating_average?: number;
     rating_count?: number;
     is_active: boolean;
