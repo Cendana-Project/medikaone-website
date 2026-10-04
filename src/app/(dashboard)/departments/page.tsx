@@ -17,7 +17,7 @@ import Cookies from "js-cookie";
 export default function DepartmentsPage() {
   const { userInfo } = useGetUserInfo();
   const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
-  const { departments: apiDepts, refetch } = useGetDepartments(hospitalId);
+  const { departments: apiDepts, isLoading, refetch } = useGetDepartments(hospitalId);
   const deleteDeptMutation = useDeleteDepartment(hospitalId);
 
   const [localDepartments, setLocalDepartments] = useState<DepartmentItem[]>([]);
@@ -49,8 +49,8 @@ export default function DepartmentsPage() {
       setLocalDepartments((prev) => prev.filter((d) => d.id !== deleteTargetId));
       setDeleteTargetId(null);
       refetch();
-    } catch (err) {
-      handleApiError(err, "Gagal menghapus departemen");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -146,6 +146,8 @@ export default function DepartmentsPage() {
         createButtonLabel="Tambah Departemen"
         createButtonIcon={<Plus className="h-4 w-4" />}
         onCreateButtonClick={() => setIsCreateOpen(true)}
+        isLoading={isLoading}
+        loadingText="Memuat data departemen..."
         emptyText="Tidak ada departemen yang ditemukan"
       />
 

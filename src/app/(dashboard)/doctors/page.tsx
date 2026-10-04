@@ -75,8 +75,8 @@ export default function DoctorsPage() {
       );
       setDeleteAffiliationTarget(null);
       refetchHospitalDoctors();
-    } catch (err) {
-      handleApiError(err, "Gagal menghapus afiliasi dokter");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -410,7 +410,9 @@ export default function DoctorsPage() {
               </Button>
             </div>
           }
-          emptyText={isHospitalLoading ? "Memuat data dokter..." : "Tidak ada data dokter yang ditemukan"}
+          isLoading={isHospitalLoading}
+          loadingText="Memuat data dokter..."
+          emptyText="Tidak ada data dokter yang ditemukan"
         />
       ) : (
         <DataTable
@@ -419,7 +421,9 @@ export default function DoctorsPage() {
           keyExtractor={(row) => row.doctor_id || row.sip_number}
           searchPlaceholder="Cari Dokter Global (Nama, MedikaOne ID, SIP, Spesialis)..."
           searchField={(row) => `${row.first_name} ${row.last_name} ${row.doctor_medikaone_id || ""} ${row.sip_number || ""} ${row.specialty || ""}`}
-          emptyText={isGlobalLoading ? "Memuat direktori dokter global..." : "Tidak ada data dokter global yang ditemukan"}
+          isLoading={isGlobalLoading}
+          loadingText="Memuat direktori dokter global..."
+          emptyText="Tidak ada data dokter global yang ditemukan"
         />
       )}
 

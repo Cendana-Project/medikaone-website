@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateDoctorInvitation } from "@/services/DoctorRegistrationService";
 import { UpdateInvitationRequest } from "@/types/doctorRegistration";
+import { handleApiError } from "@/lib/handleError";
 
 export function useUpdateDoctorInvitation(hospitalId: string) {
     const queryClient = useQueryClient();
@@ -11,6 +12,9 @@ export function useUpdateDoctorInvitation(hospitalId: string) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["doctor-invitations", hospitalId] });
             queryClient.invalidateQueries({ queryKey: ["doctor-invitation"] });
+        },
+        onError: (error) => {
+            handleApiError(error, "Gagal memperbarui undangan dokter");
         },
     });
 }

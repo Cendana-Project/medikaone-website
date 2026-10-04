@@ -2,6 +2,10 @@ import toast from "react-hot-toast";
 import React from "react";
 
 export interface ApiErrorDetail {
+    title_idn?: string;
+    title_eng?: string;
+    desc_idn?: string;
+    desc_eng?: string;
     idn?: string;
     en?: string;
     description?: string;
@@ -10,9 +14,12 @@ export interface ApiErrorDetail {
 
 export interface ApiErrorResponseData {
     message?: string;
+    message_detail?: ApiErrorDetail | string;
+    data?: unknown;
+    trace_id?: string;
+    timestamp?: string;
     desc?: string | ApiErrorDetail;
     description?: string | ApiErrorDetail;
-    message_detail?: string | ApiErrorDetail;
     detail?: string | ApiErrorDetail;
     error_description?: string;
     errors?: Array<{ message?: string } | string> | Record<string, string[]>;
@@ -52,6 +59,7 @@ const ERROR_CODE_MAP: Record<string, string> = {
     INVITATION_CANCELLED: "Undangan ini telah dibatalkan.",
     MESSAGE_ERROR: "Gagal memproses permintaan.",
     BAD_REQUEST: "Permintaan tidak valid. Silakan periksa kembali data Anda.",
+    ENDPOINT_NOT_FOUND: "Endpoint API yang diminta tidak tersedia.",
 };
 
 function translateErrorString(input: string): string {
@@ -73,20 +81,6 @@ function translateErrorString(input: string): string {
     return trimmed;
 }
 
-function extractDetailString(target: string | ApiErrorDetail | undefined): string {
-    if (!target) return "";
-    if (typeof target === "object") {
-        return (
-            target.idn ||
-            target.description ||
-            target.message ||
-            target.en ||
-            ""
-        );
-    }
-    return String(target);
-}
-
 export function handleApiError(error: unknown, fallbackTitle: string = "Terjadi Kesalahan"): void {
     const axiosError = error as { response?: { data?: ApiErrorResponseData } };
     const data = axiosError?.response?.data;
@@ -95,17 +89,32 @@ export function handleApiError(error: unknown, fallbackTitle: string = "Terjadi 
     let detailMessage = "";
 
     if (data) {
-        // 1. Extract detail description (checking desc, message_detail, detail, description, etc.)
-        const rawDetail =
-            extractDetailString(data.desc) ||
-            extractDetailString(data.message_detail) ||
-            extractDetailString(data.detail) ||
-            extractDetailString(data.description) ||
-            extractDetailString(data.error_description);
+        const msgDetail = data.message_detail || data.desc || data.description || data.detail;
 
-        if (rawDetail) {
-            detailMessage = translateErrorString(rawDetail);
-        } else if (data.errors) {
+        if (msgDetail && typeof msgDetail === "object") {
+            const detailObj = msgDetail as ApiErrorDetail;
+
+            if (detailObj.title_idn || detailObj.title_eng) {
+                mainTitle = detailObj.title_idn || detailObj.title_eng || fallbackTitle;
+            }
+
+            const rawDesc =
+                detailObj.desc_idn ||
+                detailObj.desc_eng ||
+                detailObj.idn ||
+                detailObj.en ||
+                detailObj.description ||
+                detailObj.message ||
+                "";
+
+            if (rawDesc) {
+                detailMessage = translateErrorString(rawDesc);
+            }
+        } else if (typeof msgDetail === "string") {
+            detailMessage = translateErrorString(msgDetail);
+        }
+
+        if (!detailMessage && data.errors) {
             if (Array.isArray(data.errors)) {
                 detailMessage = data.errors
                     .map((err) => (typeof err === "object" ? err?.message : err))
@@ -120,8 +129,7 @@ export function handleApiError(error: unknown, fallbackTitle: string = "Terjadi 
             }
         }
 
-        // 2. Handle title or raw uppercase error code in data.message
-        if (data.message) {
+        if (mainTitle === fallbackTitle && data.message) {
             const translatedMessage = translateErrorString(data.message);
             const isErrorCode =
                 data.message.includes("_") ||

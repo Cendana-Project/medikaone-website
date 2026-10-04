@@ -81,7 +81,7 @@ export function RoomModal({
       onSubmitSuccess?.({ code, name, departmentName: deptName });
       onClose();
     } catch {
-      toast.error("Gagal menyimpan ruangan");
+      // Error handled by hook's onError (handleApiError)
     }
   };
 

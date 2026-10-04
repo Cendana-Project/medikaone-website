@@ -130,8 +130,8 @@ export function ScheduleChangeModal({
       setSchedules([]);
       setSelectedAffiliationId("");
       setSpecificDate("");
-    } catch (err) {
-      handleApiError(err, "Gagal Mengajukan Perubahan Jadwal");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
