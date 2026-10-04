@@ -66,6 +66,10 @@ export function CreateDoctorModal({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Ukuran file dokumen melebihi batas maksimal 5 MB.");
+        return;
+      }
       if (file.type !== "application/pdf") {
         toast.error("File kontrak harus berformat PDF.");
         return;
@@ -86,7 +90,7 @@ export function CreateDoctorModal({
       setNewDeptCode("");
       setNewDeptName("");
       refetchDepts();
-      if (res?.data?.id) setDepartmentId(res.data.id);
+      if (res?.id) setDepartmentId(res.id);
     } catch (err) {
       handleApiError(err, "Gagal membuat departemen");
     }
@@ -112,7 +116,7 @@ export function CreateDoctorModal({
       setNewRoomCode("");
       setNewRoomName("");
       refetchRooms();
-      if (res?.data?.id) setRoomId(res.data.id);
+      if (res?.id) setRoomId(res.id);
     } catch (err) {
       handleApiError(err, "Gagal membuat ruangan");
     }
@@ -163,7 +167,7 @@ export function CreateDoctorModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl md:max-w-4xl p-6 md:p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl p-6 md:p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Header with Stepper Progress */}
         <DialogHeader className="pb-4 border-b border-gray-100">
           <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -491,7 +495,7 @@ export function CreateDoctorModal({
             <div className="flex flex-col gap-2">
               <Label className="text-sm font-semibold text-gray-800 flex items-center justify-between">
                 <span>Dokumen Kontrak Kerjasama</span>
-                <span className="text-xs text-gray-400 font-normal">(Opsional)</span>
+                <span className="text-xs text-gray-400 font-normal">Maks. 5 MB (Opsional)</span>
               </Label>
               <div className="relative border-2 border-dashed border-gray-200 hover:border-[#3BB49F] rounded-xl p-3.5 transition-colors text-center bg-gray-50/50 flex flex-col items-center justify-center gap-1.5 cursor-pointer">
                 <input

@@ -50,8 +50,8 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
   const [endTime, setEndTime] = useState<string>("12:00");
   const [timezone, setTimezone] = useState<string>("Asia/Jakarta");
   const [bookingMode, setBookingMode] = useState<"FIXED_SLOT" | "SESSION_QUEUE">("FIXED_SLOT");
-  const [slotDuration, setSlotDuration] = useState<number>(30);
-  const [capacity, setCapacity] = useState<number>(1);
+  const [slotDuration, setSlotDuration] = useState<number | string>("");
+  const [capacity, setCapacity] = useState<number | string>("");
 
   const handleStartTimeChange = (newStart: string) => {
     setStartTime(newStart);
@@ -88,8 +88,8 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
       end_time: cappedEnd,
       timezone: timezone || "Asia/Jakarta",
       booking_mode: bookingMode,
-      slot_duration_minutes: Number(slotDuration),
-      capacity: Number(capacity),
+      slot_duration_minutes: bookingMode === "FIXED_SLOT" ? Number(slotDuration || 30) : undefined,
+      capacity: bookingMode === "SESSION_QUEUE" ? Number(capacity || 20) : undefined,
     };
 
     if (editingIndex !== null) {
@@ -100,6 +100,8 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
     } else {
       onChange([...schedules, newSlot]);
     }
+    setSlotDuration("");
+    setCapacity("");
   };
 
   const handleStartEdit = (index: number) => {
@@ -111,8 +113,8 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
     setEndTime(target.end_time || "12:00");
     setTimezone(target.timezone || "Asia/Jakarta");
     setBookingMode(target.booking_mode || "FIXED_SLOT");
-    setSlotDuration(target.slot_duration_minutes || 30);
-    setCapacity(target.capacity || 1);
+    setSlotDuration(target.slot_duration_minutes ?? "");
+    setCapacity(target.capacity ?? "");
   };
 
   const handleCancelEdit = () => {
@@ -337,31 +339,34 @@ export function SchedulePicker({ schedules, onChange }: SchedulePickerProps) {
                 </select>
               </div>
 
-              {/* Durasi */}
-              <div>
-                <Label className="text-xs font-semibold text-gray-700 mb-1 block">Durasi (Menit)</Label>
-                <Input
-                  type="number"
-                  min={5}
-                  max={240}
-                  value={slotDuration}
-                  onChange={(e) => setSlotDuration(Number(e.target.value))}
-                  className="h-9 px-2.5 text-xs bg-white border-gray-200 rounded-lg focus-visible:ring-[#3BB49F]"
-                />
-              </div>
-
-              {/* Kapasitas Pasien */}
-              <div>
-                <Label className="text-xs font-semibold text-gray-700 mb-1 block">Kapasitas Pasien</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={500}
-                  value={capacity}
-                  onChange={(e) => setCapacity(Number(e.target.value))}
-                  className="h-9 px-2.5 text-xs bg-white border-gray-200 rounded-lg focus-visible:ring-[#3BB49F]"
-                />
-              </div>
+              {/* Conditional Input based on Mode */}
+              {bookingMode === "FIXED_SLOT" ? (
+                <div>
+                  <Label className="text-xs font-semibold text-gray-700 mb-1 block">Durasi (Menit)</Label>
+                  <Input
+                    type="number"
+                    min={5}
+                    max={240}
+                    placeholder="30"
+                    value={slotDuration === 0 ? "" : slotDuration}
+                    onChange={(e) => setSlotDuration(e.target.value === "" ? "" : Number(e.target.value))}
+                    className="h-9 px-2.5 text-xs bg-white border-gray-200 rounded-lg focus-visible:ring-[#3BB49F]"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <Label className="text-xs font-semibold text-gray-700 mb-1 block">Kapasitas Pasien (Sesi)</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={500}
+                    placeholder="20"
+                    value={capacity === 0 ? "" : capacity}
+                    onChange={(e) => setCapacity(e.target.value === "" ? "" : Number(e.target.value))}
+                    className="h-9 px-2.5 text-xs bg-white border-gray-200 rounded-lg focus-visible:ring-[#3BB49F]"
+                  />
+                </div>
+              )}
 
               {/* Zona Waktu */}
               <div>

@@ -162,7 +162,7 @@ export function EditDoctorInvitationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <DialogContent className="w-full sm:max-w-2xl md:max-w-3xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="px-7 pt-7 pb-4 border-b border-gray-100 shrink-0">
           <DialogTitle className="text-xl font-bold text-gray-900 tracking-tight flex items-center justify-between">
@@ -369,8 +369,9 @@ export function EditDoctorInvitationModal({
                               type="number"
                               min={1}
                               max={500}
-                              value={sch.capacity || 20}
-                              onChange={(e) => handleScheduleChange(idx, "capacity", Number(e.target.value))}
+                              placeholder="20"
+                              value={sch.capacity ?? ""}
+                              onChange={(e) => handleScheduleChange(idx, "capacity", e.target.value === "" ? undefined : Number(e.target.value))}
                               className="h-9 bg-white border-gray-200 text-xs rounded-lg px-2"
                             />
                           </div>
@@ -381,8 +382,9 @@ export function EditDoctorInvitationModal({
                               type="number"
                               min={5}
                               max={240}
-                              value={sch.slot_duration_minutes || 30}
-                              onChange={(e) => handleScheduleChange(idx, "slot_duration_minutes", Number(e.target.value))}
+                              placeholder="30"
+                              value={sch.slot_duration_minutes ?? ""}
+                              onChange={(e) => handleScheduleChange(idx, "slot_duration_minutes", e.target.value === "" ? undefined : Number(e.target.value))}
                               className="h-9 bg-white border-gray-200 text-xs rounded-lg px-2"
                             />
                           </div>

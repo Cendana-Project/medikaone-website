@@ -8,11 +8,7 @@ export const useApproveScheduleChange = (hospitalId: string) => {
     return useMutation({
         mutationFn: (scheduleChangeId: string) =>
             approveScheduleChangeRequest(hospitalId, scheduleChangeId),
-        onSuccess: (data) => {
-            if (data?.error) {
-                handleApiError(data.error, "Gagal menyetujui perubahan jadwal");
-                return;
-            }
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["scheduleChanges", hospitalId] });
             queryClient.invalidateQueries({ queryKey: ["doctors", hospitalId] });
         },

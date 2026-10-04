@@ -9,13 +9,14 @@ export const useGetScheduleChanges = (hospitalId: string, status?: string) => {
         enabled: Boolean(hospitalId),
     });
 
-    const rawList = data?.data || data?.items || (Array.isArray(data) ? data : []);
-    const scheduleChanges: ScheduleChangeRequestItem[] = Array.isArray(rawList) ? rawList : [];
+    const scheduleChanges: ScheduleChangeRequestItem[] = Array.isArray(data) ? data : [];
 
     return {
         scheduleChanges,
+        data: scheduleChanges,
         isLoading,
         isError,
         refetch,
     };
 };
+

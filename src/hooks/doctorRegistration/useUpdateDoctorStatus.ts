@@ -14,7 +14,7 @@ export const useUpdateDoctorStatus = (hospitalId: string) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ doctorId, payload }: MutationArgs) => updateDoctorStatus(hospitalId, doctorId, payload),
+        mutationFn: ({ doctorId, payload }: MutationArgs) => updateDoctorStatus(hospitalId, doctorId, payload.status),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["doctors", hospitalId] });
         },

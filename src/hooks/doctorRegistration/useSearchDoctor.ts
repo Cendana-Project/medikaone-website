@@ -5,13 +5,12 @@ import { searchDoctor } from "@/services/DoctorRegistrationService";
 import { DoctorSearchResult, SearchDoctorParams } from "@/types/doctorRegistration";
 
 export const useSearchDoctor = (hospitalId: string, params: SearchDoctorParams, enabled: boolean = true) => {
-    const hasParam = Boolean(params.identity || params.email || params.sip_number || params.medikaone_id);
+    const hasParam = Boolean(params.identity || params.email || params.sip_number || params.medikaone_id || params.query);
 
-    return useQuery<DoctorSearchResult[] | DoctorSearchResult>({
+    return useQuery<DoctorSearchResult[]>({
         queryKey: ["search-doctor", hospitalId, params],
         queryFn: async () => {
-            const res = await searchDoctor(hospitalId, params);
-            return res.data;
+            return await searchDoctor(hospitalId, params);
         },
         enabled: Boolean(hospitalId) && hasParam && enabled,
     });

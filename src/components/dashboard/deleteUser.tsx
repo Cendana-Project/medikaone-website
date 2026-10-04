@@ -43,7 +43,7 @@ export default function DeleteUser({ onConfirm }: DeleteDialogProps) {
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[340px] text-center py-6 bg-white">
+            <DialogContent className="w-full sm:max-w-md md:max-w-lg text-center py-6 bg-white">
                 <div className="flex flex-col items-center space-y-4">
                     <div className="bg-red-50 p-4 rounded-full">
                         <div className="bg-red-100 p-6 rounded-full">

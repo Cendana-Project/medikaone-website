@@ -64,13 +64,14 @@ export default function DoctorsPage() {
 
   const handleDeleteAffiliationConfirm = async () => {
     if (!deleteAffiliationTarget) return;
+    const docId = deleteAffiliationTarget.doctor_id || deleteAffiliationTarget.affiliation_id || deleteAffiliationTarget.id;
+    if (!docId) return;
     try {
-      const docId = deleteAffiliationTarget.doctor_id || deleteAffiliationTarget.affiliation_id;
       const res = await deleteAffiliationMutation.mutateAsync(docId);
       handleApiSuccess(
         res,
         "Afiliasi Dokter Berhasil Dihapus",
-        `Afiliasi dokter ${deleteAffiliationTarget.first_name} ${deleteAffiliationTarget.last_name} di rumah sakit telah diarsipkan.`
+        `Afiliasi dokter ${deleteAffiliationTarget.first_name || ""} ${deleteAffiliationTarget.last_name || ""} di rumah sakit telah diarsipkan.`
       );
       setDeleteAffiliationTarget(null);
       refetchHospitalDoctors();

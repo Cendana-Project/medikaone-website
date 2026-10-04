@@ -117,7 +117,7 @@ export function HospitalGalleryModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="max-w-3xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+        <DialogContent className="w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
           {/* Header */}
           <div className="px-7 pt-7 pb-4 border-b border-gray-100 shrink-0 flex items-center justify-between">
             <div>

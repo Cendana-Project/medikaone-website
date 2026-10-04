@@ -8,14 +8,12 @@ export const useGetRooms = (hospitalId: string, departmentId?: string) => {
     const { data, isLoading, isError, refetch } = useQuery({
         queryKey: ["rooms", hospitalId, departmentId],
         queryFn: async () => {
-            const res = await getRooms(hospitalId, departmentId);
-            return res.data || res;
+            return getRooms(hospitalId, departmentId);
         },
         enabled: Boolean(hospitalId),
     });
 
-    const rawList = data?.data || (Array.isArray(data) ? data : []);
-    const rooms: Room[] = Array.isArray(rawList) ? rawList : [];
+    const rooms: Room[] = Array.isArray(data) ? data : [];
 
     return {
         rooms,

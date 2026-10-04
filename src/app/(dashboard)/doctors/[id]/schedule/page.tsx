@@ -18,7 +18,9 @@ import {
   FileText,
   CheckCircle2,
   Building2,
+  Eye,
 } from "lucide-react";
+import { SlotDetailModal } from "@/components/doctors/SlotDetailModal";
 
 const DAYS_OF_WEEK = [
   { index: 1, name: "Senin", short: "Sen" },
@@ -35,12 +37,6 @@ const HOURS_24 = Array.from({ length: 24 }, (_, i) => {
   return `${hour}:00`;
 });
 
-const DEFAULT_MOCK_SCHEDULES: DoctorSchedule[] = [
-  { day_of_week: [1], start_time: "08:00", end_time: "12:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", slot_duration_minutes: 30, capacity: 15 },
-  { day_of_week: [3], start_time: "13:00", end_time: "17:00", timezone: "Asia/Jakarta", booking_mode: "SESSION_QUEUE", capacity: 20 },
-  { day_of_week: [5], start_time: "09:00", end_time: "14:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", slot_duration_minutes: 30, capacity: 10 },
-];
-
 const getDayIndex = (dayOfWeek: number | number[]): number => {
   if (Array.isArray(dayOfWeek)) return dayOfWeek[0] ?? 1;
   return dayOfWeek;
@@ -49,13 +45,14 @@ const getDayIndex = (dayOfWeek: number | number[]): number => {
 export default function DoctorSchedulePage() {
   const params = useParams();
   const router = useRouter();
-  const doctorId = (params?.id as string) || "doc-1";
+  const doctorId = (params?.id as string) || "";
   const hospitalId = Cookies.get("hospitalId") || "";
 
   const [viewMode, setViewMode] = useState<"24h-grid" | "cards">("24h-grid");
+  const [selectedSlot, setSelectedSlot] = useState<DoctorSchedule | null>(null);
 
   const { doctors } = useGetDoctors(hospitalId);
-  const foundDoctor = doctors.find((d) => d.doctor_id === doctorId || d.affiliation_id === doctorId);
+  const foundDoctor = doctors.find((d) => d.doctor_id === doctorId || d.id === doctorId || d.affiliation_id === doctorId);
 
   let rawSchedules = foundDoctor?.schedules;
   if (typeof rawSchedules === "string") {
@@ -69,14 +66,14 @@ export default function DoctorSchedulePage() {
   const doctorSchedules: DoctorSchedule[] =
     Array.isArray(rawSchedules) && rawSchedules.length > 0
       ? rawSchedules
-      : DEFAULT_MOCK_SCHEDULES;
+      : [];
 
   const doctorData = {
-    doctorName: foundDoctor ? `${foundDoctor.first_name} ${foundDoctor.last_name}` : doctorId === "doc-2" ? "Phoenix Baker" : doctorId === "doc-3" ? "Lana Steiner" : "Olivia Rhye",
-    specialty: foundDoctor?.specialty || (doctorId === "doc-3" ? "Spesialis Penyakit Dalam" : "Spesialis Kandungan"),
-    sipNumber: foundDoctor?.sip_number || (doctorId === "doc-2" ? "SIP-3174-2026-002" : doctorId === "doc-3" ? "SIP-3174-2026-003" : "SIP-3174-2026-001"),
-    departmentName: foundDoctor?.department || (doctorId === "doc-3" ? "Poli Penyakit Dalam" : "Poli Kandungan"),
-    roomName: foundDoctor?.room || (doctorId === "doc-2" ? "Ruang Bunga II" : doctorId === "doc-3" ? "Ruang Anggrek I" : "Ruang Bunga I"),
+    doctorName: foundDoctor ? `${foundDoctor.first_name} ${foundDoctor.last_name}` : "Dokter",
+    specialty: foundDoctor?.specialty || "-",
+    sipNumber: foundDoctor?.sip_number || "-",
+    departmentName: foundDoctor?.department || "-",
+    roomName: foundDoctor?.room || "-",
     schedules: doctorSchedules,
   };
 
@@ -253,13 +250,16 @@ export default function DoctorSchedulePage() {
                               {matchingSlots.map((slot, sIdx) => (
                                 <div
                                   key={sIdx}
-                                  className="w-full h-full bg-[#EBF8F5] border border-[#3BB49F] rounded-lg p-2 flex flex-col justify-between shadow-2xs transition-all hover:shadow-xs"
+                                  onClick={() => setSelectedSlot(slot)}
+                                  className="w-full h-full bg-[#EBF8F5] border border-[#3BB49F] rounded-lg p-2 flex flex-col justify-between shadow-2xs transition-all hover:shadow-xs cursor-pointer hover:border-[#008A72]"
+                                  title="Klik untuk melihat detail slot"
                                 >
                                   <div className="flex items-center justify-between text-[#008A72] font-bold text-[11px]">
                                     <span className="flex items-center gap-1">
                                       <Clock className="h-3 w-3" />
                                       {slot.start_time} - {slot.end_time}
                                     </span>
+                                    <Eye className="h-3 w-3 opacity-60" />
                                   </div>
 
                                   <div className="flex items-center justify-between text-[10px] text-gray-600 mt-1 font-medium gap-1">
@@ -315,16 +315,19 @@ export default function DoctorSchedulePage() {
                         {daySlots.map((slot, sIdx) => (
                           <div
                             key={sIdx}
-                            className="p-3 bg-[#F8FAFC] border border-gray-200 rounded-lg flex flex-col gap-1 text-xs"
+                            onClick={() => setSelectedSlot(slot)}
+                            className="p-3 bg-[#F8FAFC] border border-gray-200 rounded-lg flex flex-col gap-1 text-xs cursor-pointer hover:border-[#008A72] hover:bg-[#F0FDF9] transition-all"
+                            title="Klik untuk melihat detail slot"
                           >
                             <div className="flex items-center justify-between text-gray-900 font-semibold">
                               <span className="flex items-center gap-1 text-[#008A72]">
                                 <Clock className="h-3.5 w-3.5" />
                                 {slot.start_time} - {slot.end_time}
                               </span>
-                              <span className="text-[11px] font-mono text-gray-500">
-                                {slot.timezone || "Asia/Jakarta"}
-                              </span>
+                              <div className="flex items-center gap-1 font-mono text-gray-500 text-[11px]">
+                                <span>{slot.timezone || "Asia/Jakarta"}</span>
+                                <Eye className="h-3 w-3 text-[#008A72] opacity-70" />
+                              </div>
                             </div>
                             <div className="flex items-center justify-between text-[11px] text-gray-600 mt-1">
                               <span>Mode: {slot.booking_mode || "FIXED_SLOT"}</span>
@@ -357,6 +360,18 @@ export default function DoctorSchedulePage() {
           </div>
         </div>
       </div>
+
+      {/* Detail Slot Popup Modal */}
+      <SlotDetailModal
+        isOpen={!!selectedSlot}
+        onClose={() => setSelectedSlot(null)}
+        slot={selectedSlot}
+        doctorName={doctorData.doctorName}
+        specialty={doctorData.specialty}
+        roomName={doctorData.roomName}
+        departmentName={doctorData.departmentName}
+        onOpenEditModal={() => router.push("/doctors/schedule-changes")}
+      />
     </div>
   );
 }

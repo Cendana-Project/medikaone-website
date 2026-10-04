@@ -8,14 +8,12 @@ export const useGetDoctorInvitations = (hospitalId: string, status?: string) => 
     const { data, isLoading, isError, refetch } = useQuery({
         queryKey: ["doctor-invitations", hospitalId, status],
         queryFn: async () => {
-            const res = await getDoctorInvitations(hospitalId, status);
-            return res.data || res;
+            return getDoctorInvitations(hospitalId, status);
         },
         enabled: Boolean(hospitalId),
     });
 
-    const rawList = data?.data || (Array.isArray(data) ? data : []);
-    const invitations: DoctorInvitation[] = Array.isArray(rawList) ? rawList : [];
+    const invitations: DoctorInvitation[] = Array.isArray(data) ? data : [];
 
     return {
         invitations,
