@@ -14,7 +14,7 @@ import { AlertTriangle, HelpCircle, Loader2 } from "lucide-react";
 
 export interface ConfirmDetailItem {
     label: string;
-    value: string;
+    value?: string;
 }
 
 interface ConfirmModalProps {
@@ -46,7 +46,7 @@ export default function ConfirmModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && !isLoading && onClose()}>
-            <DialogContent className="max-w-md bg-white rounded-xl p-6">
+            <DialogContent className="w-full sm:max-w-lg md:max-w-xl bg-white rounded-xl p-6">
                 <DialogHeader className="flex flex-col gap-2">
                     <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
@@ -68,8 +68,8 @@ export default function ConfirmModal({
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 my-2 flex flex-col gap-1.5 text-xs text-gray-700">
                         {details.map((item, idx) => (
                             <div key={idx} className="flex justify-between items-start gap-2">
-                                <span className="text-gray-500 font-medium">{item.label}:</span>
-                                <span className="font-semibold text-gray-900 text-right truncate max-w-[200px]">
+                                <span className="text-gray-500 font-medium shrink-0">{item.label}:</span>
+                                <span className="font-semibold text-gray-900 text-right break-words max-w-[320px]">
                                     {item.value || "-"}
                                 </span>
                             </div>

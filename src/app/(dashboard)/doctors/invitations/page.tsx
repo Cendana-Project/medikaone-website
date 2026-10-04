@@ -165,11 +165,13 @@ export default function DoctorInvitationsPage() {
       sortable: true,
       render: (row) => (
         <span className="text-gray-600 text-xs">
-          {new Date(row.created_at).toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          })}
+          {row.created_at
+            ? new Date(row.created_at).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
+            : "-"}
         </span>
       ),
     },

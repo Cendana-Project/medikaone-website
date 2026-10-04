@@ -9,7 +9,7 @@ export const useCreateDepartment = (hospitalId: string) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (payload: CreateDepartmentRequest) => createDepartment(hospitalId, payload),
+        mutationFn: (payload: string | CreateDepartmentRequest) => createDepartment(hospitalId, payload),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["departments", hospitalId] });
         },

@@ -9,11 +9,7 @@ export const useCreateScheduleChange = (hospitalId: string) => {
     return useMutation({
         mutationFn: (payload: CreateScheduleChangePayload) =>
             createScheduleChangeRequest(hospitalId, payload),
-        onSuccess: (data) => {
-            if (data?.error) {
-                handleApiError(data.error, "Gagal membuat pengajuan perubahan jadwal");
-                return;
-            }
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["scheduleChanges", hospitalId] });
             queryClient.invalidateQueries({ queryKey: ["doctors", hospitalId] });
         },

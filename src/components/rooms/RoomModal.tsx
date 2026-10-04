@@ -87,7 +87,7 @@ export function RoomModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md p-6 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
+      <DialogContent className="w-full sm:max-w-xl md:max-w-2xl p-6 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
         <DialogHeader className="pb-3 border-b border-gray-100">
           <DialogTitle className="text-xl font-bold text-[#101828]">
             {initialData ? "Ubah Data Ruangan" : "Tambah Ruangan Baru"}

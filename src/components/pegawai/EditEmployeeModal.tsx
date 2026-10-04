@@ -85,7 +85,7 @@ export function EditEmployeeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-xl p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full sm:max-w-xl md:max-w-2xl p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-4 border-b border-gray-100">
           <DialogTitle className="text-2xl font-bold text-[#101828] tracking-tight">
             Edit Akun Pegawai

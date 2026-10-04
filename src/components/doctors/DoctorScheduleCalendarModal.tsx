@@ -9,7 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DoctorSchedule } from "@/types/doctorRegistration";
-import { Calendar, Clock, User, Stethoscope, MapPin, FileText, CheckCircle2 } from "lucide-react";
+import { Calendar, Clock, User, Stethoscope, MapPin, FileText, CheckCircle2, Eye } from "lucide-react";
+import { SlotDetailModal } from "./SlotDetailModal";
 
 interface DoctorScheduleCalendarModalProps {
   doctorName?: string;
@@ -39,25 +40,20 @@ const HOURS_24 = Array.from({ length: 24 }, (_, i) => {
   return `${hour}:00`;
 });
 
-const DEFAULT_MOCK_SCHEDULES: DoctorSchedule[] = [
-  { day_of_week: 1, start_time: "08:00", end_time: "12:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", capacity: 15 },
-  { day_of_week: 3, start_time: "13:00", end_time: "17:00", timezone: "Asia/Jakarta", booking_mode: "SESSION_QUEUE", capacity: 20 },
-  { day_of_week: 5, start_time: "09:00", end_time: "14:00", timezone: "Asia/Jakarta", booking_mode: "FIXED_SLOT", capacity: 10 },
-];
-
 export function DoctorScheduleCalendarModal({
   doctorName = "Dokter",
-  specialty = "Spesialis Kandungan",
-  roomName = "Ruang Bunga I",
-  departmentName = "Poli Kandungan",
-  sipNumber = "SIP-3174-2026-001",
+  specialty = "-",
+  roomName = "-",
+  departmentName = "-",
+  sipNumber = "-",
   schedules,
   isOpen,
   onClose,
   onOpenEditModal,
 }: DoctorScheduleCalendarModalProps) {
   const [viewMode, setViewMode] = useState<"24h-grid" | "cards">("24h-grid");
-  const activeSchedules = schedules && schedules.length > 0 ? schedules : DEFAULT_MOCK_SCHEDULES;
+  const [selectedSlot, setSelectedSlot] = useState<DoctorSchedule | null>(null);
+  const activeSchedules = schedules && schedules.length > 0 ? schedules : [];
 
   const parseHourInt = (timeStr: string) => {
     if (!timeStr) return 0;
@@ -67,7 +63,7 @@ export function DoctorScheduleCalendarModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-5xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <DialogContent className="w-full sm:max-w-5xl md:max-w-6xl lg:max-w-7xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
         {/* Header Section */}
         <div className="p-6 bg-linear-to-r from-[#008A72] to-[#3BB49F] text-white shrink-0">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -216,11 +212,13 @@ export function DoctorScheduleCalendarModal({
                               return (
                                 <div
                                   key={sIdx}
-                                  className={`w-full h-full rounded-md p-1.5 flex flex-col justify-center ${
+                                  onClick={() => setSelectedSlot(slot)}
+                                  className={`w-full h-full rounded-md p-1.5 flex flex-col justify-center cursor-pointer transition-all hover:scale-[1.02] hover:shadow-xs ${
                                     isFirstHour
                                       ? "bg-[#008A72] text-white shadow-2xs font-bold"
                                       : "bg-[#EBF8F5] text-[#008A72] border border-[#C4E9E2]"
                                   }`}
+                                  title="Klik untuk melihat detail slot"
                                 >
                                   {isFirstHour && (
                                     <div className="flex flex-col">
@@ -270,13 +268,18 @@ export function DoctorScheduleCalendarModal({
                         {daySlots.map((slot, idx) => (
                           <div
                             key={idx}
-                            className="bg-[#EBF8F5] border border-[#C4E9E2] p-2.5 rounded-lg flex flex-col gap-1 shadow-2xs"
+                            onClick={() => setSelectedSlot(slot)}
+                            className="bg-[#EBF8F5] border border-[#C4E9E2] p-2.5 rounded-lg flex flex-col gap-1 shadow-2xs cursor-pointer hover:border-[#008A72] hover:shadow-xs transition-all"
+                            title="Klik untuk melihat detail slot"
                           >
-                            <div className="flex items-center gap-1 font-bold text-xs text-[#008A72]">
-                              <Clock className="h-3 w-3 shrink-0" />
-                              <span>
-                                {slot.start_time} - {slot.end_time}
-                              </span>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1 font-bold text-xs text-[#008A72]">
+                                <Clock className="h-3 w-3 shrink-0" />
+                                <span>
+                                  {slot.start_time} - {slot.end_time}
+                                </span>
+                              </div>
+                              <Eye className="h-3 w-3 text-[#008A72] opacity-70" />
                             </div>
                             <div className="text-[10px] text-gray-600 font-medium">
                               {slot.booking_mode || "FIXED_SLOT"}
@@ -310,7 +313,8 @@ export function DoctorScheduleCalendarModal({
                 return (
                   <div
                     key={idx}
-                    className="bg-white border border-gray-200 p-3 rounded-xl flex items-center justify-between text-xs shadow-2xs"
+                    onClick={() => setSelectedSlot(slot)}
+                    className="bg-white border border-gray-200 p-3 rounded-xl flex items-center justify-between text-xs shadow-2xs cursor-pointer hover:border-[#008A72] transition-all"
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-[#008A72] bg-[#EBF8F5] px-2.5 py-1 rounded-md border border-[#C4E9E2]">
@@ -343,6 +347,18 @@ export function DoctorScheduleCalendarModal({
           </Button>
         </div>
       </DialogContent>
+
+      {/* Detail Slot Popup Modal */}
+      <SlotDetailModal
+        isOpen={!!selectedSlot}
+        onClose={() => setSelectedSlot(null)}
+        slot={selectedSlot}
+        doctorName={doctorName}
+        specialty={specialty}
+        roomName={roomName}
+        departmentName={departmentName}
+        onOpenEditModal={onOpenEditModal}
+      />
     </Dialog>
   );
 }

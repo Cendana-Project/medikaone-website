@@ -85,6 +85,12 @@ export default function EditProfileModal({
         const file = e.target.files?.[0];
         if (!file) return;
 
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("Ukuran file foto melebihi batas maksimal 5 MB.");
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
+        }
+
         if (!file.type.startsWith("image/")) {
             toast.error("Format file harus berupa gambar.");
             return;
@@ -195,7 +201,7 @@ export default function EditProfileModal({
     return (
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-                <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-full sm:max-w-xl md:max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
                     {/* Modal Header */}
                     <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                         <div className="flex items-center gap-2">
@@ -244,7 +250,10 @@ export default function EditProfileModal({
                             </div>
 
                             <div className="flex flex-col gap-1.5 flex-1">
-                                <span className="text-xs font-semibold text-gray-800">Foto Profil</span>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-semibold text-gray-800">Foto Profil</span>
+                                    <span className="text-[11px] text-gray-500 font-normal">Maks. 5 MB</span>
+                                </div>
                                 <div className="flex flex-wrap items-center gap-2">
                                     <input
                                         type="file"

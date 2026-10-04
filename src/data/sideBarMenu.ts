@@ -5,7 +5,6 @@ export type SidebarMenuItem = {
 
 const baseMenus: Record<string, SidebarMenuItem[]> = {
     ADMIN: [
-        { name: "Kelola User", path: "/dashboard/roles" },
         { name: "Kelola Doctor", path: "/doctors" },
         { name: "Undangan & Verifikasi", path: "/doctors/invitations" },
         { name: "Perubahan Jadwal", path: "/doctors/schedule-changes" },

@@ -24,7 +24,7 @@ export function useGetGlobalDoctors(params?: {
     queryKey: ["global-doctors", params],
     queryFn: async () => {
       const res = await getGlobalDoctors(params);
-      const items = res?.data?.items || res?.data || [];
+      const items = res?.data || [];
       return Array.isArray(items) ? items : [];
     },
   });
