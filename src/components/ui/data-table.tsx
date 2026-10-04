@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Search, ArrowUpDown, ArrowUp, ArrowDown, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ArrowUpDown, ArrowUp, ArrowDown, Plus, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +41,7 @@ export interface DataTableProps<T> {
   createButtonIcon?: React.ReactNode;
   extraHeaderControls?: React.ReactNode;
   isLoading?: boolean;
+  loadingText?: string;
   emptyText?: string;
   keyExtractor: (row: T) => string | number;
 
@@ -62,6 +63,7 @@ export function DataTable<T>({
   createButtonIcon,
   extraHeaderControls,
   isLoading = false,
+  loadingText,
   emptyText = "Tidak ada data yang ditemukan",
   keyExtractor,
   totalItems,
@@ -308,9 +310,9 @@ export function DataTable<T>({
                     colSpan={columns.length + 1}
                     className="text-center text-gray-500 py-12"
                   >
-                    <div className="flex items-center justify-center gap-2 text-sm">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#3BB49F] border-t-transparent" />
-                      <span>Memuat data...</span>
+                    <div className="flex flex-col items-center justify-center gap-2 text-sm">
+                      <RefreshCw className="h-6 w-6 animate-spin text-[#008A72]" />
+                      <span>{loadingText || "Memuat data..."}</span>
                     </div>
                   </TableCell>
                 </TableRow>

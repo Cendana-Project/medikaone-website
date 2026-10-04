@@ -5,7 +5,7 @@ import { DataTable, ColumnDef } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Building2, Plus, MapPin, Phone, Search, Eye, Edit } from "lucide-react";
+import { Building2, Plus, MapPin, Phone, Search, Eye, Edit, RefreshCw } from "lucide-react";
 import { useGetHospitals, HospitalItem } from "@/hooks/hospital/useGetHospitals";
 import RegisterHospitalModal from "@/components/dashboard/RegisterHospitalModal";
 import { HospitalDetailModal } from "@/components/dashboard/HospitalDetailModal";
@@ -173,7 +173,9 @@ export default function HospitalsPage() {
           onCreateButtonClick={() => setIsRegisterOpen(true)}
           searchPlaceholder="Cari Nama Rumah Sakit, Kode RS, atau Kota..."
           searchField={(row) => `${row.name} ${row.code} ${row.city || ""} ${row.province || ""}`}
-          emptyText={isLoading ? "Memuat data rumah sakit..." : "Tidak ada data rumah sakit yang ditemukan"}
+          isLoading={isLoading}
+          loadingText="Memuat data rumah sakit..."
+          emptyText="Tidak ada data rumah sakit yang ditemukan"
         />
       </div>
 
@@ -190,7 +192,12 @@ export default function HospitalsPage() {
           />
         </div>
 
-        {hospitals.length > 0 ? (
+        {isLoading ? (
+          <div className="p-12 text-center text-xs text-gray-500 bg-white rounded-xl border border-gray-200 flex flex-col items-center justify-center gap-2">
+            <RefreshCw className="h-6 w-6 animate-spin text-[#008A72]" />
+            <span>Memuat data rumah sakit...</span>
+          </div>
+        ) : hospitals.length > 0 ? (
           hospitals.map((hospital) => (
             <div
               key={hospital.id}
@@ -243,7 +250,7 @@ export default function HospitalsPage() {
           ))
         ) : (
           <div className="p-6 text-center text-xs text-gray-500 bg-white rounded-xl border border-gray-200">
-            {isLoading ? "Memuat data rumah sakit..." : "Tidak ada data rumah sakit yang ditemukan"}
+            Tidak ada data rumah sakit yang ditemukan
           </div>
         )}
       </div>

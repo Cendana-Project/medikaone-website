@@ -25,7 +25,7 @@ interface RoomRow {
 export default function RoomsPage() {
   const { userInfo } = useGetUserInfo();
   const hospitalId = Cookies.get("hospitalId") || userInfo?.hospitals?.[0]?.id || userInfo?.hospitals?.[0]?.code || "";
-  const { rooms: apiRooms, refetch } = useGetRooms(hospitalId);
+  const { rooms: apiRooms, isLoading, refetch } = useGetRooms(hospitalId);
   const deleteRoomMutation = useDeleteRoom(hospitalId);
 
   const [localRooms, setLocalRooms] = useState<RoomRow[]>([]);
@@ -57,8 +57,8 @@ export default function RoomsPage() {
       setLocalRooms((prev) => prev.filter((r) => r.id !== deleteTargetId));
       setDeleteTargetId(null);
       refetch();
-    } catch (err) {
-      handleApiError(err, "Gagal menghapus ruangan");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -161,6 +161,8 @@ export default function RoomsPage() {
           setSelectedRoom(null);
           setIsModalOpen(true);
         }}
+        isLoading={isLoading}
+        loadingText="Memuat data ruangan..."
         emptyText="Tidak ada ruangan yang ditemukan"
       />
 

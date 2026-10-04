@@ -153,8 +153,8 @@ export function EditDoctorInvitationModal({
 
       onRefresh?.();
       onClose();
-    } catch (err) {
-      handleApiError(err, "Gagal memperbarui undangan dokter");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 

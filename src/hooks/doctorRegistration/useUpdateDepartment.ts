@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateDepartment } from "@/services/DoctorRegistrationService";
+import { handleApiError } from "@/lib/handleError";
 
 export const useUpdateDepartment = (hospitalId: string) => {
   const queryClient = useQueryClient();
@@ -9,6 +10,9 @@ export const useUpdateDepartment = (hospitalId: string) => {
       updateDepartment(hospitalId, departmentId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["departments", hospitalId] });
+    },
+    onError: (error) => {
+      handleApiError(error, "Gagal memperbarui departemen");
     },
   });
 };

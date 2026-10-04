@@ -91,8 +91,8 @@ export function CreateDoctorModal({
       setNewDeptName("");
       refetchDepts();
       if (res?.id) setDepartmentId(res.id);
-    } catch (err) {
-      handleApiError(err, "Gagal membuat departemen");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -117,8 +117,8 @@ export function CreateDoctorModal({
       setNewRoomName("");
       refetchRooms();
       if (res?.id) setRoomId(res.id);
-    } catch (err) {
-      handleApiError(err, "Gagal membuat ruangan");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -160,8 +160,8 @@ export function CreateDoctorModal({
       setMessage("Silakan bergabung dengan tim medis kami.");
       setContractFile(null);
       setSchedules([]);
-    } catch (err) {
-      handleApiError(err, "Gagal Meng-assign Dokter");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 

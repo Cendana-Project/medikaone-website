@@ -71,7 +71,7 @@ export function DepartmentModal({
       onSubmitSuccess?.({ code, name });
       onClose();
     } catch {
-      toast.error("Gagal menyimpan departemen");
+      // Error handled by hook's onError (handleApiError)
     }
   };
 

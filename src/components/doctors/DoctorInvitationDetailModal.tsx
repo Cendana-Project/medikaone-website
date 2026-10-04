@@ -59,8 +59,8 @@ export function DoctorInvitationDetailModal({
       setConfirmAction(null);
       onRefresh?.();
       onClose();
-    } catch (err) {
-      handleApiError(err, "Gagal membatalkan undangan");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -70,8 +70,8 @@ export function DoctorInvitationDetailModal({
       handleApiSuccess(res, "Undangan Berhasil Dikirim Ulang", "Undangan telah dikirim ulang ke email dokter.");
       setConfirmAction(null);
       onRefresh?.();
-    } catch (err) {
-      handleApiError(err, "Gagal mengirim ulang undangan");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -82,8 +82,8 @@ export function DoctorInvitationDetailModal({
       setConfirmAction(null);
       onRefresh?.();
       onClose();
-    } catch (err) {
-      handleApiError(err, "Gagal menghapus undangan");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 

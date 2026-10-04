@@ -37,7 +37,7 @@ export const searchDoctor = async (
             "",
         };
 
-  const response = await api.get(`/v1/hospitals/${hospitalId}/doctors/search`, {
+  const response = await api.get(`hospitals/${hospitalId}/doctors/search`, {
     params: paramsObj,
   });
   const data = response.data?.data || response.data || [];
@@ -45,12 +45,12 @@ export const searchDoctor = async (
 };
 
 export const getMasterDepartments = async (): Promise<MasterDepartment[]> => {
-  const response = await api.get("/v1/departments");
+  const response = await api.get("departments");
   return response.data?.data || response.data || [];
 };
 
 export const getDepartments = async (hospitalId: string): Promise<Department[]> => {
-  const response = await api.get(`/v1/hospitals/${hospitalId}/departments`);
+  const response = await api.get(`hospitals/${hospitalId}/departments`);
   return response.data?.data || response.data || [];
 };
 
@@ -59,7 +59,7 @@ export const createDepartment = async (
   payload: string | CreateDepartmentRequest
 ): Promise<Department> => {
   const body = typeof payload === "string" ? { master_department_id: payload } : payload;
-  const response = await api.post(`/v1/hospitals/${hospitalId}/departments`, body);
+  const response = await api.post(`hospitals/${hospitalId}/departments`, body);
   return response.data?.data || response.data;
 };
 
@@ -68,16 +68,16 @@ export const updateDepartment = async (
   departmentId: string,
   payload: { master_department_id?: string; code?: string; name?: string; description?: string }
 ): Promise<Department> => {
-  const response = await api.patch(`/v1/hospitals/${hospitalId}/departments/${departmentId}`, payload);
+  const response = await api.patch(`hospitals/${hospitalId}/departments/${departmentId}`, payload);
   return response.data?.data || response.data;
 };
 
 export const deleteDepartment = async (hospitalId: string, departmentId: string): Promise<void> => {
-  await api.delete(`/v1/hospitals/${hospitalId}/departments/${departmentId}`);
+  await api.delete(`hospitals/${hospitalId}/departments/${departmentId}`);
 };
 
 export const getRooms = async (hospitalId: string, departmentId?: string): Promise<Room[]> => {
-  const response = await api.get(`/v1/hospitals/${hospitalId}/rooms`, {
+  const response = await api.get(`hospitals/${hospitalId}/rooms`, {
     params: departmentId ? { department_id: departmentId } : {},
   });
   return response.data?.data || response.data || [];
@@ -87,7 +87,7 @@ export const createRoom = async (
   hospitalId: string,
   payload: { department_id: string; code: string; name: string; description?: string }
 ): Promise<Room> => {
-  const response = await api.post(`/v1/hospitals/${hospitalId}/rooms`, payload);
+  const response = await api.post(`hospitals/${hospitalId}/rooms`, payload);
   return response.data?.data || response.data;
 };
 
@@ -96,12 +96,12 @@ export const updateRoom = async (
   roomId: string,
   payload: { name?: string; description?: string }
 ): Promise<Room> => {
-  const response = await api.patch(`/v1/hospitals/${hospitalId}/rooms/${roomId}`, payload);
+  const response = await api.patch(`hospitals/${hospitalId}/rooms/${roomId}`, payload);
   return response.data?.data || response.data;
 };
 
 export const deleteRoom = async (hospitalId: string, roomId: string): Promise<void> => {
-  await api.delete(`/v1/hospitals/${hospitalId}/rooms/${roomId}`);
+  await api.delete(`hospitals/${hospitalId}/rooms/${roomId}`);
 };
 
 // ==========================================
@@ -109,14 +109,14 @@ export const deleteRoom = async (hospitalId: string, roomId: string): Promise<vo
 // ==========================================
 
 export const getDoctorInvitations = async (hospitalId: string, status?: string): Promise<DoctorInvitation[]> => {
-  const response = await api.get(`/v1/hospitals/${hospitalId}/doctor-invitations`, {
+  const response = await api.get(`hospitals/${hospitalId}/doctor-invitations`, {
     params: status ? { status } : {},
   });
   return response.data?.data || response.data || [];
 };
 
 export const getDoctorInvitationById = async (hospitalId: string, invitationId: string): Promise<DoctorInvitation> => {
-  const response = await api.get(`/v1/hospitals/${hospitalId}/doctor-invitations/${invitationId}`);
+  const response = await api.get(`hospitals/${hospitalId}/doctor-invitations/${invitationId}`);
   return response.data?.data || response.data;
 };
 
@@ -135,13 +135,13 @@ export const createDoctorInvitation = async (
     }
     formData.append("contract", payload.contract);
 
-    const response = await api.post(`/v1/hospitals/${hospitalId}/doctor-invitations`, formData, {
+    const response = await api.post(`hospitals/${hospitalId}/doctor-invitations`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data?.data || response.data;
   }
 
-  const response = await api.post(`/v1/hospitals/${hospitalId}/doctor-invitations`, payload);
+  const response = await api.post(`hospitals/${hospitalId}/doctor-invitations`, payload);
   return response.data?.data || response.data;
 };
 
@@ -158,49 +158,49 @@ export const updateDoctorInvitation = async (
     if (payload.schedules) formData.append("schedules", JSON.stringify(payload.schedules));
     formData.append("contract", payload.contract);
 
-    const response = await api.patch(`/v1/hospitals/${hospitalId}/doctor-invitations/${invitationId}`, formData, {
+    const response = await api.patch(`hospitals/${hospitalId}/doctor-invitations/${invitationId}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data?.data || response.data;
   }
 
-  const response = await api.patch(`/v1/hospitals/${hospitalId}/doctor-invitations/${invitationId}`, payload);
+  const response = await api.patch(`hospitals/${hospitalId}/doctor-invitations/${invitationId}`, payload);
   return response.data?.data || response.data;
 };
 
 export const cancelDoctorInvitation = async (hospitalId: string, invitationId: string): Promise<void> => {
-  await api.post(`/v1/hospitals/${hospitalId}/doctor-invitations/${invitationId}/cancel`);
+  await api.post(`hospitals/${hospitalId}/doctor-invitations/${invitationId}/cancel`);
 };
 
 export const resendDoctorInvitation = async (hospitalId: string, invitationId: string): Promise<DoctorInvitation> => {
-  const response = await api.post(`/v1/hospitals/${hospitalId}/doctor-invitations/${invitationId}/resend`);
+  const response = await api.post(`hospitals/${hospitalId}/doctor-invitations/${invitationId}/resend`);
   return response.data?.data || response.data;
 };
 
 export const deleteDoctorInvitation = async (hospitalId: string, invitationId: string): Promise<void> => {
-  await api.delete(`/v1/hospitals/${hospitalId}/doctor-invitations/${invitationId}`);
+  await api.delete(`hospitals/${hospitalId}/doctor-invitations/${invitationId}`);
 };
 
 export const getDoctors = async (hospitalId: string, status?: string | Record<string, unknown>): Promise<DoctorAffiliation[]> => {
   const params = typeof status === "string" ? { status } : status || {};
-  const response = await api.get(`/v1/hospitals/${hospitalId}/doctor-affiliations`, { params });
+  const response = await api.get(`hospitals/${hospitalId}/doctor-affiliations`, { params });
   return response.data?.data || response.data || [];
 };
 
 export const getGlobalDoctors = async (params?: Record<string, unknown>): Promise<{ data: DoctorAffiliation[] }> => {
   const hospitalId = (params?.hospital_id as string) || "";
-  const response = await api.get(`/v1/hospitals/${hospitalId}/doctor-affiliations`, { params });
+  const response = await api.get(`hospitals/${hospitalId}/doctor-affiliations`, { params });
   const data = response.data?.data || response.data || [];
   return { data: Array.isArray(data) ? data : [data] };
 };
 
 export const getDoctorById = async (hospitalId: string, affiliationId: string): Promise<DoctorAffiliation> => {
-  const response = await api.get(`/v1/hospitals/${hospitalId}/doctor-affiliations/${affiliationId}`);
+  const response = await api.get(`hospitals/${hospitalId}/doctor-affiliations/${affiliationId}`);
   return response.data?.data || response.data;
 };
 
 export const deleteDoctorAffiliation = async (hospitalId: string, affiliationId: string): Promise<void> => {
-  await api.delete(`/v1/hospitals/${hospitalId}/doctor-affiliations/${affiliationId}`);
+  await api.delete(`hospitals/${hospitalId}/doctor-affiliations/${affiliationId}`);
 };
 
 export const updateDoctorStatus = async (
@@ -209,7 +209,7 @@ export const updateDoctorStatus = async (
   statusOrPayload: "ACTIVE" | "SUSPENDED" | "INACTIVE" | { status: "ACTIVE" | "SUSPENDED" | "INACTIVE" }
 ): Promise<void> => {
   const status = typeof statusOrPayload === "string" ? statusOrPayload : statusOrPayload.status;
-  await api.patch(`/v1/hospitals/${hospitalId}/doctors/${doctorId}/status`, { status });
+  await api.patch(`hospitals/${hospitalId}/doctors/${doctorId}/status`, { status });
 };
 
 // ==========================================
@@ -217,7 +217,7 @@ export const updateDoctorStatus = async (
 // ==========================================
 
 export const getScheduleChanges = async (hospitalId: string, status?: string): Promise<ScheduleChangeProposal[]> => {
-  const response = await api.get(`/v1/hospitals/${hospitalId}/doctor-affiliations/schedule-changes`, {
+  const response = await api.get(`hospitals/${hospitalId}/doctor-affiliations/schedule-changes`, {
     params: status ? { status } : {},
   });
   return response.data?.data || response.data || [];
@@ -232,7 +232,7 @@ export const createScheduleChangeRequest = async (
   payload: CreateScheduleChangePayload
 ): Promise<ScheduleChangeProposal> => {
   const response = await api.post(
-    `/v1/hospitals/${hospitalId}/doctor-affiliations/${payload.affiliation_id}/schedule-changes`,
+    `hospitals/${hospitalId}/doctor-affiliations/${payload.affiliation_id}/schedule-changes`,
     {
       reason: payload.reason,
       schedules: payload.schedules,
@@ -250,7 +250,7 @@ export const createSpecificScheduleRequest = async (
   payload: CreateSpecificSchedulePayload
 ): Promise<ScheduleChangeProposal> => {
   const response = await api.post(
-    `/v1/hospitals/${hospitalId}/doctor-affiliations/${payload.affiliation_id}/schedules/specific`,
+    `hospitals/${hospitalId}/doctor-affiliations/${payload.affiliation_id}/schedules/specific`,
     {
       affiliation_id: payload.affiliation_id,
       reason: payload.reason,
@@ -277,7 +277,7 @@ export const deleteDoctorSchedule = async (
   affiliationId: string,
   scheduleId: string
 ): Promise<void> => {
-  await api.delete(`/v1/hospitals/${hospitalId}/doctor-affiliations/${affiliationId}/schedules/${scheduleId}`);
+  await api.delete(`hospitals/${hospitalId}/doctor-affiliations/${affiliationId}/schedules/${scheduleId}`);
 };
 
 /**
@@ -288,7 +288,7 @@ export const deactivateDoctorSchedule = async (
   payload: DeactivateSchedulePayload
 ): Promise<ScheduleChangeProposal> => {
   const response = await api.post(
-    `/v1/hospitals/${hospitalId}/doctor-affiliations/${payload.affiliation_id}/schedules/deactivate`,
+    `hospitals/${hospitalId}/doctor-affiliations/${payload.affiliation_id}/schedules/deactivate`,
     {
       scope: payload.scope,
       day_of_week: payload.day_of_week,
@@ -302,7 +302,7 @@ export const deactivateDoctorSchedule = async (
  * 5. Approve Schedule Change Proposal
  */
 export const approveScheduleChange = async (hospitalId: string, scheduleChangeId: string): Promise<void> => {
-  await api.post(`/v1/hospitals/${hospitalId}/doctor-affiliations/schedule-changes/${scheduleChangeId}/approve`);
+  await api.post(`hospitals/${hospitalId}/doctor-affiliations/schedule-changes/${scheduleChangeId}/approve`);
 };
 export const approveScheduleChangeRequest = approveScheduleChange;
 
@@ -315,7 +315,7 @@ export const rejectScheduleChange = async (
   payload?: { reason?: string } | string
 ): Promise<void> => {
   const reason = typeof payload === "string" ? payload : payload?.reason;
-  await api.post(`/v1/hospitals/${hospitalId}/doctor-affiliations/schedule-changes/${scheduleChangeId}/reject`, {
+  await api.post(`hospitals/${hospitalId}/doctor-affiliations/schedule-changes/${scheduleChangeId}/reject`, {
     reason,
   });
 };
@@ -330,7 +330,7 @@ export const getContractUrl = async (
   version: "original" | "signed" = "original"
 ): Promise<string> => {
   const response = await api.get(
-    `/v1/hospitals/${hospitalId}/doctor-invitations/${invitationOrAffiliationId}/contract`,
+    `hospitals/${hospitalId}/doctor-invitations/${invitationOrAffiliationId}/contract`,
     { params: { version } }
   );
   return response.data?.data?.url || response.data?.url || "";

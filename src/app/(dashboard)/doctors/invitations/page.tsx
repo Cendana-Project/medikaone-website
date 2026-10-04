@@ -69,8 +69,8 @@ export default function DoctorInvitationsPage() {
       );
       setResendTarget(null);
       refetch();
-    } catch (err) {
-      handleApiError(err, "Gagal mengirim ulang undangan");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -81,8 +81,8 @@ export default function DoctorInvitationsPage() {
       handleApiSuccess(res, "Undangan Berhasil Dibatalkan");
       setCancelTarget(null);
       refetch();
-    } catch (err) {
-      handleApiError(err, "Gagal membatalkan undangan");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -93,8 +93,8 @@ export default function DoctorInvitationsPage() {
       handleApiSuccess(res, "Undangan Berhasil Dihapus", "Arsip undangan dokter telah dihapus.");
       setDeleteTarget(null);
       refetch();
-    } catch (err) {
-      handleApiError(err, "Gagal menghapus undangan");
+    } catch {
+      // Error handled by hook's onError handler (handleApiError)
     }
   };
 
@@ -339,7 +339,9 @@ export default function DoctorInvitationsPage() {
         }
         searchPlaceholder="Cari nama dokter, email, atau NIK/SIP..."
         searchField={(row) => `${row.doctor_first_name} ${row.doctor_last_name} ${row.doctor_email} ${row.sip_number || ""} ${row.department_name || ""}`}
-        emptyText={isLoading ? "Memuat data undangan..." : "Tidak ada data undangan dokter yang ditemukan"}
+        isLoading={isLoading}
+        loadingText="Memuat data undangan dokter..."
+        emptyText="Tidak ada data undangan dokter yang ditemukan"
       />
 
       {/* Modals */}
