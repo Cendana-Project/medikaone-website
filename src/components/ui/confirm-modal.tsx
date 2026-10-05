@@ -46,7 +46,7 @@ export default function ConfirmModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && !isLoading && onClose()}>
-            <DialogContent className="w-full sm:max-w-lg md:max-w-xl bg-white rounded-xl p-6">
+            <DialogContent className="w-max max-w-[calc(100vw-2rem)] bg-white rounded-xl p-6">
                 <DialogHeader className="flex flex-col gap-2">
                     <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${

@@ -32,7 +32,7 @@ export function TermsModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-2xl bg-white rounded-2xl p-6 sm:p-7 max-h-[88vh] flex flex-col gap-0 shadow-xl border border-slate-100 overflow-hidden">
+            <DialogContent className="w-max max-w-[calc(100vw-2rem)] bg-white rounded-2xl p-6 sm:p-7 max-h-[88vh] flex flex-col gap-0 shadow-xl border border-slate-100 overflow-hidden">
                 {/* Header */}
                 <DialogHeader className="pb-4 border-b border-slate-100 text-left space-y-3">
                     <div>

@@ -14,7 +14,7 @@ import { DoctorSchedule } from "@/types/doctorRegistration";
 import { SchedulePicker } from "./SchedulePicker";
 import { useCreateScheduleChange } from "@/hooks/doctorRegistration/useCreateScheduleChange";
 import { useCreateSpecificSchedule } from "@/hooks/doctorRegistration/useCreateSpecificSchedule";
-import { handleApiError, handleApiSuccess } from "@/lib/handleError";
+import { handleApiSuccess } from "@/lib/handleError";
 import { useGetDoctors } from "@/hooks/doctorRegistration/useGetDoctors";
 import { ChevronDown, Edit3, Calendar, Clock, Sparkles } from "lucide-react";
 import Cookies from "js-cookie";
@@ -137,7 +137,7 @@ export function ScheduleChangeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl p-6 md:p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-6 md:p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-4 border-b border-gray-100">
           <DialogTitle className="text-xl md:text-2xl font-bold text-[#101828] tracking-tight flex items-center gap-2">
             <Edit3 className="h-6 w-6 text-[#008A72]" />
@@ -356,4 +356,3 @@ export function ScheduleChangeModal({
     </Dialog>
   );
 }
-

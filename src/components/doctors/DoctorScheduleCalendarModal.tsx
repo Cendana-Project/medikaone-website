@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { DoctorSchedule } from "@/types/doctorRegistration";
 import { Calendar, Clock, User, Stethoscope, MapPin, FileText, CheckCircle2, Eye } from "lucide-react";
 import { SlotDetailModal } from "./SlotDetailModal";
+import { getDayIndex } from "@/lib/scheduleUtils";
 
 interface DoctorScheduleCalendarModalProps {
   doctorName?: string;
@@ -23,6 +24,7 @@ interface DoctorScheduleCalendarModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenEditModal?: () => void;
+  affiliationId?: string;
 }
 
 const DAYS_OF_WEEK = [
@@ -50,10 +52,12 @@ export function DoctorScheduleCalendarModal({
   isOpen,
   onClose,
   onOpenEditModal,
+  affiliationId,
 }: DoctorScheduleCalendarModalProps) {
   const [viewMode, setViewMode] = useState<"24h-grid" | "cards">("24h-grid");
   const [selectedSlot, setSelectedSlot] = useState<DoctorSchedule | null>(null);
   const activeSchedules = schedules && schedules.length > 0 ? schedules : [];
+  const specificSchedules = activeSchedules.filter((schedule) => Boolean(schedule.schedule_date));
 
   const parseHourInt = (timeStr: string) => {
     if (!timeStr) return 0;
@@ -63,7 +67,7 @@ export function DoctorScheduleCalendarModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full sm:max-w-5xl md:max-w-6xl lg:max-w-7xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
         {/* Header Section */}
         <div className="p-6 bg-linear-to-r from-[#008A72] to-[#3BB49F] text-white shrink-0">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -194,7 +198,7 @@ export function DoctorScheduleCalendarModal({
                       {/* Days Slots */}
                       {DAYS_OF_WEEK.map((day) => {
                         const matchingSlots = activeSchedules.filter((s) => {
-                          if (s.day_of_week !== day.index) return false;
+                           if (getDayIndex(s.day_of_week) !== day.index) return false;
                           const startH = parseHourInt(s.start_time);
                           const endH = parseHourInt(s.end_time);
                           return hourInt >= startH && hourInt < endH;
@@ -246,7 +250,7 @@ export function DoctorScheduleCalendarModal({
             /* Card Grid Summary View */
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-3">
               {DAYS_OF_WEEK.map((day) => {
-                const daySlots = activeSchedules.filter((s) => s.day_of_week === day.index);
+                 const daySlots = activeSchedules.filter((s) => getDayIndex(s.day_of_week) === day.index);
                 return (
                   <div
                     key={day.index}
@@ -301,6 +305,25 @@ export function DoctorScheduleCalendarModal({
             </div>
           )}
 
+          {specificSchedules.length > 0 && (
+            <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <h4 className="text-xs font-bold text-amber-900">Jadwal Spesifik Bertanggal</h4>
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                {specificSchedules.map((slot) => (
+                  <button
+                    type="button"
+                    key={slot.id || `${slot.schedule_date}-${slot.start_time}`}
+                    onClick={() => setSelectedSlot(slot)}
+                    className="text-left p-3 bg-white border border-amber-200 rounded-lg hover:border-amber-400 transition-colors"
+                  >
+                    <span className="block text-xs font-bold text-amber-900">{slot.schedule_date}</span>
+                    <span className="block mt-1 text-xs text-gray-700">{slot.start_time} - {slot.end_time} · {slot.timezone || "Asia/Jakarta"}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Schedule Detail Breakdown Footer */}
           <div className="mt-6 bg-[#F8FAFC] border border-gray-200 p-4 rounded-xl flex flex-col gap-3">
             <h4 className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
@@ -309,7 +332,7 @@ export function DoctorScheduleCalendarModal({
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {activeSchedules.map((slot, idx) => {
-                const dayName = DAYS_OF_WEEK.find((d) => d.index === slot.day_of_week)?.name || `Hari ${slot.day_of_week}`;
+                 const dayName = DAYS_OF_WEEK.find((d) => d.index === getDayIndex(slot.day_of_week))?.name || (slot.schedule_date ? "Jadwal spesifik" : "Hari");
                 return (
                   <div
                     key={idx}
@@ -358,6 +381,7 @@ export function DoctorScheduleCalendarModal({
         roomName={roomName}
         departmentName={departmentName}
         onOpenEditModal={onOpenEditModal}
+        affiliationId={affiliationId}
       />
     </Dialog>
   );

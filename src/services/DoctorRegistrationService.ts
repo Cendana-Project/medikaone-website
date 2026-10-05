@@ -217,7 +217,7 @@ export const updateDoctorStatus = async (
 // ==========================================
 
 export const getScheduleChanges = async (hospitalId: string, status?: string): Promise<ScheduleChangeProposal[]> => {
-  const response = await api.get(`hospitals/${hospitalId}/doctor-affiliations/schedule-changes`, {
+  const response = await api.get(`hospitals/${hospitalId}/schedule-change-requests`, {
     params: status ? { status } : {},
   });
   return response.data?.data || response.data || [];
@@ -232,7 +232,7 @@ export const createScheduleChangeRequest = async (
   payload: CreateScheduleChangePayload
 ): Promise<ScheduleChangeProposal> => {
   const response = await api.post(
-    `hospitals/${hospitalId}/doctor-affiliations/${payload.affiliation_id}/schedule-changes`,
+    `hospitals/${hospitalId}/schedule-change-requests`,
     {
       reason: payload.reason,
       schedules: payload.schedules,
@@ -250,7 +250,7 @@ export const createSpecificScheduleRequest = async (
   payload: CreateSpecificSchedulePayload
 ): Promise<ScheduleChangeProposal> => {
   const response = await api.post(
-    `hospitals/${hospitalId}/doctor-affiliations/${payload.affiliation_id}/schedules/specific`,
+    `hospitals/${hospitalId}/specific-schedules`,
     {
       affiliation_id: payload.affiliation_id,
       reason: payload.reason,
@@ -274,10 +274,9 @@ export const createSpecificScheduleRequest = async (
  */
 export const deleteDoctorSchedule = async (
   hospitalId: string,
-  affiliationId: string,
   scheduleId: string
 ): Promise<void> => {
-  await api.delete(`hospitals/${hospitalId}/doctor-affiliations/${affiliationId}/schedules/${scheduleId}`);
+  await api.delete(`hospitals/${hospitalId}/schedules/${scheduleId}`);
 };
 
 /**
@@ -302,7 +301,7 @@ export const deactivateDoctorSchedule = async (
  * 5. Approve Schedule Change Proposal
  */
 export const approveScheduleChange = async (hospitalId: string, scheduleChangeId: string): Promise<void> => {
-  await api.post(`hospitals/${hospitalId}/doctor-affiliations/schedule-changes/${scheduleChangeId}/approve`);
+  await api.post(`hospitals/${hospitalId}/schedule-change-requests/${scheduleChangeId}/approve`);
 };
 export const approveScheduleChangeRequest = approveScheduleChange;
 
@@ -315,7 +314,7 @@ export const rejectScheduleChange = async (
   payload?: { reason?: string } | string
 ): Promise<void> => {
   const reason = typeof payload === "string" ? payload : payload?.reason;
-  await api.post(`hospitals/${hospitalId}/doctor-affiliations/schedule-changes/${scheduleChangeId}/reject`, {
+  await api.post(`hospitals/${hospitalId}/schedule-change-requests/${scheduleChangeId}/reject`, {
     reason,
   });
 };

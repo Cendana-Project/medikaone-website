@@ -34,8 +34,8 @@ export function CreateEmployeeModal({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error("Ukuran file maksimal 10MB");
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Ukuran file maksimal 5MB");
         return;
       }
       setPhoto(file);
@@ -75,7 +75,7 @@ export function CreateEmployeeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full sm:max-w-xl md:max-w-2xl p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-4 border-b border-gray-100">
           <DialogTitle className="text-2xl font-bold text-[#101828] tracking-tight">
             Buat Akun Baru
@@ -172,7 +172,7 @@ export function CreateEmployeeModal({
             </div>
             <div className="flex items-center gap-1.5 text-xs text-gray-400 italic">
               <Info className="h-3.5 w-3.5" />
-              <span>Maksimal file yaitu 10MB dengan format PNG. / JPG.</span>
+               <span>Maksimal file yaitu 5MB dengan format PNG / JPG.</span>
             </div>
           </div>
 

@@ -16,7 +16,7 @@ import { DoctorInvitationDetailModal } from "@/components/doctors/DoctorInvitati
 import { EditDoctorInvitationModal } from "@/components/doctors/EditDoctorInvitationModal";
 import ConfirmModal from "@/components/ui/confirm-modal";
 import { StatusFilterDropdown, StatusOption } from "@/components/ui/StatusFilterDropdown";
-import { handleApiError, handleApiSuccess } from "@/lib/handleError";
+import { handleApiSuccess } from "@/lib/handleError";
 import Cookies from "js-cookie";
 
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -435,4 +435,3 @@ export default function DoctorInvitationsPage() {
     </div>
   );
 }
-

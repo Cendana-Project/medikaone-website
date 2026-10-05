@@ -15,7 +15,7 @@ import { useGetGlobalDoctors, GlobalDoctorItem } from "@/hooks/doctorRegistratio
 import { useDeleteDoctorAffiliation } from "@/hooks/doctorRegistration/useDeleteDoctorAffiliation";
 import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
 import { DoctorAffiliation, DoctorSchedule } from "@/types/doctorRegistration";
-import { handleApiError, handleApiSuccess } from "@/lib/handleError";
+import { handleApiSuccess } from "@/lib/handleError";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 

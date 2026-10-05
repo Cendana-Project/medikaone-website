@@ -11,7 +11,6 @@ import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { useGetRooms } from "@/hooks/doctorRegistration/useGetRooms";
 import { useDeleteRoom } from "@/hooks/doctorRegistration/useDeleteRoom";
 import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
-import { handleApiError } from "@/lib/handleError";
 import Cookies from "js-cookie";
 
 interface RoomRow {

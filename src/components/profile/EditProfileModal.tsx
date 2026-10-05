@@ -201,7 +201,7 @@ export default function EditProfileModal({
     return (
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-                <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-full sm:max-w-xl md:max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-max max-w-[calc(100vw-2rem)] overflow-hidden flex flex-col max-h-[90vh]">
                     {/* Modal Header */}
                     <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                         <div className="flex items-center gap-2">

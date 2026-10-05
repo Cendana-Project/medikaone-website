@@ -94,7 +94,7 @@ export default function RegisterHospitalModal({
     return (
         <>
             <Dialog open={isOpen} onOpenChange={(open) => !open && handleModalClose()}>
-                <DialogContent className="w-full sm:max-w-xl md:max-w-2xl bg-white rounded-2xl p-0 max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border-0">
+                <DialogContent className="w-max max-w-[calc(100vw-2rem)] bg-white rounded-2xl p-0 max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border-0">
                     {/* Modal Header */}
                     <div className="px-7 pt-7 pb-4 border-b border-gray-100 shrink-0">
                         <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">
