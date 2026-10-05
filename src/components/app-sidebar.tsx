@@ -76,6 +76,7 @@ const getMenuIcon = (name: string, isActive: boolean) => {
         case "Data User":
             return <Users size={iconSize} style={{ color: iconColor }} />;
         case "Detail Pasien":
+        case "Verifikasi Pasien":
             return <Stethoscope size={iconSize} style={{ color: iconColor }} />;
         case "Riwayat Pemasukan":
             return <TrendingUp size={iconSize} style={{ color: iconColor }} />;
@@ -304,4 +305,4 @@ export function AppSidebar({ role }: AppSidebarProps) {
             </SidebarFooter>
         </Sidebar>
     );
-}
+}

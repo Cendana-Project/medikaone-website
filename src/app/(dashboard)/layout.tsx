@@ -26,6 +26,18 @@ const getHeaderInfo = (pathname: string) => {
     if (pathname.includes("/rooms")) {
         return { title: "Kelola Ruangan", badge: null };
     }
+    if (pathname.includes("/appointments")) {
+        return { title: "Appointment", badge: null };
+    }
+    if (pathname.includes("/patients")) {
+        return { title: "Verifikasi Pasien", badge: null };
+    }
+    if (pathname.includes("/queue")) {
+        return { title: "Antrean Pasien", badge: null };
+    }
+    if (pathname.includes("/doctor-schedule")) {
+        return { title: "Jadwal Dokter", badge: null };
+    }
     if (pathname.includes("/system")) {
         return { title: "System Setting", badge: null };
     }
