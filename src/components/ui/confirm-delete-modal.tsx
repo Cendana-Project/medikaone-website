@@ -30,7 +30,7 @@ export function ConfirmDeleteModal({
 }: ConfirmDeleteModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full sm:max-w-lg md:max-w-xl p-6 bg-white rounded-2xl sm:rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
+      <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-6 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
         <DialogHeader className="flex flex-col items-center justify-center text-center pt-4 pb-2">
           {/* Circular Soft Red Trash Icon Container */}
           <div className="relative w-24 h-24 rounded-full bg-red-50 flex items-center justify-center mb-4">

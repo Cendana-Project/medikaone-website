@@ -32,7 +32,7 @@ export function HospitalDetailModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="w-full sm:max-w-2xl md:max-w-3xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+        <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
           {/* Header */}
           <div className="p-6 bg-linear-to-r from-[#008A72] to-[#3BB49F] text-white shrink-0">
             <div className="flex items-center justify-between">

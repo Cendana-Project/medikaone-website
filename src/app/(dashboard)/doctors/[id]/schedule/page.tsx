@@ -21,6 +21,7 @@ import {
   Eye,
 } from "lucide-react";
 import { SlotDetailModal } from "@/components/doctors/SlotDetailModal";
+import { getDayIndex, normalizeSchedules } from "@/lib/scheduleUtils";
 
 const DAYS_OF_WEEK = [
   { index: 1, name: "Senin", short: "Sen" },
@@ -37,11 +38,6 @@ const HOURS_24 = Array.from({ length: 24 }, (_, i) => {
   return `${hour}:00`;
 });
 
-const getDayIndex = (dayOfWeek: number | number[]): number => {
-  if (Array.isArray(dayOfWeek)) return dayOfWeek[0] ?? 1;
-  return dayOfWeek;
-};
-
 export default function DoctorSchedulePage() {
   const params = useParams();
   const router = useRouter();
@@ -51,22 +47,12 @@ export default function DoctorSchedulePage() {
   const [viewMode, setViewMode] = useState<"24h-grid" | "cards">("24h-grid");
   const [selectedSlot, setSelectedSlot] = useState<DoctorSchedule | null>(null);
 
-  const { doctors } = useGetDoctors(hospitalId);
+  const { doctors, refetch } = useGetDoctors(hospitalId);
   const foundDoctor = doctors.find((d) => d.doctor_id === doctorId || d.id === doctorId || d.affiliation_id === doctorId);
 
-  let rawSchedules = foundDoctor?.schedules;
-  if (typeof rawSchedules === "string") {
-    try {
-      rawSchedules = JSON.parse(rawSchedules);
-    } catch {
-      rawSchedules = [];
-    }
-  }
+  const doctorSchedules: DoctorSchedule[] = normalizeSchedules(foundDoctor);
 
-  const doctorSchedules: DoctorSchedule[] =
-    Array.isArray(rawSchedules) && rawSchedules.length > 0
-      ? rawSchedules
-      : [];
+  const specificSchedules = doctorSchedules.filter((schedule) => Boolean(schedule.schedule_date));
 
   const doctorData = {
     doctorName: foundDoctor ? `${foundDoctor.first_name} ${foundDoctor.last_name}` : "Dokter",
@@ -351,6 +337,25 @@ export default function DoctorSchedulePage() {
             </div>
           )}
 
+          {specificSchedules.length > 0 && (
+            <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <h3 className="text-sm font-bold text-amber-900">Jadwal Spesifik Bertanggal</h3>
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                {specificSchedules.map((slot) => (
+                  <button
+                    type="button"
+                    key={slot.id || `${slot.schedule_date}-${slot.start_time}`}
+                    onClick={() => setSelectedSlot(slot)}
+                    className="text-left p-3 bg-white border border-amber-200 rounded-lg hover:border-amber-400 transition-colors"
+                  >
+                    <span className="block text-xs font-bold text-amber-900">{slot.schedule_date}</span>
+                    <span className="block mt-1 text-xs text-gray-700">{slot.start_time} - {slot.end_time} · {slot.timezone || "Asia/Jakarta"}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="mt-6 p-4 bg-[#EBF8F5] border border-[#C4E9E2] rounded-xl flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-[#008A72] font-semibold">
               <CheckCircle2 className="h-4 w-4" />
@@ -371,6 +376,8 @@ export default function DoctorSchedulePage() {
         roomName={doctorData.roomName}
         departmentName={doctorData.departmentName}
         onOpenEditModal={() => router.push("/doctors/schedule-changes")}
+        affiliationId={foundDoctor?.affiliation_id || foundDoctor?.id}
+        onScheduleChanged={() => refetch()}
       />
     </div>
   );

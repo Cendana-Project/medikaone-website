@@ -48,8 +48,8 @@ export function HospitalGalleryModal({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.size > 10 * 1024 * 1024) {
-        handleApiError(new Error("Ukuran foto maksimal 10 MB."));
+      if (file.size > 5 * 1024 * 1024) {
+        handleApiError(new Error("Ukuran foto maksimal 5 MB."));
         return;
       }
       setSelectedFile(file);
@@ -117,7 +117,7 @@ export function HospitalGalleryModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="w-full sm:max-w-3xl md:max-w-4xl lg:max-w-5xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+        <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
           {/* Header */}
           <div className="px-7 pt-7 pb-4 border-b border-gray-100 shrink-0 flex items-center justify-between">
             <div>
@@ -141,7 +141,7 @@ export function HospitalGalleryModal({
                 <span className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
                   <Upload className="h-4 w-4 text-[#3BB49F]" /> Unggah Foto Galeri Baru
                 </span>
-                <span className="text-[11px] text-gray-500">Format PNG / JPEG, Maks. 10 MB</span>
+                <span className="text-[11px] text-gray-500">Format PNG / JPEG, Maks. 5 MB</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

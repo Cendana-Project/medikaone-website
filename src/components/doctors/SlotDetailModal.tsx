@@ -10,6 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DoctorSchedule } from "@/types/doctorRegistration";
 import { Clock, Calendar, Users, Globe, CheckCircle2, AlertCircle, MapPin, User, Edit3 } from "lucide-react";
+import Cookies from "js-cookie";
+import { useDeleteDoctorSchedule } from "@/hooks/doctorRegistration/useDeleteDoctorSchedule";
+import { useDeactivateDoctorSchedule } from "@/hooks/doctorRegistration/useDeactivateDoctorSchedule";
+import { handleApiError } from "@/lib/handleError";
 
 interface SlotDetailModalProps {
   isOpen: boolean;
@@ -20,6 +24,8 @@ interface SlotDetailModalProps {
   roomName?: string;
   departmentName?: string;
   onOpenEditModal?: () => void;
+  affiliationId?: string;
+  onScheduleChanged?: () => void;
 }
 
 const DAYS = [
@@ -41,7 +47,13 @@ export function SlotDetailModal({
   roomName = "-",
   departmentName = "-",
   onOpenEditModal,
+  affiliationId,
+  onScheduleChanged,
 }: SlotDetailModalProps) {
+  const hospitalId = Cookies.get("hospitalId") || "";
+  const deleteMutation = useDeleteDoctorSchedule(hospitalId);
+  const deactivateMutation = useDeactivateDoctorSchedule(hospitalId);
+
   if (!slot) return null;
 
   const dayIndex = Array.isArray(slot.day_of_week)
@@ -52,10 +64,39 @@ export function SlotDetailModal({
 
   const dayObj = DAYS.find((d) => d.index === dayIndex) || { name: `Hari ${dayIndex}` };
   const isFixedSlot = slot.booking_mode === "FIXED_SLOT";
+  const isRecurring = !slot.schedule_date && typeof dayIndex === "number";
+  const canManage = Boolean(affiliationId && slot.id);
+
+  const handleDelete = async () => {
+    if (!slot.id || !canManage || !window.confirm("Ajukan penghapusan slot jadwal ini?")) return;
+    try {
+      await deleteMutation.mutateAsync({ scheduleId: slot.id });
+      onScheduleChanged?.();
+      onClose();
+    } catch (error) {
+      handleApiError(error, "Gagal mengajukan penghapusan jadwal");
+    }
+  };
+
+  const handleDeactivate = async () => {
+    if (!affiliationId || !isRecurring || !window.confirm(`Ajukan penonaktifan seluruh jadwal ${dayObj.name}?`)) return;
+    try {
+      await deactivateMutation.mutateAsync({
+        affiliation_id: affiliationId,
+        scope: "RECURRING_DAY",
+        day_of_week: dayIndex,
+        reason: `Penonaktifan jadwal ${dayObj.name}`,
+      });
+      onScheduleChanged?.();
+      onClose();
+    } catch (error) {
+      handleApiError(error, "Gagal mengajukan penonaktifan jadwal");
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-full sm:max-w-xl md:max-w-2xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden">
+      <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden">
         {/* Header Section */}
         <div className="p-6 bg-linear-to-r from-[#008A72] to-[#3BB49F] text-white">
           <div className="flex items-center justify-between gap-4">
@@ -154,7 +195,7 @@ export function SlotDetailModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
           <Button
             type="button"
             variant="outline"
@@ -164,19 +205,24 @@ export function SlotDetailModal({
             Tutup
           </Button>
 
-          {onOpenEditModal && (
-            <Button
-              type="button"
-              onClick={() => {
-                onClose();
-                onOpenEditModal();
-              }}
-              className="py-2.5 px-6 h-10 text-xs font-semibold bg-[#008A72] hover:bg-[#007661] text-white rounded-xl cursor-pointer shadow-xs flex items-center gap-1.5"
-            >
-              <Edit3 className="h-3.5 w-3.5" />
-              <span>Ajukan Perubahan Jadwal</span>
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {canManage && (
+              <Button type="button" variant="outline" onClick={handleDelete} disabled={deleteMutation.isPending || deactivateMutation.isPending} className="h-10 rounded-xl border-rose-200 text-rose-700 hover:bg-rose-50 text-xs">
+                {deleteMutation.isPending ? "Mengajukan..." : "Hapus Jadwal"}
+              </Button>
+            )}
+            {isRecurring && affiliationId && (
+              <Button type="button" variant="outline" onClick={handleDeactivate} disabled={deleteMutation.isPending || deactivateMutation.isPending} className="h-10 rounded-xl border-amber-200 text-amber-700 hover:bg-amber-50 text-xs">
+                {deactivateMutation.isPending ? "Mengajukan..." : "Nonaktifkan Hari"}
+              </Button>
+            )}
+            {onOpenEditModal && (
+              <Button type="button" onClick={() => { onClose(); onOpenEditModal(); }} className="py-2.5 px-6 h-10 text-xs font-semibold bg-[#008A72] hover:bg-[#007661] text-white rounded-xl cursor-pointer shadow-xs flex items-center gap-1.5">
+                <Edit3 className="h-3.5 w-3.5" />
+                <span>Ajukan Perubahan Jadwal</span>
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

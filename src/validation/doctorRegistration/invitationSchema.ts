@@ -16,5 +16,5 @@ export const createInvitationSchema = z.object({
     contract: z
         .instanceof(File, { message: "File kontrak PDF wajib diunggah" })
         .refine((file) => file.type === "application/pdf", "File harus format PDF")
-        .refine((file) => file.size <= 10 * 1024 * 1024, "Ukuran file maksimal 10MB"),
+        .refine((file) => file.size <= 5 * 1024 * 1024, "Ukuran file maksimal 5MB"),
 });

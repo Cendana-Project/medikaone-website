@@ -14,7 +14,7 @@ import { useGetContractUrl } from "@/hooks/doctorRegistration/useGetContractUrl"
 import { useCancelDoctorInvitation } from "@/hooks/doctorRegistration/useCancelDoctorInvitation";
 import { useResendDoctorInvitation } from "@/hooks/doctorRegistration/useResendDoctorInvitation";
 import { useDeleteDoctorInvitation } from "@/hooks/doctorRegistration/useDeleteDoctorInvitation";
-import { handleApiError, handleApiSuccess } from "@/lib/handleError";
+import { handleApiSuccess } from "@/lib/handleError";
 import ConfirmModal from "@/components/ui/confirm-modal";
 import { FileText, Send, XCircle, ExternalLink, Calendar, Clock, MapPin, Building, Trash2 } from "lucide-react";
 import Cookies from "js-cookie";
@@ -90,7 +90,7 @@ export function DoctorInvitationDetailModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="w-full sm:max-w-2xl md:max-w-3xl p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-8 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
           <DialogHeader className="pb-4 border-b border-gray-100 flex flex-row items-center justify-between">
             <div>
               <DialogTitle className="text-2xl font-bold text-[#101828] tracking-tight">

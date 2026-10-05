@@ -427,7 +427,7 @@ export default function ScheduleChangesPage() {
       {/* Detail & Confirmation Modal */}
       {selectedProposal && (
         <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-          <DialogContent className="w-full sm:max-w-2xl md:max-w-3xl p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+          <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-0 bg-white rounded-2xl border-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <DialogHeader className="p-6 bg-linear-to-r from-[#008A72] to-[#3BB49F] text-white shrink-0">
               <div className="flex items-center justify-between gap-4">
                 <div>
@@ -601,7 +601,7 @@ export default function ScheduleChangesPage() {
 
       {/* Reject Reason Dialog */}
       <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
-        <DialogContent className="w-full sm:max-w-md p-6 bg-white rounded-2xl border border-gray-100 shadow-2xl">
+        <DialogContent className="w-max max-w-[calc(100vw-2rem)] p-6 bg-white rounded-2xl border border-gray-100 shadow-2xl">
           <DialogHeader className="pb-3">
             <DialogTitle className="text-lg font-bold text-gray-900">Alasan Penolakan Pengajuan</DialogTitle>
           </DialogHeader>

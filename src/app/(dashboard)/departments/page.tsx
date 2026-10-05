@@ -11,7 +11,6 @@ import { ConfirmDeleteModal } from "@/components/ui/confirm-delete-modal";
 import { useGetDepartments } from "@/hooks/doctorRegistration/useGetDepartments";
 import { useDeleteDepartment } from "@/hooks/doctorRegistration/useDeleteDepartment";
 import { useGetUserInfo } from "@/hooks/auth/useGetUserInfo";
-import { handleApiError } from "@/lib/handleError";
 import Cookies from "js-cookie";
 
 export default function DepartmentsPage() {

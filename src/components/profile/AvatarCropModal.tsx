@@ -191,7 +191,7 @@ export default function AvatarCropModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-md bg-white rounded-xl p-6">
+            <DialogContent className="w-max max-w-[calc(100vw-2rem)] bg-white rounded-xl p-6">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-bold text-gray-900">
                         Sesuaikan Position Foto
