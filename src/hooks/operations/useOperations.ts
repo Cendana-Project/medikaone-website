@@ -5,13 +5,19 @@ import { handleApiError, handleApiSuccess } from "@/lib/handleError";
 import {
   cancelAppointment,
   confirmCheckIn,
+  correctVitals,
   createWalkInAppointment,
+  finalizeVitals,
+  getExamination,
+  getPrescription,
+  getPrescriptionDocumentUrl,
   listAppointmentQueue,
   listAppointments,
   listHospitalDoctors,
   lookupPatientForCheckIn,
+  saveVitalsDraft,
 } from "@/services/OperationsService";
-import { CreateWalkInPayload } from "@/types/operations";
+import { CreateWalkInPayload, VitalsInput } from "@/types/operations";
 
 export const useAppointments = (hospitalId: string, date?: string, status?: string) => {
   const query = useQuery({
@@ -87,3 +93,69 @@ export const useCreateWalkInAppointment = (hospitalId: string) => {
     onError: (error) => handleApiError(error, "Gagal membuat appointment walk-in"),
   });
 };
+
+export const useExamination = (hospitalId: string, appointmentId?: string) => {
+  const query = useQuery({
+    queryKey: ["examination", hospitalId, appointmentId],
+    queryFn: () => getExamination(hospitalId, appointmentId as string),
+    enabled: Boolean(hospitalId && appointmentId),
+  });
+  return { examination: query.data, ...query };
+};
+
+export const useSaveVitalsDraft = (hospitalId: string) => {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { appointmentId: string; vitals: VitalsInput }) =>
+      saveVitalsDraft(hospitalId, input.appointmentId, input.vitals),
+    onSuccess: (_data, input) => {
+      handleApiSuccess(undefined, "Draft tanda vital tersimpan");
+      client.invalidateQueries({ queryKey: ["examination", hospitalId, input.appointmentId] });
+    },
+    onError: (error) => handleApiError(error, "Gagal menyimpan draft tanda vital"),
+  });
+};
+
+export const useFinalizeVitals = (hospitalId: string) => {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { appointmentId: string; vitals: VitalsInput }) =>
+      saveVitalsDraft(hospitalId, input.appointmentId, input.vitals).then(() => finalizeVitals(hospitalId, input.appointmentId)),
+    onSuccess: (_data, input) => {
+      handleApiSuccess(undefined, "Tanda vital difinalisasi", "Pasien diteruskan ke antrean dokter.");
+      client.invalidateQueries({ queryKey: ["examination", hospitalId, input.appointmentId] });
+      client.invalidateQueries({ queryKey: ["appointments", hospitalId] });
+      client.invalidateQueries({ queryKey: ["appointmentQueue", hospitalId] });
+    },
+    onError: (error) => handleApiError(error, "Gagal memfinalisasi tanda vital"),
+  });
+};
+
+export const useCorrectVitals = (hospitalId: string) => {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { appointmentId: string; vitals: VitalsInput; reason: string }) =>
+      correctVitals(hospitalId, input.appointmentId, input.vitals, input.reason),
+    onSuccess: (_data, input) => {
+      handleApiSuccess(undefined, "Koreksi tanda vital tercatat");
+      client.invalidateQueries({ queryKey: ["examination", hospitalId, input.appointmentId] });
+    },
+    onError: (error) => handleApiError(error, "Gagal mengoreksi tanda vital"),
+  });
+};
+
+export const usePrescription = (hospitalId: string, appointmentId?: string) => {
+  const query = useQuery({
+    queryKey: ["prescription", hospitalId, appointmentId],
+    queryFn: () => getPrescription(hospitalId, appointmentId as string),
+    enabled: Boolean(hospitalId && appointmentId),
+    retry: false,
+  });
+  return { prescription: query.data, ...query };
+};
+
+export const usePrescriptionDocumentUrl = (hospitalId: string) => useMutation({
+  mutationFn: (appointmentId: string) => getPrescriptionDocumentUrl(hospitalId, appointmentId),
+  onSuccess: (data) => window.open(data.url, "_blank", "noopener,noreferrer"),
+  onError: (error) => handleApiError(error, "Gagal membuka PDF resep"),
+});

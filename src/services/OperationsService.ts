@@ -4,7 +4,12 @@ import {
   AppointmentQueueResponse,
   CheckInCandidate,
   CreateWalkInPayload,
+  Examination,
   HospitalAppointment,
+  HospitalPrescription,
+  PrescriptionDocumentUrl,
+  VitalsInput,
+  VitalsRecord,
 } from "@/types/operations";
 
 const unwrap = <T>(response: { data?: { data?: T } | T }): T => {
@@ -84,3 +89,44 @@ export const listHospitalDoctors = async (hospitalId: string): Promise<DoctorAff
 
 export const getDoctorSchedules = (doctor: DoctorAffiliation): DoctorSchedule[] =>
   doctor.schedule_groups?.flatMap((group) => group.schedules || []) || doctor.schedules || [];
+
+const examinationPath = (hospitalId: string, appointmentId: string) =>
+  `hospitals/${hospitalId}/appointments/${appointmentId}/examination`;
+
+export const getExamination = async (hospitalId: string, appointmentId: string): Promise<Examination> => {
+  const response = await api.get(examinationPath(hospitalId, appointmentId));
+  return unwrap<Examination>(response);
+};
+
+export const saveVitalsDraft = async (hospitalId: string, appointmentId: string, vitals: VitalsInput): Promise<VitalsRecord> => {
+  const response = await api.put(`${examinationPath(hospitalId, appointmentId)}/vitals`, vitals);
+  return unwrap<{ vitals: VitalsRecord }>(response).vitals;
+};
+
+export const finalizeVitals = async (hospitalId: string, appointmentId: string): Promise<VitalsRecord> => {
+  const response = await api.post(`${examinationPath(hospitalId, appointmentId)}/vitals/finalize`);
+  return unwrap<{ vitals: VitalsRecord }>(response).vitals;
+};
+
+export const correctVitals = async (
+  hospitalId: string,
+  appointmentId: string,
+  vitals: VitalsInput,
+  correctionReason: string
+): Promise<VitalsRecord> => {
+  const response = await api.post(`${examinationPath(hospitalId, appointmentId)}/vitals/corrections`, {
+    ...vitals,
+    correction_reason: correctionReason,
+  });
+  return unwrap<{ vitals: VitalsRecord }>(response).vitals;
+};
+
+export const getPrescription = async (hospitalId: string, appointmentId: string): Promise<HospitalPrescription> => {
+  const response = await api.get(`hospitals/${hospitalId}/appointments/${appointmentId}/prescription`);
+  return unwrap<HospitalPrescription>(response);
+};
+
+export const getPrescriptionDocumentUrl = async (hospitalId: string, appointmentId: string): Promise<PrescriptionDocumentUrl> => {
+  const response = await api.get(`hospitals/${hospitalId}/appointments/${appointmentId}/prescription/document-url`);
+  return unwrap<PrescriptionDocumentUrl>(response);
+};

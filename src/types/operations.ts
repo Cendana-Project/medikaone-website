@@ -80,3 +80,56 @@ export type CreateWalkInPayload = {
   capacity_override?: boolean;
   capacity_override_reason?: string;
 };
+
+export type VitalsInput = {
+  height_cm?: number;
+  weight_kg?: number;
+  temperature_c?: number;
+  systolic_mmhg?: number;
+  diastolic_mmhg?: number;
+  heart_rate_bpm?: number;
+  respiratory_rate_bpm?: number;
+  oxygen_saturation_percent?: number;
+  nurse_note?: string;
+};
+
+export type VitalsRecord = VitalsInput & {
+  version?: number;
+  status?: "DRAFT" | "FINALIZED";
+  bmi?: number;
+};
+
+export type Examination = {
+  id: string;
+  appointment_id: string;
+  patient_name?: string;
+  patient_allergies?: string;
+  patient_medical_history?: string;
+  reason_for_visit?: string;
+  vitals?: VitalsRecord;
+};
+
+export type PrescriptionItem = {
+  order: number;
+  medication_name: string;
+  strength?: string;
+  dose_amount?: number;
+  dose_unit?: string;
+  frequency_per_day?: number;
+  duration_value?: number;
+  duration_unit?: string;
+  quantity?: number;
+  quantity_unit?: string;
+  directions?: string;
+};
+
+export type HospitalPrescription = {
+  id: string;
+  prescription_number?: string;
+  patient_name?: string;
+  doctor_name?: string;
+  status?: string;
+  current_revision?: { issued_at?: string; items?: PrescriptionItem[] };
+};
+
+export type PrescriptionDocumentUrl = { url: string; expires_at?: string };

@@ -30,7 +30,6 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
 
     NURSE: [
         { name: "Antrian Pasien", path: "/queue" },
-        { name: "Verifikasi Pasien", path: "/patients" },
     ],
 
     BOD: [
