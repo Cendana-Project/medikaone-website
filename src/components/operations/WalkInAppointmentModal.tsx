@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreateWalkInAppointment, useHospitalDoctors } from "@/hooks/operations/useOperations";
 import { getDoctorSchedules } from "@/services/OperationsService";
+import { DoctorSchedule } from "@/types/doctorRegistration";
 import Cookies from "js-cookie";
 
 export function WalkInAppointmentModal({ isOpen, onClose, onSuccess }: { isOpen: boolean; onClose: () => void; onSuccess?: () => void }) {
@@ -24,20 +25,28 @@ export function WalkInAppointmentModal({ isOpen, onClose, onSuccess }: { isOpen:
   const [reason, setReason] = useState("");
 
   const doctor = doctors.find((item) => (item.affiliation_id || item.doctor_id) === doctorId);
-  const schedules = doctor ? getDoctorSchedules(doctor).filter((item) => item.status === "ACTIVE" || !item.status) : [];
+  const now = new Date();
+  const todayDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const isForToday = (item: DoctorSchedule) =>
+    item.schedule_date ? item.schedule_date === todayDate : [item.day_of_week].flat().includes(now.getDay());
+  const schedules = doctor ? getDoctorSchedules(doctor).filter((item) => (item.status === "ACTIVE" || !item.status) && isForToday(item)) : [];
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    await mutation.mutateAsync({
-      idempotencyKey: crypto.randomUUID(),
-      payload: {
-        schedule_id: scheduleId,
-        patient: { first_name: firstName, last_name: lastName || undefined, phone, date_of_birth: dob, gender, identity_type: "NIK", identity_number: identityNumber },
-        reason_for_visit: reason,
-        consent_version: "walk-in-consent-v1",
-      },
-    });
-    onSuccess?.();
+    try {
+      await mutation.mutateAsync({
+        idempotencyKey: crypto.randomUUID(),
+        payload: {
+          schedule_id: scheduleId,
+          patient: { first_name: firstName, last_name: lastName || undefined, phone, date_of_birth: dob, gender, identity_type: "NIK", identity_number: identityNumber },
+          reason_for_visit: reason,
+          consent_version: "walk-in-consent-v1",
+        },
+      });
+      onSuccess?.();
+    } catch {
+      return; // error toast is shown by the mutation's onError
+    }
     onClose();
   };
 
@@ -47,7 +56,7 @@ export function WalkInAppointmentModal({ isOpen, onClose, onSuccess }: { isOpen:
         <DialogHeader><DialogTitle>Buat Appointment Walk-in</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0 sm:min-w-[34rem]">
           <div className="sm:col-span-2"><Label>Dokter</Label><select required value={doctorId} onChange={(e) => { setDoctorId(e.target.value); setScheduleId(""); }} className="mt-1 h-10 w-full rounded-md border px-3 text-sm"><option value="">Pilih dokter</option>{doctors.map((item) => <option key={item.affiliation_id || item.doctor_id} value={item.affiliation_id || item.doctor_id}>{item.doctor_name || `${item.first_name || ""} ${item.last_name || ""}`.trim()}</option>)}</select></div>
-          <div className="sm:col-span-2"><Label>Jadwal hari ini</Label><select required value={scheduleId} onChange={(e) => setScheduleId(e.target.value)} className="mt-1 h-10 w-full rounded-md border px-3 text-sm"><option value="">Pilih jadwal</option>{schedules.filter((item) => item.id).map((item) => <option key={item.id} value={item.id}>{item.start_time} - {item.end_time}</option>)}</select></div>
+          <div className="sm:col-span-2"><Label>Jadwal hari ini</Label><select required value={scheduleId} onChange={(e) => setScheduleId(e.target.value)} className="mt-1 h-10 w-full rounded-md border px-3 text-sm"><option value="">Pilih jadwal</option>{schedules.filter((item) => item.id).map((item) => <option key={item.id} value={item.id}>{item.start_time} - {item.end_time}</option>)}</select>{doctor && schedules.length === 0 && <p className="mt-1 text-xs text-amber-600">Dokter ini tidak memiliki jadwal aktif hari ini.</p>}</div>
           <div><Label>Nama depan</Label><Input required value={firstName} onChange={(e) => setFirstName(e.target.value)} /></div>
           <div><Label>Nama belakang</Label><Input value={lastName} onChange={(e) => setLastName(e.target.value)} /></div>
           <div><Label>No. telepon</Label><Input required value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
