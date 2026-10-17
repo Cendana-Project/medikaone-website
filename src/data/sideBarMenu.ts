@@ -25,11 +25,13 @@ const baseMenus: Record<string, SidebarMenuItem[]> = {
     RECEPTIONIST: [
         { name: "Data Appointment", path: "/appointments" },
         { name: "Verifikasi Pasien", path: "/patients" },
+        { name: "Antrian Pasien", path: "/queue" },
         { name: "Cek Jadwal Dokter", path: "/doctor-schedule" },
     ],
 
     NURSE: [
         { name: "Antrian Pasien", path: "/queue" },
+        { name: "Cek Jadwal Dokter", path: "/doctor-schedule" },
     ],
 
     BOD: [
